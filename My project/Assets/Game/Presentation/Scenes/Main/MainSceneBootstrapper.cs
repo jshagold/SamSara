@@ -3,7 +3,7 @@ using UnityEngine;
 public class MainSceneBootstrapper : MonoBehaviour
 {
     [Header("UI Views")]
-    [SerializeField] private TopHUDView _topHudView;
+    [SerializeField] private HUDBootstrapper _hudBootstrapper;
     [SerializeField] private MainContentView _mainContentView;
     [SerializeField] private MainBackgroundView _backgroundView;
 
@@ -20,9 +20,8 @@ public class MainSceneBootstrapper : MonoBehaviour
         _backgroundPresenter = new MainBackgroundPresenter(_backgroundView);
         _backgroundPresenter.Initialize();
 
-        // 2. HUD Presenter 조립
-        _hudPresenter = new TopHUDPresenter(_topHudView);
-        _hudPresenter.Initialize();
+        // 2. HUD Bootstrapper
+        _hudBootstrapper.Initialize();
 
         // 3. Content Presenter 조립
         _contentPresenter = new MainContentPresenter(_mainContentView);
