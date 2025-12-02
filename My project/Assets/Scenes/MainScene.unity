@@ -150,10 +150,10 @@ RectTransform:
   - {fileID: 679291084}
   m_Father: {fileID: 1281800752}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &312816586
 GameObject:
@@ -166,6 +166,7 @@ GameObject:
   - component: {fileID: 312816587}
   - component: {fileID: 312816589}
   - component: {fileID: 312816588}
+  - component: {fileID: 312816590}
   m_Layer: 5
   m_Name: Background_View
   m_TagString: Untagged
@@ -230,6 +231,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 312816586}
   m_CullTransparentMesh: 1
+--- !u!114 &312816590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 312816586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbefc4c45c99e4b49a3e20ceeab5b0fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainBackgroundView
+  _backgroundImage: {fileID: 0}
+  _backgrounds: []
 --- !u!1 &395038127
 GameObject:
   m_ObjectHideFlags: 0
@@ -287,7 +302,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Button
+  m_text: Option
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -531,8 +546,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 160, y: 30}
+  m_AnchoredPosition: {x: 237.90607, y: 35}
+  m_SizeDelta: {x: 164.1879, y: 30.7852}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &799121169
 MonoBehaviour:
@@ -764,6 +779,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MainSceneBootstrapper
   _topHudView: {fileID: 0}
   _mainContentView: {fileID: 0}
+  _backgroundView: {fileID: 0}
 --- !u!4 &1614476108
 Transform:
   m_ObjectHideFlags: 0
@@ -811,10 +827,10 @@ RectTransform:
   - {fileID: 799121168}
   m_Father: {fileID: 1281800752}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 190}
+  m_SizeDelta: {x: 0, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1726999196
 GameObject:
@@ -847,10 +863,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1641179116}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 0, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1726999198
 MonoBehaviour:
