@@ -4,28 +4,25 @@ public class MainSceneBootstrapper : MonoBehaviour
 {
     [Header("UI Views")]
     [SerializeField] private HUDBootstrapper _hudBootstrapper;
-    [SerializeField] private MainContentView _mainContentView;
-    [SerializeField] private MainBackgroundView _backgroundView;
-
-    // Presenter 보관
-    private TopHUDPresenter _hudPresenter;
-    private MainContentPresenter _contentPresenter;
-    private MainBackgroundPresenter _backgroundPresenter;
+    [SerializeField] private ContentBootstrapper _contentBootstrapper;
+    [SerializeField] private BackgroundBootstrapper _backgroundBootstrapper;
 
     private void Awake()
     {
         Debug.Log(">>> MainScene Bootstrapping Start");
-        
+
+        IUserInventroyRepository userInventoryRepository = new UserInventoryRepository();
+        var getMoneyUseCase = new GetMoneyUseCase(userInventoryRepository);
+
+
         // 1. Background Presenter 조립
-        _backgroundPresenter = new MainBackgroundPresenter(_backgroundView);
-        _backgroundPresenter.Initialize();
+        _backgroundBootstrapper.Initialize();
 
         // 2. HUD Bootstrapper
-        _hudBootstrapper.Initialize();
+        _hudBootstrapper.Initialize(getMoneyUseCase);
 
         // 3. Content Presenter 조립
-        _contentPresenter = new MainContentPresenter(_mainContentView);
-        _contentPresenter.Initialize();
+        _contentBootstrapper.Initialize();
 
     }
 

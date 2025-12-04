@@ -3,21 +3,31 @@ using UnityEngine;
 public class TopHUDPresenter
 {
     private readonly TopHUDView _view;
+    
 
-    public TopHUDPresenter(TopHUDView view)
+    // 로직
+    private readonly GetMoneyUseCase _moneyUseCase;
+
+    public TopHUDPresenter(TopHUDView view, GetMoneyUseCase moneyUseCase)
     {
         _view = view;
+        _moneyUseCase = moneyUseCase;
     }
 
     public void Initialize()
     {
+        UserInventory inventory = _moneyUseCase.GetInventory();
+
         _view.OnOptionClicked += HandleOptionClick;
         _view.UpdateStatus("Ready");
+        _view.UpdateMoney(inventory.Money.ToString());
     }
+
 
     private void HandleOptionClick()
     {
         Debug.Log("[HUD] 옵션 버튼 클릭됨 -> 팝업을 띄우거나 씬 이동");
         _view.UpdateStatus("Paused");
     }
+
 }
