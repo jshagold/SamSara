@@ -5,6 +5,7 @@
 
 ### 데이터 및 로직 흐름도 (Flow Summary)
 
+```mermaid
 sequenceDiagram
     participant User
     participant View
@@ -28,3 +29,4 @@ sequenceDiagram
     Entity->>Presenter: 7. OnExpChanged 이벤트 발생 (Observer)
     Presenter->>View: 8. UpdateUI(newExp) 호출
     View-->>User: 9. 화면 갱신 (텍스트 변경)
+```
