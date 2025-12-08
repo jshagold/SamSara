@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+
 public class GetMoneyUseCase
 {
     private readonly IUserInventroyRepository _userInventroyRepository;
@@ -8,9 +10,9 @@ public class GetMoneyUseCase
     }
 
 
-    public UserInventory GetInventory()
+    public UniTask<UserInventory> LoadInventoryAsync()
     {
-        return _userInventroyRepository.LoadInventory();
+        return _userInventroyRepository.LoadInventoryAsync();
     }
 
 }
