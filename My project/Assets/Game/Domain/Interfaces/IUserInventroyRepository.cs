@@ -1,6 +1,8 @@
 
+using Cysharp.Threading.Tasks;
+
 public interface IUserInventroyRepository
 {
-    UserInventory GetInventory();
-    void SaveInventory(UserInventory inventory);
+    UniTask<UserInventory> LoadInventoryAsync();
+    UniTask SaveUserInventoryAsync(UserInventory inventory);
 }

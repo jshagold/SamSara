@@ -1,21 +1,47 @@
-using Newtonsoft.Json;
+﻿using System.IO;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
+
 
 public class UserInventoryRepository : IUserInventroyRepository
 {
-    public UserInventory GetInventory()
-    {
-        if(PlayerPrefs.HasKey("UserInventory"))
-        {
-            string json = PlayerPrefs.GetString("UserInventory");
-            return JsonConvert.DeserializeObject<UserInventory>(json);
-        }
+    private readonly string _filePath;
 
-        return new UserInventory { Money = 10000 };
+    public UserInventoryRepository()
+    {
+        // 안드로이드 내부 저장소 경로
+        _filePath = Path.Combine(Application.persistentDataPath, "save_user_inventory_data.json");
     }
 
-    public void SaveInventory(UserInventory inventory)
+
+    public async UniTask<UserInventory> LoadInventoryAsync()
     {
-        throw new System.NotImplementedException();
+        if (!File.Exists(_filePath))
+        {
+            return new UserInventory(money: 0);
+        }
+
+        // 파일 읽기 (I/O는 Thread Pool 에서)
+        string json = await UniTask.RunOnThreadPool(() => File.ReadAllText(_filePath));
+
+        // JSON -> DTO
+        var dto = JsonUtility.FromJson<UserInventoryData>(json);
+
+        // DTO -> Entity
+        return dto.ToDomain();
+    }
+
+    public async UniTask SaveUserInventoryAsync(UserInventory inventory)
+    {
+        // Entity -> DTO
+        var dto = inventory.ToData();
+
+        // DTO -> JSON
+        string json = JsonUtility.ToJson(dto, true);
+
+        // 파일 쓰기
+        await UniTask.RunOnThreadPool(() => File.WriteAllText(_filePath, json));
+
+        Debug.Log($"로컬 파일 저장완료 : {_filePath}");
     }
 }

@@ -10,7 +10,7 @@ public class GetMoneyUseCase
 
     public UserInventory GetInventory()
     {
-        return _userInventroyRepository.GetInventory();
+        return _userInventroyRepository.LoadInventory();
     }
 
 }
