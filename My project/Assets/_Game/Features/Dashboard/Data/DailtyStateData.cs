@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 [Serializable]
-public class GameStateData
+public class DailtyStateData
 {
     public int CurrentDay;
 

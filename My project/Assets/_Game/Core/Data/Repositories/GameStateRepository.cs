@@ -2,7 +2,7 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-public class GameStateRepository : IGameStateRepository
+public class GameStateRepository : IDailyStateRepository
 {
     private readonly string _filePath;
 
@@ -13,10 +13,12 @@ public class GameStateRepository : IGameStateRepository
     }
 
     // 메모리에 가지고 있는 데이터
-    private GameStateData _cachedData;
+    private DailtyStateData _cachedData;
 
+    // 현재 날짜 가져오기
     public int GetCurrentDay => _cachedData.CurrentDay;
 
+    // 행동력 횟수 소모
     public void ConsumeActionSlot(int charId, int slotIndex)
     {
         if(_cachedData.CharacterActionMap.ContainsKey(charId))
@@ -28,17 +30,20 @@ public class GameStateRepository : IGameStateRepository
         // 보통은 AutoSave 매니저가 따로 있거나, 턴 종료 시점에 모아서 저장합니다.
     }
 
+    // 행동력 횟수 가져오기
     public bool[] GetActionSlot(int charId)
     {
         return _cachedData.CharacterActionMap[charId];
     }
 
+    // 데이터 불러오기
     public async UniTask LoadDataAsync()
     {
         string json = await File.ReadAllTextAsync(_filePath);
-        _cachedData = JsonUtility.FromJson<GameStateData>(json);
+        _cachedData = JsonUtility.FromJson<DailtyStateData>(json);
     }
 
+    // 데이터 저장하기
     public async UniTask SaveDataAsync()
     {
         string json = JsonUtility.ToJson(_cachedData);

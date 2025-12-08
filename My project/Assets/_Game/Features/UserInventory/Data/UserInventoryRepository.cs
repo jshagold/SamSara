@@ -14,6 +14,7 @@ public class UserInventoryRepository : IUserInventroyRepository
     }
 
 
+    // 인벤토리 정보 가져오기
     public async UniTask<UserInventory> LoadInventoryAsync()
     {
         if (!File.Exists(_filePath))
@@ -31,6 +32,7 @@ public class UserInventoryRepository : IUserInventroyRepository
         return dto.ToDomain();
     }
 
+    // 인벤토리 정보 저장
     public async UniTask SaveUserInventoryAsync(UserInventory inventory)
     {
         // Entity -> DTO
