@@ -15,7 +15,7 @@ public class DailyStateUseCase
         return _gameStateRepository.GetCurrentDay;
     }
 
-    public bool[] GetActionSlot(int charId)
+    public bool[] GetActionSlot(string charId)
     {
         return _gameStateRepository.GetActionSlot(charId: charId);
     }

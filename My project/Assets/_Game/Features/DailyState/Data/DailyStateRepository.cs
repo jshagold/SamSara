@@ -2,11 +2,11 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-public class GameStateRepository : IDailyStateRepository
+public class DailyStateRepository : IDailyStateRepository
 {
     private readonly string _filePath;
 
-    public GameStateRepository()
+    public DailyStateRepository()
     {
         // 안드로이드 내부 저장소 경로
         _filePath = Path.Combine(Application.persistentDataPath, "save_game_state_data.json");
@@ -19,7 +19,7 @@ public class GameStateRepository : IDailyStateRepository
     public int GetCurrentDay => _cachedData.CurrentDay;
 
     // 행동력 횟수 소모
-    public void ConsumeActionSlot(int charId, int slotIndex)
+    public void ConsumeActionSlot(string charId, int slotIndex)
     {
         if(_cachedData.CharacterActionMap.ContainsKey(charId))
         {
@@ -31,7 +31,7 @@ public class GameStateRepository : IDailyStateRepository
     }
 
     // 행동력 횟수 가져오기
-    public bool[] GetActionSlot(int charId)
+    public bool[] GetActionSlot(string charId)
     {
         return _cachedData.CharacterActionMap[charId];
     }

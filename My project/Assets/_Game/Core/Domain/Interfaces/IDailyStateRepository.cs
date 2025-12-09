@@ -17,7 +17,7 @@ public interface IDailyStateRepository
     /// </summary> 
     /// <param name="charId">캐릭터 Id 값 - int</param>
     /// <returns>캐릭터의 행동 횟수 return - bool[]</returns>
-    bool[] GetActionSlot(int charId);
+    bool[] GetActionSlot(string charId);
 
     // =================================================
     // 데이터 영속성 (저장/로딩)

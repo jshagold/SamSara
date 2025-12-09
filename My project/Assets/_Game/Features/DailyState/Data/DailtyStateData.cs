@@ -6,5 +6,5 @@ public class DailtyStateData
 {
     public int CurrentDay;
 
-    public Dictionary<int, bool[]> CharacterActionMap;
+    public Dictionary<string, bool[]> CharacterActionMap;
 }

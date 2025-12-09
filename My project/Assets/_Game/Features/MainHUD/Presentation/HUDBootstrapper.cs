@@ -1,15 +1,14 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class HUDBootstrapper : MonoBehaviour
 {
     [SerializeField] private TopHUDView _topView;
     
-
-    public void Initialize(GetMoneyUseCase getMoneyUseCase) // MainBootstrapper°¡ È£ÃâÇØ ÁÜ
+    public void Initialize(GameContext gameContext) // MainBootstrapperê°€ í˜¸ì¶œí•´ ì¤Œ
     {
-        var topPresenter = new TopHUDPresenter(_topView, getMoneyUseCase);
+        var topPresenter = new TopHUDPresenter(_topView, gameContext.GetMoneyUseCase);
         topPresenter.Initialize();
 
-        Debug.Log("HUD Á¶¸³ ¿Ï·á");
+        Debug.Log("HUD ì¡°ë¦½ ì™„ë£Œ");
     }
 }
