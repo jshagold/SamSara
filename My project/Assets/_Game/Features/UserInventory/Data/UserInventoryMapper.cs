@@ -1,4 +1,4 @@
-public static class UserInventoryMapper
+﻿public static class UserInventoryMapper
 {
     // SaveData(DTO) -> Domain
     public static UserInventory ToDomain(this UserInventoryData dto)
@@ -13,9 +13,6 @@ public static class UserInventoryMapper
     // Domain -> SaveData(DTO)
     public static UserInventoryData ToData(this UserInventory domain)
     {
-        return new UserInventoryData
-        {
-            money = domain.Money
-        };
+        return new UserInventoryData(money: domain.Money);        
     }
 }

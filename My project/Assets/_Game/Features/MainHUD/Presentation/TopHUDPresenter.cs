@@ -1,11 +1,11 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class TopHUDPresenter
 {
     private readonly TopHUDView _view;
     
 
-    // ·ÎÁ÷
+    // ë¡œì§
     private readonly GetMoneyUseCase _moneyUseCase;
 
     public TopHUDPresenter(TopHUDView view, GetMoneyUseCase moneyUseCase)
@@ -14,19 +14,19 @@ public class TopHUDPresenter
         _moneyUseCase = moneyUseCase;
     }
 
-    public void Initialize()
+    public async void Initialize()
     {
-        UserInventory inventory = _moneyUseCase.GetInventory();
+        int money = await _moneyUseCase.GetInventoryMoneyAsync();
 
         _view.OnOptionClicked += HandleOptionClick;
         _view.UpdateStatus("Ready");
-        _view.UpdateMoney(inventory.Money.ToString());
+        _view.UpdateMoney(money.ToString());
     }
 
 
     private void HandleOptionClick()
     {
-        Debug.Log("[HUD] ¿É¼Ç ¹öÆ° Å¬¸¯µÊ -> ÆË¾÷À» ¶ç¿ì°Å³ª ¾À ÀÌµ¿");
+        Debug.Log("[HUD] ì˜µì…˜ ë²„íŠ¼ í´ë¦­ë¨ -> íŒì—…ì„ ë„ìš°ê±°ë‚˜ ì”¬ ì´ë™");
         _view.UpdateStatus("Paused");
     }
 
