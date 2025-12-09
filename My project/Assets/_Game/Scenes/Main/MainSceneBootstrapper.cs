@@ -4,7 +4,6 @@ public class MainSceneBootstrapper : MonoBehaviour
 {
     [Header("UI Views")]
     [SerializeField] private HUDBootstrapper _hudBootstrapper;
-    [SerializeField] private DashboardBootstrapper _dashboardBootstrapper;
     [SerializeField] private BackgroundBootstrapper _backgroundBootstrapper;
 
     private void Start() // Global이 Awake에서 초기화될 시간을 주기 위해 Start 권장
@@ -25,8 +24,6 @@ public class MainSceneBootstrapper : MonoBehaviour
         // 2. HUD Bootstrapper
         _hudBootstrapper.Initialize(gameContext);
 
-        // 3. Content Presenter 조립
-        _dashboardBootstrapper.Initialize();
 
         Debug.Log(">>> MainScene Bootstrapping Start");
     }
