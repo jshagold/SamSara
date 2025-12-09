@@ -1,14 +1,16 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class BackgroundBootstrapper : MonoBehaviour
 {
     [SerializeField] private MainBackgroundView _mainBackgroundView;
 
-    public void Initialize() // MainBootstrapper°¡ È£ÃâÇØ ÁÜ
-    {
-        var backgroundPresenter = new MainBackgroundPresenter(_mainBackgroundView);
-        backgroundPresenter.Initialize();
+    private MainBackgroundPresenter _backgroundPresenter;
 
-        Debug.Log("Background Á¶¸³ ¿Ï·á");
+    public void Initialize() // MainBootstrapperê°€ í˜¸ì¶œí•´ ì¤Œ
+    {
+        _backgroundPresenter = new MainBackgroundPresenter(_mainBackgroundView);
+        _backgroundPresenter.Initialize();
+
+        Debug.Log("Background ì¡°ë¦½ ì™„ë£Œ");
     }
 }
