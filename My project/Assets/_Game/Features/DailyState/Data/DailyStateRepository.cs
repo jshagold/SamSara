@@ -6,16 +6,19 @@ using Newtonsoft.Json;
 
 public class DailyStateRepository : IDailyStateRepository
 {
-    private readonly string _filePath;
     private readonly string _logClass = "[DailyStateRepository]";
 
+    private readonly string _filePath;
+    private readonly NewGameConfig _newGameConfig;
     // 메모리에 가지고 있는 데이터
     private DailyStateData _cachedData;
 
-    public DailyStateRepository()
+    public DailyStateRepository(NewGameConfig newGameConfig)
     {
+        _newGameConfig = newGameConfig;
         // 안드로이드/IOS/PC 공용 경로
         _filePath = Path.Combine(Application.persistentDataPath, "save_game_state_data.json");
+        
     }
 
     // -------
@@ -32,8 +35,16 @@ public class DailyStateRepository : IDailyStateRepository
         {
             Debug.Log($"{_logClass}[LoadDataAsync] 세이브 파일 없어서 새로 생성.");
 
-            _cachedData = new DailyStateData(currentDay: 0, characterActionMap: new Dictionary<string, bool[]>());
-            
+            var initialMap = new Dictionary<string, bool[]>();
+            foreach(var charId in _newGameConfig.StartingCharacterIds)
+            {
+                bool[] slots = new bool[_newGameConfig.DefaultActionSlots];
+                for (int i = 0; i < slots.Length; i++) slots[i] = true;
+
+                initialMap.Add(charId, slots);
+            }
+
+            _cachedData = new DailyStateData(currentDay: _newGameConfig.StartDay, characterActionMap: initialMap);
             return _cachedData.ToDomain();
         }
 

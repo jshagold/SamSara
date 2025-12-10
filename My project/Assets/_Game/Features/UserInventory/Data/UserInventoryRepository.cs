@@ -6,15 +6,16 @@ using UnityEngine;
 
 public class UserInventoryRepository : IUserInventoryRepository
 {
-    private readonly string _filePath;
     private readonly string _logClass = "[UserInventoryRepository]";
 
-    // 메모리에 가지고 있는 데이터
+    private readonly string _filePath;
+    private readonly NewGameConfig _newGameConfig;
     private UserInventoryData _cachedData;
 
-    public UserInventoryRepository()
+    public UserInventoryRepository(NewGameConfig config)
     {
-        // 안드로이드 내부 저장소 경로
+        _newGameConfig = config;
+        // 안드로이드/IOS/PC 공용 경로
         _filePath = Path.Combine(Application.persistentDataPath, "save_user_inventory_data.json");
     }
 
@@ -30,7 +31,7 @@ public class UserInventoryRepository : IUserInventoryRepository
         {
             Debug.Log($"{_logClass}[LoadDataAsync] 세이브 파일 없어서 새로 생성.");
 
-            _cachedData = new UserInventoryData(money: 0);
+            _cachedData = new UserInventoryData(money: _newGameConfig.InitialMoney);
 
             return _cachedData.ToDomain();
         }
