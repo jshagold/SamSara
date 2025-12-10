@@ -30,6 +30,14 @@ MonoBehaviour:
     m_Localized: Character Info
     m_Metadata:
       m_Items: []
+  - m_Id: 158950979305472
+    m_Localized: Start Game
+    m_Metadata:
+      m_Items: []
+  - m_Id: 159111684063232
+    m_Localized: Restart Game
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

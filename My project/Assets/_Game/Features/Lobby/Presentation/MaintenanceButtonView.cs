@@ -13,7 +13,6 @@ public class MaintenanceButtonView : MonoBehaviour
     [Header("Resources")]
     [SerializeField] private Sprite normalSprite;
 
-    private const string TextTableName = "UI TABLE";
 
     public void SetOnClickAction(UnityAction action)
     {
@@ -31,7 +30,7 @@ public class MaintenanceButtonView : MonoBehaviour
     {
         gameObject.SetActive(true);
         iconImg.sprite = normalSprite;
-        string text = LocalizationUtils.GetString(tableName: TextTableName, key: "scene_main_maintenance_button");
+        string text = LocalizationUtils.GetString(key: "scene_main_maintenance_button");
         textMesh.text = text;
     }
  
