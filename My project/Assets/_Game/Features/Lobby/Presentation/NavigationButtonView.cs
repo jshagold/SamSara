@@ -4,15 +4,11 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine.Localization.Settings;
 
-public class MaintenanceButtonView : MonoBehaviour
+public class NavigationButtonView : MonoBehaviour
 {
     [SerializeField] private Button btn;
     [SerializeField] private Image iconImg;
-    [SerializeField] private TextMeshProUGUI textMesh;
-
-    [Header("Resources")]
-    [SerializeField] private Sprite normalSprite;
-
+    [SerializeField] private TextMeshProUGUI label;
 
     public void SetOnClickAction(UnityAction action)
     {
@@ -26,12 +22,15 @@ public class MaintenanceButtonView : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void ShowNormalMode()
+    public void Show()
     {
         gameObject.SetActive(true);
-        iconImg.sprite = normalSprite;
-        string text = LocalizationUtils.GetString(key: "scene_main_maintenance_button");
-        textMesh.text = text;
     }
- 
+
+    public void SetVisual(Sprite sprite, string text)
+    {
+        gameObject.SetActive(true);
+        iconImg.sprite = sprite;
+        label.text = text;
+    }
 }
