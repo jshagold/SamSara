@@ -1,32 +1,39 @@
-using System;
+ï»¿using System;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class OptionButtonView : MonoBehaviour
 {
     [SerializeField] private Button _button;
 
-    // ¿ÜºÎ(Presenter)¿¡¼­ ±¸µ¶ÇÒ ÀÌº¥Æ®
+    // ì™¸ë¶€(Presenter)ì—ì„œ êµ¬ë…í•  ì´ë²¤íŠ¸
     public event Action OnClicked;
+
+    public void OnClickBtn(UnityAction action)
+    {
+        _button.onClick.RemoveAllListeners();
+        _button.onClick.AddListener(action);
+    }
 
     private void Awake()
     {
-        // ¾ÈÀüÀåÄ¡: ½Ç¼ö·Î ÀÎ½ºÆåÅÍ ¿¬°á ¾È ÇßÀ» °æ¿ì ÀÚµ¿ Ã£±â
+        // ì•ˆì „ì¥ì¹˜: ì‹¤ìˆ˜ë¡œ ì¸ìŠ¤í™í„° ì—°ê²° ì•ˆ í–ˆì„ ê²½ìš° ìë™ ì°¾ê¸°
         if (_button == null)
             _button = GetComponent<Button>();
 
-        // ¶÷´Ù ´ë½Å ¸í¸íµÈ ¸Ş¼­µå µî·Ï (°ü¸®°¡ ´õ ±ò²ûÇÔ)
+        // ëŒë‹¤ ëŒ€ì‹  ëª…ëª…ëœ ë©”ì„œë“œ ë“±ë¡ (ê´€ë¦¬ê°€ ë” ê¹”ë”í•¨)
         _button.onClick.AddListener(() => OnClicked?.Invoke());
     }
 
     private void OnDestroy()
     {
-        // 1. À¯´ÏÆ¼ ¹öÆ° ¸®½º³Ê Á¤¸®
+        // 1. ìœ ë‹ˆí‹° ë²„íŠ¼ ë¦¬ìŠ¤ë„ˆ ì •ë¦¬
         if (_button != null)
             _button.onClick.RemoveAllListeners();
 
-        // 2. [Áß¿ä] ³ª¸¦ ±¸µ¶ÇÏ°í ÀÖ´ø Presenterµé°úÀÇ ¿¬°áÀ» ²÷À½
-        // ÀÌ°É ¾È ÇÏ¸é Presenter°¡ Á×Àº View¸¦ °è¼Ó ºÙµé°í ÀÖÀ» ¼ö ÀÖÀ½
+        // 2. [ì¤‘ìš”] ë‚˜ë¥¼ êµ¬ë…í•˜ê³  ìˆë˜ Presenterë“¤ê³¼ì˜ ì—°ê²°ì„ ëŠìŒ
+        // ì´ê±¸ ì•ˆ í•˜ë©´ Presenterê°€ ì£½ì€ Viewë¥¼ ê³„ì† ë¶™ë“¤ê³  ìˆì„ ìˆ˜ ìˆìŒ
         OnClicked = null;
     }
 }

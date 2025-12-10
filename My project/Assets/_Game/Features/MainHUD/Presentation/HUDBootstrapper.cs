@@ -8,7 +8,11 @@ public class HUDBootstrapper : MonoBehaviour
 
     public void Initialize(GameContext gameContext) // MainBootstrapper가 호출해 줌
     {
-        _topHUDpresenter = new TopHUDPresenter(_topView, gameContext.GetMoneyUseCase);
+        _topHUDpresenter = new TopHUDPresenter(
+            view: _topView, 
+            moneyUseCase: gameContext.GetMoneyUseCase,
+            dailyStateUseCase: gameContext.DailyStateUseCase
+        );
         _topHUDpresenter.Initialize();
 
         Debug.Log("HUD 조립 완료");

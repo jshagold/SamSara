@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class DailyStateRepository : IDailyStateRepository
 {
@@ -13,10 +14,32 @@ public class DailyStateRepository : IDailyStateRepository
     }
 
     // 메모리에 가지고 있는 데이터
-    private DailtyStateData _cachedData;
+    private DailyStateData _cachedData;
 
     // 현재 날짜 가져오기
-    public int GetCurrentDay => _cachedData.CurrentDay;
+    public async UniTask<int> GetCurrentDay()
+    {
+        // 1. 메모리 값 리턴
+        if (_cachedData != null)
+        {
+            return _cachedData.CurrentDay;
+        }
+
+        // 2. 저장 파일 없을때 새로운 객체 리턴
+        if (!File.Exists(_filePath))
+        {
+            _cachedData = new DailyStateData(currentDay: 0, characterActionMap: new Dictionary<string, bool[]>());
+        }
+        // 3. 저장 파일 데이터 캐싱하고 리턴
+        else
+        {
+            string json = await UniTask.RunOnThreadPool(() => File.ReadAllText(_filePath));
+            var dto = JsonUtility.FromJson<DailyStateData>(json);
+            _cachedData = dto;
+        }
+
+        return _cachedData.CurrentDay;
+    }
 
     // 행동력 횟수 소모
     public void ConsumeActionSlot(string charId, int slotIndex)
@@ -37,10 +60,25 @@ public class DailyStateRepository : IDailyStateRepository
     }
 
     // 데이터 불러오기
-    public async UniTask LoadDataAsync()
+    public async UniTask<DailyStateData> LoadDataAsync()
     {
-        string json = await File.ReadAllTextAsync(_filePath);
-        _cachedData = JsonUtility.FromJson<DailtyStateData>(json);
+        //string json = await File.ReadAllTextAsync(_filePath);
+        //_cachedData = JsonUtility.FromJson<DailyStateData>(json);
+
+        if (!File.Exists(_filePath))
+        {
+            return new DailyStateData(currentDay: 0, characterActionMap: new Dictionary<string, bool[]>());
+        }
+
+        // 파일 읽기 (I/O는 Thread Pool 에서)
+        string json = await UniTask.RunOnThreadPool(() => File.ReadAllText(_filePath));
+
+        // JSON -> DTO
+        var dto = JsonUtility.FromJson<DailyStateData>(json);
+        _cachedData = dto;
+
+        // DTO -> Entity
+        return dto.ToDomain();
     }
 
     // 데이터 저장하기
