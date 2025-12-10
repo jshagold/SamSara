@@ -1,16 +1,14 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 
-[Serializable]
-public class DailyStateData
+public class DailyState
 {
     public int currentDay;
 
     public Dictionary<string, bool[]> characterActionMap;
 
     [JsonConstructor]
-    public DailyStateData(int currentDay, Dictionary<string, bool[]> characterActionMap)
+    public DailyState(int currentDay, Dictionary<string, bool[]> characterActionMap)
     {
         this.currentDay = currentDay;
         this.characterActionMap = characterActionMap ?? new Dictionary<string, bool[]>();

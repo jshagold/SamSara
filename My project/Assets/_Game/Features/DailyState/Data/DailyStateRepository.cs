@@ -2,89 +2,144 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 public class DailyStateRepository : IDailyStateRepository
 {
     private readonly string _filePath;
-
-    public DailyStateRepository()
-    {
-        // 안드로이드 내부 저장소 경로
-        _filePath = Path.Combine(Application.persistentDataPath, "save_game_state_data.json");
-    }
+    private readonly string _logClass = "[DailyStateRepository]";
 
     // 메모리에 가지고 있는 데이터
     private DailyStateData _cachedData;
 
-    // 현재 날짜 가져오기
-    public async UniTask<int> GetCurrentDay()
+    public DailyStateRepository()
     {
-        // 1. 메모리 값 리턴
-        if (_cachedData != null)
-        {
-            return _cachedData.CurrentDay;
-        }
-
-        // 2. 저장 파일 없을때 새로운 객체 리턴
-        if (!File.Exists(_filePath))
-        {
-            _cachedData = new DailyStateData(currentDay: 0, characterActionMap: new Dictionary<string, bool[]>());
-        }
-        // 3. 저장 파일 데이터 캐싱하고 리턴
-        else
-        {
-            string json = await UniTask.RunOnThreadPool(() => File.ReadAllText(_filePath));
-            var dto = JsonUtility.FromJson<DailyStateData>(json);
-            _cachedData = dto;
-        }
-
-        return _cachedData.CurrentDay;
+        // 안드로이드/IOS/PC 공용 경로
+        _filePath = Path.Combine(Application.persistentDataPath, "save_game_state_data.json");
     }
 
-    // 행동력 횟수 소모
-    public void ConsumeActionSlot(string charId, int slotIndex)
+    // -------
+    // 데이터 불러오기
+    // -------
+    public async UniTask<DailyState> LoadDataAsync()
     {
-        if(_cachedData.CharacterActionMap.ContainsKey(charId))
+        if(_cachedData != null)
         {
-            _cachedData.CharacterActionMap[charId][slotIndex] = false;
+            return _cachedData.ToDomain();
         }
 
-        // 주의: 여기서 매번 SaveDataAsync()를 호출하면 느려집니다.
-        // 보통은 AutoSave 매니저가 따로 있거나, 턴 종료 시점에 모아서 저장합니다.
+        if (!File.Exists(_filePath))
+        {
+            Debug.Log($"{_logClass}[LoadDataAsync] 세이브 파일 없어서 새로 생성.");
+
+            _cachedData = new DailyStateData(currentDay: 0, characterActionMap: new Dictionary<string, bool[]>());
+            
+            return _cachedData.ToDomain();
+        }
+
+        try
+        {
+            // 파일 읽기 (I/O는 Thread Pool 에서)
+            string json = await UniTask.RunOnThreadPool(() => File.ReadAllText(_filePath));
+
+            // JsonConvert 사용
+            var loadedDto = JsonConvert.DeserializeObject<DailyStateData>(json);
+
+            if (loadedDto == null)
+            {
+                throw new System.InvalidOperationException("[LoadDataAsync] 데이터가 null입니다. 파일 손상 의심.");
+            }
+
+            _cachedData = loadedDto;
+
+            Debug.Log($"{_logClass} 로드 완료");
+
+            return _cachedData.ToDomain();
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"{_logClass}[LoadDataAsync] 저장파일 로드 실패 : {e.Message}");
+            _cachedData = new DailyStateData(currentDay: 0, characterActionMap: new Dictionary<string, bool[]>());
+        }
+    }
+
+    // -------
+    // 데이터 저장
+    // -------
+    public async UniTask SaveDataAsync()
+    {
+        if (_cachedData == null)
+        {
+            throw new System.InvalidOperationException("[CRITICAL] 저장 실패! 메모리 데이터가 증발했습니다. 이 세션은 오염되었습니다.");
+        }
+
+        // 스레드 풀에서 저장. (게임 멈춤 방지)
+        try
+        {
+            await UniTask.RunOnThreadPool(() =>
+            {
+                string json = JsonConvert.SerializeObject(_cachedData, Formatting.Indented);
+                File.WriteAllText(_filePath, json);
+            });
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"{_logClass}[IO Error] 파일 쓰기 실패!!: {e.Message}");
+        }
+
+        Debug.Log("[DailyStateRepository] 저장 완료");
+    }
+
+    // 현재 날짜 가져오기
+    public int GetCurrentDay()
+    {
+        if ( _cachedData == null)
+        {
+            throw new System.InvalidOperationException("[CRITICAL] DailyStateData is NULL! 데이터가 로드되지 않은 상태에서 접근했습니다.");
+        }
+
+        return _cachedData.currentDay;
     }
 
     // 행동력 횟수 가져오기
     public bool[] GetActionSlot(string charId)
     {
-        return _cachedData.CharacterActionMap[charId];
-    }
-
-    // 데이터 불러오기
-    public async UniTask<DailyStateData> LoadDataAsync()
-    {
-        //string json = await File.ReadAllTextAsync(_filePath);
-        //_cachedData = JsonUtility.FromJson<DailyStateData>(json);
-
-        if (!File.Exists(_filePath))
+        if (_cachedData == null)
         {
-            return new DailyStateData(currentDay: 0, characterActionMap: new Dictionary<string, bool[]>());
+            throw new System.InvalidOperationException("[CRITICAL] DailyStateData is NULL! 데이터 로드 실패.");
         }
 
-        // 파일 읽기 (I/O는 Thread Pool 에서)
-        string json = await UniTask.RunOnThreadPool(() => File.ReadAllText(_filePath));
+        if(_cachedData.characterActionMap == null)
+        {
+            throw new System.InvalidOperationException("[CRITICAL] characterActionMap is NULL!");
+        }
 
-        // JSON -> DTO
-        var dto = JsonUtility.FromJson<DailyStateData>(json);
-        _cachedData = dto;
+        if (_cachedData.characterActionMap.TryGetValue(charId, out bool[] slots))
+        {
+            return slots;
+        }
 
-        // DTO -> Entity
-        return dto.ToDomain();
+        throw new System.InvalidOperationException("[CRITICAL] charId 가 등록되지 않음!");
     }
 
-    // 데이터 저장하기
-    public async UniTask SaveDataAsync()
+    // 행동력 횟수 소모
+    public void ConsumeActionSlot(string charId, int slotIndex)
     {
-        string json = JsonUtility.ToJson(_cachedData);
-        await File.WriteAllTextAsync(_filePath, json);
+        if (_cachedData == null)
+        {
+            throw new System.InvalidOperationException($"[CRITICAL] 메모리 데이터가 로드되지 않았습니다. (CharID: {charId})");
+        }
+
+        bool[] slots = _cachedData.characterActionMap[charId];
+        if (slotIndex < 0 || slotIndex >= slots.Length)
+        {
+            throw new System.IndexOutOfRangeException($"[CRITICAL] 잘못된 슬롯 인덱스입니다. CharID: {charId}, Request: {slotIndex}, Max: {slots.Length - 1}");
+        }
+
+        slots[slotIndex] = false;
+
+        // 주의: 여기서 매번 SaveDataAsync()를 호출하면 느려집니다.
+        // 보통은 AutoSave 매니저가 따로 있거나, 턴 종료 시점에 모아서 저장합니다.
+        // TODO 저장해야함
     }
 }
