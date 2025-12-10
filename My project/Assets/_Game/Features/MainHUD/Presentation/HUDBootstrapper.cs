@@ -2,18 +2,19 @@
 
 public class HUDBootstrapper : MonoBehaviour
 {
-    [SerializeField] private TopHUDView _topView;
+    [SerializeField] private HUDView _hudView;
     
-    private TopHUDPresenter _topHUDpresenter;
+    private HUDPresenter _hudPresenter;
 
-    public void Initialize(GameContext gameContext) // MainBootstrapper가 호출해 줌
+    public void Initialize(GameContext gameContext)
     {
-        _topHUDpresenter = new TopHUDPresenter(
-            view: _topView, 
+        _hudPresenter = new HUDPresenter(
+            view: _hudView, 
             moneyUseCase: gameContext.GetMoneyUseCase,
             dailyStateUseCase: gameContext.DailyStateUseCase
         );
-        _topHUDpresenter.Initialize();
+
+        _hudPresenter.Initialize();
 
         Debug.Log("HUD 조립 완료");
     }

@@ -3,7 +3,7 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class TopHUDView : MonoBehaviour
+public class HUDView : MonoBehaviour
 {
     [Header("Components")]
     [SerializeField] private OptionButtonView _optionButton; // 재사용 컴포넌트 연결
@@ -51,14 +51,11 @@ public class TopHUDView : MonoBehaviour
 
     private void Reset()
     {
-        if (_abovePanelRect == null) _abovePanelRect = GetComponent<RectTransform>();
-        if (_abovePanelCanvasGroup == null) _abovePanelCanvasGroup = GetComponent<CanvasGroup>();
-
         if (_optionButton == null) _optionButton = GetComponentInChildren<OptionButtonView>();
         if (_dateDisplay == null) _dateDisplay = GetComponentInChildren<DateDisplayView>();
         if (_currencyView == null) _currencyView = GetComponentInChildren<CurrencyView>();
 
-        Debug.Log($"[TopHUDView] 에디터 자동 연결 완료: {name}");
+        Debug.Log($"[TopHUDView] 에디터 자동 연결 완료 (Panel 연결 확인해야함): {name}");
     }
 
     // Presenter가 버튼 이벤트를 구독할 수 있게 연결 통로(Proxy)를 열어줍니다.
@@ -84,23 +81,31 @@ public class TopHUDView : MonoBehaviour
     {
         var token = this.GetCancellationTokenOnDestroy();
 
-        // 터치 방지
-        if(_abovePanelCanvasGroup) _abovePanelCanvasGroup.interactable = false;
-        if(_leftPanelCanvasGroup) _leftPanelCanvasGroup.interactable=false;
+        var taskAbove = UniTask.CompletedTask;
+        var taskLeft = UniTask.CompletedTask;
 
-        var taskAbove = _abovePanelRect.DOAnchorPos(_abovePanelHiddenPos, animDuration)
-            .SetEase(Ease.InBack)
-            .ToUniTask(cancellationToken: token);
+        if(_abovePanelRect != null)
+        {
+            if (_abovePanelCanvasGroup) _abovePanelCanvasGroup.interactable = false;
 
-        var taskLeft = _leftPanelRect.DOAnchorPos(_leftPanelHiddenPos, animDuration)
-            .SetEase(Ease.InBack)
-            .ToUniTask(cancellationToken: token);
+            taskAbove = _abovePanelRect.DOAnchorPos(_abovePanelHiddenPos, animDuration)
+                .SetEase(Ease.InBack)
+                .ToUniTask(cancellationToken: token);
+        }
+
+        if(_leftPanelRect != null)
+        {
+            if (_leftPanelCanvasGroup) _leftPanelCanvasGroup.interactable = false;
+
+            taskLeft = _leftPanelRect.DOAnchorPos(_leftPanelHiddenPos, animDuration)
+                .SetEase(Ease.InBack)
+                .ToUniTask(cancellationToken: token);
+        }
 
         await UniTask.WhenAll(taskAbove, taskLeft);
-        
 
-        _abovePanelRect.gameObject.SetActive(false);
-        _leftPanelRect.gameObject.SetActive(false);
+        if (_abovePanelRect != null) _abovePanelRect.gameObject.SetActive(false);
+        if (_leftPanelRect != null) _leftPanelRect.gameObject.SetActive(false);
     }
 
     // 화면안으로 들어오기 (Show)
@@ -115,25 +120,25 @@ public class TopHUDView : MonoBehaviour
         {
             _abovePanelRect.gameObject.SetActive(true);
             taskAbove = _abovePanelRect.DOAnchorPos(_abovePanelVisiblePos, animDuration)
-            .SetEase(Ease.OutBack)
-            .ToUniTask(cancellationToken: token);
+                .SetEase(Ease.OutBack)
+                .ToUniTask(cancellationToken: token);
         }
 
         if (_leftPanelRect != null)
         {
             _leftPanelRect.gameObject.SetActive(true);
             taskLeft = _leftPanelRect.DOAnchorPos(_leftPanelVisiblePos, animDuration)
-            .SetEase(Ease.OutBack)
-            .ToUniTask(cancellationToken: token);
+                .SetEase(Ease.OutBack)
+                .ToUniTask(cancellationToken: token);
         }
 
         await UniTask.WhenAll(taskAbove, taskLeft);
 
-       if(_abovePanelRect != null)
+       if(_abovePanelRect != null && _abovePanelCanvasGroup != null)
         {
             _abovePanelCanvasGroup.interactable = true;
         }
-        if (_leftPanelRect != null)
+        if (_leftPanelRect != null && _leftPanelCanvasGroup != null)
         {
             _leftPanelCanvasGroup.interactable = true;
         }

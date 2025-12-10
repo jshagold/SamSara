@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using Cysharp.Threading.Tasks;
-
-public class DailyStateUseCase
+﻿public class DailyStateUseCase
 {
     private readonly IDailyStateRepository _gameStateRepository;
 
@@ -12,7 +9,7 @@ public class DailyStateUseCase
     
     public int GetCurrentDay()
     {
-        return _gameStateRepository.GetCurrentDay;
+        return _gameStateRepository.GetCurrentDay();
     }
 
     public bool[] GetActionSlot(string charId)
