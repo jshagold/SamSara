@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -11,6 +12,9 @@ public class UserInventoryRepository : IUserInventoryRepository
     private readonly string _filePath;
     private readonly NewGameConfig _newGameConfig;
     private UserInventoryData _cachedData;
+
+    // 데이터 변경 알림 이벤트
+    public event Action OnInventoryChanged;
 
     public UserInventoryRepository(NewGameConfig config)
     {
@@ -59,13 +63,10 @@ public class UserInventoryRepository : IUserInventoryRepository
         }
     }
 
-    // 정보 저장
+    // 정보 저장 - 비동기
     public async UniTask SaveDataAsync()
     {
-        if (_cachedData == null)
-        {
-            throw new System.InvalidOperationException("[CRITICAL] 저장 실패! 메모리 데이터가 증발했습니다. 이 세션은 오염되었습니다.");
-        }
+        CheckDataIntegrity();
 
         // 스레드 풀에서 저장. (게임 멈춤 방지)
         try
@@ -84,16 +85,52 @@ public class UserInventoryRepository : IUserInventoryRepository
         Debug.Log("[DailyStateRepository] 저장 완료");
     }
 
-
-    public int GetMoneyAsync()
+    // 긴급 저장 (OnApplicationPause 용) - 동기
+    public void SaveDataSync()
     {
-        // 1. 메모리 값 리턴
-        if(_cachedData == null)
-        {
-            throw new System.InvalidOperationException("[CRITICAL] UserInventoryData is NULL! 데이터가 로드되지 않은 상태에서 접근했습니다.");
-        }
+        CheckDataIntegrity();
 
+        try
+        {
+            // 메인 스레드에서 즉시 씀
+            string json = JsonConvert.SerializeObject(_cachedData);
+            File.WriteAllText(_filePath, json);
+            Debug.Log($"{_logClass} 동기 저장 완료");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"{_logClass} 동기 저장 실패: {e.Message}");
+        }
+    }
+
+    public int GetMoney()
+    {
+        CheckDataIntegrity();
         return _cachedData.money;
     }
 
+    public void AddMoney(int amount)
+    {
+        CheckDataIntegrity();
+        if (amount < 0) throw new ArgumentException("음수는 추가할 수 없습니다.");
+
+        _cachedData.money += amount;
+
+        NotifyChanged();
+    }
+
+
+    private void NotifyChanged()
+    {
+        OnInventoryChanged?.Invoke();
+    }
+
+    // 데이터 무결성 체크 (Fail Fast)
+    private void CheckDataIntegrity()
+    {
+        if (_cachedData == null)
+        {
+            throw new InvalidOperationException($"{_logClass} 데이터가 로드되지 않았습니다! (Bootstrapper 확인 필요)");
+        }
+    }
 }

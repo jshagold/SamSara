@@ -15,7 +15,7 @@ public class GetMoneyUseCase
     /// <returns></returns>
     public int GetInventoryMoneyAsync()
     {
-        return _userInventroyRepository.GetMoneyAsync();
+        return _userInventroyRepository.GetMoney();
     }
 
 

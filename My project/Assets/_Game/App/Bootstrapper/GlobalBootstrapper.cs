@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class GlobalBootstrapper : MonoBehaviour
 {
+    [SerializeField] private AutoSaveManager _autoSaveManager;
+    [SerializeField] private NewGameConfig _newGameConfig;
+
     // SingleTon 패턴
     public static GlobalBootstrapper Instance { get; private set; }
 
@@ -19,13 +22,22 @@ public class GlobalBootstrapper : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject); // Scene이 바뀌어도 파괴되지 않게하는 코드
 
-        IUserInventoryRepository userInventoryRepo = new UserInventoryRepository();
-        IDailyStateRepository gameStateRepo = new DailyStateRepository();
+        IUserInventoryRepository userInventoryRepo = new UserInventoryRepository(config: _newGameConfig);
+        IDailyStateRepository gameStateRepo = new DailyStateRepository(newGameConfig: _newGameConfig);
 
         GameContext = new GameContext(
             inventory: userInventoryRepo,
             dailyStateRepo: gameStateRepo
         );
+
+        if(_autoSaveManager != null)
+        {
+            _autoSaveManager.Initialize(GameContext);
+
+            GameContext.InverntoryRepo.OnInventoryChanged += () => _autoSaveManager.MakeDirty();
+            GameContext.DailyStateRepo.OnInventoryChanged += () => _autoSaveManager.MakeDirty();
+            // TODO Repo 추가
+        }
 
         Debug.Log("Global Bootstrapper Initialized");
     }
@@ -36,9 +48,9 @@ public class GlobalBootstrapper : MonoBehaviour
 
         // 각 Repository의 로딩 함수들을 호출합니다.
         // 이때 await를 바로 걸지 않고 Task(일감)만 받아옵니다.
-        var task1 = GameContext.Inverntory.LoadDataAsync();
+        var task1 = GameContext.InverntoryRepo.LoadDataAsync();
         var task2 = GameContext.DailyStateRepo.LoadDataAsync();
-        // TODO 추가
+        // TODO Repo 추가
 
         // UniTask.WhenAll: 두 작업이 '모두' 끝날 때까지 병렬로 기다립니다.
         // (하나가 1초, 다른 하나가 2초 걸리면 총 2초만 기다림)

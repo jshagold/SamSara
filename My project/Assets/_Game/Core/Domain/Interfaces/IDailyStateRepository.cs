@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using System;
 
 public interface IDailyStateRepository
 {
@@ -32,4 +33,7 @@ public interface IDailyStateRepository
     UniTask<DailyState> LoadDataAsync();
 
     UniTask SaveDataAsync();
+    void SaveDataSync();
+
+    event Action OnInventoryChanged;
 }
