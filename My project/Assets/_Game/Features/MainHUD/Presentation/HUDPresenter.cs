@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 ﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
+=======
+﻿using UnityEngine;
+>>>>>>> 36f994afe419b4b8d7b06f49f11d06acd1662ef2
 
 public class HUDPresenter
 {
@@ -29,8 +33,11 @@ public class HUDPresenter
 
         _view.UpdateDate(date: date);
         _view.UpdateCurreny(amount: money);
+<<<<<<< HEAD
 
         _view.PlaySlideIn().Forget();
+=======
+>>>>>>> 36f994afe419b4b8d7b06f49f11d06acd1662ef2
     }
 
     
