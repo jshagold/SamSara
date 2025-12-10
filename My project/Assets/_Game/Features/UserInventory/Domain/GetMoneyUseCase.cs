@@ -13,15 +13,16 @@ public class GetMoneyUseCase
     /// 현재 소지금을 가져온다
     /// </summary>
     /// <returns></returns>
-    public async UniTask<int> GetInventoryMoneyAsync()
+    public int GetInventoryMoneyAsync()
     {
-        return await _userInventroyRepository.GetMoneyAsync();
+        return _userInventroyRepository.GetMoneyAsync();
     }
 
 
     public UniTask<UserInventory> LoadInventoryAsync()
     {
-        return _userInventroyRepository.LoadInventoryAsync();
+        return _userInventroyRepository.LoadDataAsync();
     }
+
 
 }

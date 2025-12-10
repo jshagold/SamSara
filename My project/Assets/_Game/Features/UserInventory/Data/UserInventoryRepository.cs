@@ -1,11 +1,16 @@
 ﻿using System.IO;
 using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
 using UnityEngine;
 
 
 public class UserInventoryRepository : IUserInventoryRepository
 {
     private readonly string _filePath;
+    private readonly string _logClass = "[UserInventoryRepository]";
+
+    // 메모리에 가지고 있는 데이터
+    private UserInventoryData _cachedData;
 
     public UserInventoryRepository()
     {
@@ -13,66 +18,81 @@ public class UserInventoryRepository : IUserInventoryRepository
         _filePath = Path.Combine(Application.persistentDataPath, "save_user_inventory_data.json");
     }
 
-
-    // 메모리에 가지고 있는 데이터
-    private UserInventoryData _cachedData;
-
-    public async UniTask<int> GetMoneyAsync()
+    // 정보 가져오기
+    public async UniTask<UserInventory> LoadDataAsync()
     {
-        // 1. 메모리 값 리턴
-        if(_cachedData != null)
+        if(_cachedData == null)
         {
-            return _cachedData.money;
+            return _cachedData.ToDomain();
         }
 
-        // 2. 저장 파일 없을때 새로운 객체 리턴
         if (!File.Exists(_filePath))
         {
+            Debug.Log($"{_logClass}[LoadDataAsync] 세이브 파일 없어서 새로 생성.");
+
             _cachedData = new UserInventoryData(money: 0);
+
+            return _cachedData.ToDomain();
         }
-        // 3. 저장 파일 데이터 캐싱하고 리턴
-        else
+
+        try
         {
             string json = await UniTask.RunOnThreadPool(() => File.ReadAllText(_filePath));
-            var dto = JsonUtility.FromJson<UserInventoryData>(json);
-            _cachedData = dto;
+
+            var loadDto = JsonConvert.DeserializeObject<UserInventoryData>(json);
+            if (loadDto == null)
+            {
+                throw new System.InvalidOperationException("[LoadDataAsync] 데이터가 null입니다. 파일 손상 의심.");
+            }
+
+            _cachedData = loadDto;
+
+            Debug.Log($"{_logClass} 로드 완료");
+
+            return _cachedData.ToDomain();
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"{_logClass}[CRITICAL] 로드 실패: {e.Message}");
+            throw;
+        }
+    }
+
+    // 정보 저장
+    public async UniTask SaveDataAsync()
+    {
+        if (_cachedData == null)
+        {
+            throw new System.InvalidOperationException("[CRITICAL] 저장 실패! 메모리 데이터가 증발했습니다. 이 세션은 오염되었습니다.");
+        }
+
+        // 스레드 풀에서 저장. (게임 멈춤 방지)
+        try
+        {
+            await UniTask.RunOnThreadPool(() =>
+            {
+                string json = JsonConvert.SerializeObject(_cachedData, Formatting.Indented);
+                File.WriteAllText(_filePath, json);
+            });
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"{_logClass}[IO Error] 파일 쓰기 실패!!: {e.Message}");
+        }
+
+        Debug.Log("[DailyStateRepository] 저장 완료");
+    }
+
+
+    public int GetMoneyAsync()
+    {
+        // 1. 메모리 값 리턴
+        if(_cachedData == null)
+        {
+            throw new System.InvalidOperationException("[CRITICAL] UserInventoryData is NULL! 데이터가 로드되지 않은 상태에서 접근했습니다.");
         }
 
         return _cachedData.money;
     }
 
-
-    // 인벤토리 정보 가져오기
-    public async UniTask<UserInventory> LoadInventoryAsync()
-    {
-        if (!File.Exists(_filePath))
-        {
-            return new UserInventory(money: 0);
-        }
-
-        // 파일 읽기 (I/O는 Thread Pool 에서)
-        string json = await UniTask.RunOnThreadPool(() => File.ReadAllText(_filePath));
-
-        // JSON -> DTO
-        var dto = JsonUtility.FromJson<UserInventoryData>(json);
-        _cachedData = dto;
-
-        // DTO -> Entity
-        return dto.ToDomain();
-    }
-
-    // 인벤토리 정보 저장
-    public async UniTask SaveUserInventoryAsync(UserInventory inventory)
-    {
-        // Entity -> DTO
-        var dto = inventory.ToData();
-
-        // DTO -> JSON
-        string json = JsonUtility.ToJson(dto, true);
-
-        // 파일 쓰기
-        await UniTask.RunOnThreadPool(() => File.WriteAllText(_filePath, json));
-
-        Debug.Log($"로컬 파일 저장완료 : {_filePath}");
-    }
 }

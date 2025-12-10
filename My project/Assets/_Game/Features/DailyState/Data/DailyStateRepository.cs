@@ -58,8 +58,8 @@ public class DailyStateRepository : IDailyStateRepository
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"{_logClass}[LoadDataAsync] 저장파일 로드 실패 : {e.Message}");
-            _cachedData = new DailyStateData(currentDay: 0, characterActionMap: new Dictionary<string, bool[]>());
+            Debug.LogError($"{_logClass}[CRITICAL] 로드 실패: {e.Message}");
+            throw;
         }
     }
 

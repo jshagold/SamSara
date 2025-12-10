@@ -20,11 +20,11 @@ public class HUDPresenter
         _dailyStateUseCase = dailyStateUseCase;
     }
 
-    public async void Initialize()
+    public void Initialize()
     {
         _view.SetOnClickOptionBtnAction(HandleOptionClick);
 
-        int money = await _moneyUseCase.GetInventoryMoneyAsync();
+        int money = _moneyUseCase.GetInventoryMoneyAsync();
         int date = _dailyStateUseCase.GetCurrentDay();
 
         _view.UpdateDate(date: date);
