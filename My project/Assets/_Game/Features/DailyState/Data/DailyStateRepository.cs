@@ -15,7 +15,7 @@ public class DailyStateRepository : IDailyStateRepository
     private DailyStateData _cachedData;
 
     // 데이터 변경 알림 이벤트
-    public event Action OnInventoryChanged;
+    public event Action OnDailyStateChanged;
 
     public DailyStateRepository(NewGameConfig newGameConfig)
     {
@@ -166,7 +166,7 @@ public class DailyStateRepository : IDailyStateRepository
 
     private void NotifyChanged()
     {
-        OnInventoryChanged?.Invoke();
+        OnDailyStateChanged?.Invoke();
     }
 
     // 데이터 무결성 체크 (Fail Fast)

@@ -34,8 +34,8 @@ public class GlobalBootstrapper : MonoBehaviour
         {
             _autoSaveManager.Initialize(GameContext);
 
-            GameContext.InverntoryRepo.OnInventoryChanged += () => _autoSaveManager.MakeDirty();
-            GameContext.DailyStateRepo.OnInventoryChanged += () => _autoSaveManager.MakeDirty();
+            GameContext.InventoryRepo.OnInventoryChanged += () => _autoSaveManager.MakeDirty();
+            GameContext.DailyStateRepo.OnDailyStateChanged += () => _autoSaveManager.MakeDirty();
             // TODO Repo 추가
         }
 
@@ -48,7 +48,7 @@ public class GlobalBootstrapper : MonoBehaviour
 
         // 각 Repository의 로딩 함수들을 호출합니다.
         // 이때 await를 바로 걸지 않고 Task(일감)만 받아옵니다.
-        var task1 = GameContext.InverntoryRepo.LoadDataAsync();
+        var task1 = GameContext.InventoryRepo.LoadDataAsync();
         var task2 = GameContext.DailyStateRepo.LoadDataAsync();
         // TODO Repo 추가
 

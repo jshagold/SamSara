@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using Cysharp.Threading.Tasks;
-using UnityEditor.Localization.Editor;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class IntroPresenter
@@ -36,7 +36,7 @@ public class IntroPresenter
             }
             catch (Exception e)
             {
-                Debug.WriteLine($"{_logClass} 데이터 로딩 실패 : {e.Message}");
+                UnityEngine.Debug.Log($"{_logClass} 데이터 로딩 실패 : {e.Message}");
 
                 bool isRetry = await PopupManager.Instance.ShowCommonPopup(
                     title: LocalizationUtils.GetString("common_error_title"),
@@ -86,6 +86,7 @@ public class IntroPresenter
 
     private void OnStartButtonClicked()
     {
+        UnityEngine.Debug.Log(">> 버튼 클릭 씬이동중");
         SceneManager.LoadScene( _nextSceneName );
     }
 

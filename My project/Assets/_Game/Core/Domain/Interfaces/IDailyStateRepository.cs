@@ -35,5 +35,5 @@ public interface IDailyStateRepository
     UniTask SaveDataAsync();
     void SaveDataSync();
 
-    event Action OnInventoryChanged;
+    event Action OnDailyStateChanged;
 }

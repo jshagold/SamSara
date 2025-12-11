@@ -16,6 +16,7 @@ public class CommonPopupView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _firstButtonText;
     [SerializeField] private Button _secondButton;
     [SerializeField] private TextMeshProUGUI _secondButtonText;
+
     private void Reset()
     {
         if (_panelRoot == null) _panelRoot = this.gameObject;

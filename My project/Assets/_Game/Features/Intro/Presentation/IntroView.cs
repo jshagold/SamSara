@@ -7,8 +7,8 @@ using UnityEngine.UI;
 public class IntroView : MonoBehaviour
 {
     [Header("스플래시/타이틀 그룹")]
-    [SerializeField] private CanvasGroup splashGroup;
-    [SerializeField] private CanvasGroup titleGroup;
+    [SerializeField] private CanvasGroup splashPanel;
+    [SerializeField] private CanvasGroup titlePanel;
 
     [Header("Title Elements")]
     [SerializeField] private Image backgroundImage;
@@ -19,12 +19,29 @@ public class IntroView : MonoBehaviour
     [SerializeField] private Sprite backgroundNormal;
     [SerializeField] private Sprite backgroundSamsara;
 
+    private void Reset()
+    {
+        var allPanels= GetComponentsInChildren<CanvasGroup>(true);
+
+        foreach (var panel in allPanels)
+        {
+            string objectName = panel.name.ToLower();
+
+            if (splashPanel == null && objectName.Contains("splash")) splashPanel = panel;
+            if (titlePanel == null && objectName.Contains("title")) titlePanel = panel;
+        }
+
+        if (backgroundImage == null) backgroundImage = GetComponentInChildren<Image>();
+        if (startButton == null) startButton = GetComponentInChildren<Button>();
+        if (buttonText == null) buttonText = GetComponentInChildren<TextMeshProUGUI>();
+    }
+
     // 초기 상태 설정 - 로고만 보이고 타이틀 숨김
     public void SetupInitialState()
     {
-        splashGroup.alpha = 1f;
-        titleGroup.alpha = 0f;
-        titleGroup.interactable = false; // 클릭 방지
+        splashPanel.alpha = 1f;
+        titlePanel.alpha = 0f;
+        titlePanel.interactable = false; // 클릭 방지
     }
 
     // 로고 서서히 사라지고 타이틀 나타나는 효과 적용(Cross Fade)
@@ -48,14 +65,23 @@ public class IntroView : MonoBehaviour
             elasped += Time.deltaTime;
             float t = elasped / duration;
 
-            splashGroup.alpha = 1 - t;
-            titleGroup.alpha = t;
+            splashPanel.alpha = 1 - t;
+            titlePanel.alpha = t;
 
             // Yield에 토큰 전달 [핵심]
             // 만약 도중에 객체가 파괴되면 여기서 OperationCanceledException이 발생하며 
             // 아래 코드를 실행하지 않고 조용히 종료됩니다.
             await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
         }
+
+        splashPanel.alpha = 0f;
+        titlePanel.alpha = 1f;
+
+        titlePanel.interactable = true;
+        titlePanel.blocksRaycasts = true;
+
+        splashPanel.interactable = false;
+        splashPanel.blocksRaycasts = false;
     }
 
     // 게임시작 버튼 이벤트 연결

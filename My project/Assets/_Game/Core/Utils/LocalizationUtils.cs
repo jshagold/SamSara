@@ -2,7 +2,7 @@
 
 public static class LocalizationUtils
 {
-    private const string TextTableName = "UI TABLE";
+    private const string TextTableName = "UI_TABLE";
 
     public static string GetString(string key)
     {

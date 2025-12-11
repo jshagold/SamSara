@@ -54,7 +54,7 @@ public class AutoSaveManager : MonoBehaviour
             // 병렬 저장 (하나라도 터지면 즉시 예외 전파)
             await UniTask.WhenAll(
                 _gameContext.DailyStateRepo.SaveDataAsync(),
-                _gameContext.InverntoryRepo.SaveDataAsync()
+                _gameContext.InventoryRepo.SaveDataAsync()
             );
             
             // 저장 성공시 플래그 초기화
@@ -139,7 +139,7 @@ public class AutoSaveManager : MonoBehaviour
         {
             // 여기서는 async/await를 쓰지 않고 즉시 파일에 씁니다.
             _gameContext.DailyStateRepo.SaveDataSync();
-            _gameContext.InverntoryRepo.SaveDataSync();
+            _gameContext.InventoryRepo.SaveDataSync();
 
             _isDirty = false;
             Debug.Log(">>> [Emergency Save] 긴급 저장 완료");
