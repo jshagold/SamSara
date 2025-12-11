@@ -35,6 +35,22 @@ MonoBehaviour:
     m_Key: scene_intro_start_button_samsara
     m_Metadata:
       m_Items: []
+  - m_Id: 551925358034944
+    m_Key: common_error_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 552070803914752
+    m_Key: common_error_retry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 552286726684672
+    m_Key: common_error_network_case1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 641946685571072
+    m_Key: common_error_quit_game
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
