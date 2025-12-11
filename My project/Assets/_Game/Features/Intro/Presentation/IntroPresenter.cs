@@ -1,8 +1,13 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System;
+using System.Diagnostics;
+using Cysharp.Threading.Tasks;
+using UnityEditor.Localization.Editor;
 using UnityEngine.SceneManagement;
 
 public class IntroPresenter
 {
+    private readonly string _logClass = "[IntroPresenter]";
+
     private IntroView _introView;
     private string _nextSceneName;
 
@@ -16,12 +21,49 @@ public class IntroPresenter
         // 1. 초기화면 세팅 (로고 on, 타이틀 off)
         _introView.SetupInitialState();
 
-        // 2. 데이터 로딩 (최소 2초 보장)
-        var loadTask = GlobalBootstrapper.Instance.LoadAllGameDataAsync();
-        var waitTask = UniTask.Delay(2000); // 로고 재생 시간
+        // 성공할 때까지 무한 반복
+        while (true)
+        {
+            try
+            {
+                // 2. 데이터 로딩 (최소 2초 보장)
+                var loadTask = GlobalBootstrapper.Instance.LoadAllGameDataAsync();
+                var waitTask = UniTask.Delay(2000); // 로고 재생 시간
 
-        await UniTask.WhenAll(loadTask, waitTask);
+                await UniTask.WhenAll(loadTask, waitTask);
 
+                break;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine($"{_logClass} 데이터 로딩 실패 : {e.Message}");
+
+                bool isRetry = await PopupManager.Instance.ShowCommonPopup(
+                    title: LocalizationUtils.GetString("common_error_title"),
+                    desc: LocalizationUtils.GetString("common_error_network_case1"),
+                    firstText: LocalizationUtils.GetString("common_error_retry"),
+                    secondText: LocalizationUtils.GetString("common_error_quit_game")
+                );
+
+                if (isRetry)
+                {
+                    // firstButton 입력
+                    continue;
+                }
+                else
+                {
+                    // secondButton을 눌렀으면 -> 게임 끄고 함수 종료
+                    #if UNITY_EDITOR
+                        UnityEditor.EditorApplication.isPlaying = false;
+                    #else
+                        Application.Quit();
+                    #endif
+                    return;
+                }
+            }
+        }
+
+        // 데이터 로딩 성공 이후
         bool isRestartGame = CheckStartOption();
 
         if (isRestartGame)
