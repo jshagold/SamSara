@@ -88,7 +88,11 @@ public class UserInventoryRepository : IUserInventoryRepository
     // 긴급 저장 (OnApplicationPause 용) - 동기
     public void SaveDataSync()
     {
-        CheckDataIntegrity();
+        if (_cachedData == null)
+        {
+            Debug.LogWarning($"{_logClass}[Save Skip] 로드된 데이터가 없어서 강제 저장 스킵");
+            return;
+        }
 
         try
         {

@@ -102,10 +102,14 @@ public class DailyStateRepository : IDailyStateRepository
         Debug.Log("[DailyStateRepository] 저장 완료");
     }
 
-    // 데이터 저장 - 동기
+    // 데이터 저장 - 동기 (긴급 저장)
     public void SaveDataSync()
     {
-        CheckDataIntegrity();
+        if (_cachedData == null)
+        {
+            Debug.LogWarning($"{_logClass}[Save Skip] 로드된 데이터가 없어서 강제 저장 스킵");
+            return;
+        }
 
         try
         {
