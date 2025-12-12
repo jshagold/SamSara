@@ -8,6 +8,10 @@ public class MainSceneBootstrapper : MonoBehaviour
     [SerializeField] private BackgroundBootstrapper _backgroundBootstrapper;
     [SerializeField] private LobbyBootstrapper _lobbyBootstrapper;
 
+    [Header("Popup Components")]
+    [SerializeField] private OptionMenuPopupView _menuPopup;
+    [SerializeField] private SettingsPopupView _settingsPopup;
+
     private void Start() // Global이 Awake에서 초기화될 시간을 주기 위해 Start 권장
     {
         if(GlobalBootstrapper.Instance == null)
@@ -15,7 +19,6 @@ public class MainSceneBootstrapper : MonoBehaviour
             Debug.LogError("GlobalBootstrapper 선언되지 않음");
             return;
         }
-
         var gameContext = GlobalBootstrapper.Instance.GameContext;
 
         // Background Presenter 조립
@@ -25,7 +28,7 @@ public class MainSceneBootstrapper : MonoBehaviour
         _lobbyBootstrapper.Initialize();
 
         // HUD Bootstrapper
-        _hudBootstrapper.Initialize(gameContext);
+        _hudBootstrapper.Initialize(gameContext: gameContext, menuPopup: _menuPopup, settingsPopup: _settingsPopup);
 
 
 

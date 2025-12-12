@@ -6,9 +6,12 @@ using UnityEngine.Events;
 public class HUDView : MonoBehaviour
 {
     [Header("Components")]
-    [SerializeField] private OptionButtonView _optionButton; // 재사용 컴포넌트 연결
+    [SerializeField] private HUDOnOffButtonView _hudOnOffButton;
     [SerializeField] private DateDisplayView _dateDisplay;
     [SerializeField] private CurrencyView _currencyView;
+
+    [Header("Option Components")]
+    [SerializeField] private OptionButtonView _optionButton;
 
     [Header("Animation Settings")]
     [SerializeField] private RectTransform _abovePanelRect; // 위로 움직일 묶음
@@ -20,6 +23,9 @@ public class HUDView : MonoBehaviour
 
     [Tooltip("1.0 = 패널 크기(가로, 세로)만큼 이동, 1.1 = 10% 여유 버퍼")]
     [SerializeField][Range(1.0f, 1.5f)] private float hideOffsetRatio = 1.1f;
+
+    // Presenter가 사용할 수 있게 프로퍼티로 노출
+    public OptionButtonView OptionButton => _optionButton;
 
     private Vector2 _abovePanelVisiblePos;
     private Vector2 _abovePanelHiddenPos;
@@ -51,7 +57,7 @@ public class HUDView : MonoBehaviour
 
     private void Reset()
     {
-        if (_optionButton == null) _optionButton = GetComponentInChildren<OptionButtonView>();
+        if (_hudOnOffButton == null) _hudOnOffButton = GetComponentInChildren<HUDOnOffButtonView>();
         if (_dateDisplay == null) _dateDisplay = GetComponentInChildren<DateDisplayView>();
         if (_currencyView == null) _currencyView = GetComponentInChildren<CurrencyView>();
 
@@ -61,7 +67,7 @@ public class HUDView : MonoBehaviour
     // Presenter가 버튼 이벤트를 구독할 수 있게 연결 통로(Proxy)를 열어줍니다.
     public void SetOnClickOptionBtnAction(UnityAction action)
     {
-        _optionButton.SetOnClickBtn(action);
+        _hudOnOffButton.SetOnClickBtn(action);
     }
 
     public void UpdateCurreny(int amount)
