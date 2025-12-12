@@ -61,7 +61,7 @@ public class HUDView : MonoBehaviour
     // Presenter가 버튼 이벤트를 구독할 수 있게 연결 통로(Proxy)를 열어줍니다.
     public void SetOnClickOptionBtnAction(UnityAction action)
     {
-        _optionButton.OnClickBtn(action);
+        _optionButton.SetOnClickBtn(action);
     }
 
     public void UpdateCurreny(int amount)

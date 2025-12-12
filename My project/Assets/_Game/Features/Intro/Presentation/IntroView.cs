@@ -36,6 +36,11 @@ public class IntroView : MonoBehaviour
         if (buttonText == null) buttonText = GetComponentInChildren<TextMeshProUGUI>();
     }
 
+    private void OnDestroy()
+    {
+        if(startButton != null) startButton.onClick.RemoveAllListeners();
+    }
+
     // 초기 상태 설정 - 로고만 보이고 타이틀 숨김
     public void SetupInitialState()
     {
