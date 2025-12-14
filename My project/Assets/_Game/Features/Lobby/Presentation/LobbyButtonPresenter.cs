@@ -37,7 +37,7 @@ public class LobbyButtonPresenter : IDisposable
         {
             string localizedText = LocalizationUtils.GetString("UITable", stageTheme.localizationKey);
             _stageButtonView.SetVisual(sprite: stageTheme.icon, text: localizedText);
-            _stageButtonView.SetOnClickAction(OnMaintenanceBtnClicked);
+            _stageButtonView.SetOnClickAction(OnStageBtnClicked);
 
             RefreshUI(LobbyButtonType.Stage);
         }
@@ -46,7 +46,7 @@ public class LobbyButtonPresenter : IDisposable
         {
             string localizedText = LocalizationUtils.GetString("UITable", characterInfoTheme.localizationKey);
             _characterInfoButtonView.SetVisual(sprite: characterInfoTheme.icon, text: localizedText);
-            _characterInfoButtonView.SetOnClickAction(OnMaintenanceBtnClicked);
+            _characterInfoButtonView.SetOnClickAction(OnCharacterInfoBtnClicked);
 
             RefreshUI(LobbyButtonType.CharacterInfo);
         }
