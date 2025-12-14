@@ -15,16 +15,24 @@ MonoBehaviour:
   m_TableCollectionName: UI_TABLE
   m_TableCollectionNameGuidString: c6206c213e90ada45a5dfc0c72690fb5
   m_Entries:
-  - m_Id: 267255980032
-    m_Key: scene_main_maintenance_button
+  - m_Id: 552286726684672
+    m_Key: common_error_network_case1
     m_Metadata:
       m_Items: []
-  - m_Id: 567777861632
-    m_Key: scene_main_stage_button
+  - m_Id: 641946685571072
+    m_Key: common_error_quit_game
     m_Metadata:
       m_Items: []
-  - m_Id: 625814446080
-    m_Key: scene_main_character_information_button
+  - m_Id: 552070803914752
+    m_Key: common_error_retry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 551925358034944
+    m_Key: common_error_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1816690739552256
+    m_Key: scene_main_popup_option_button_account
     m_Metadata:
       m_Items: []
   - m_Id: 158950979305472
@@ -35,20 +43,20 @@ MonoBehaviour:
     m_Key: scene_intro_start_button_samsara
     m_Metadata:
       m_Items: []
-  - m_Id: 551925358034944
-    m_Key: common_error_title
+  - m_Id: 625814446080
+    m_Key: scene_main_character_information_button
     m_Metadata:
       m_Items: []
-  - m_Id: 552070803914752
-    m_Key: common_error_retry
+  - m_Id: 267255980032
+    m_Key: scene_main_maintenance_button
     m_Metadata:
       m_Items: []
-  - m_Id: 552286726684672
-    m_Key: common_error_network_case1
+  - m_Id: 1816381338329088
+    m_Key: scene_main_popup_option_button_setting
     m_Metadata:
       m_Items: []
-  - m_Id: 641946685571072
-    m_Key: common_error_quit_game
+  - m_Id: 567777861632
+    m_Key: scene_main_stage_button
     m_Metadata:
       m_Items: []
   m_Metadata:

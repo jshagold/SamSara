@@ -24,7 +24,6 @@ public class MainOptionPresenter : IDisposable
 
     public void Initialize()
     {
-        //
         _menuPopupView.HidePopup();
         _settingsPopupView.ClosePopup();
 
@@ -35,11 +34,19 @@ public class MainOptionPresenter : IDisposable
 
         _menuPopupView.SetActions(
             onSettingsClicked: OnOpenSettings,
-            onBackgroundClicked: () => _menuPopupView.HidePopup()
+            onAccountClicked: () => { },
+            onBackgroundClicked: _menuPopupView.HidePopup
+        );
+        string settingLabel = LocalizationUtils.GetString("scene_main_popup_option_button_setting");
+        string accountLabel = LocalizationUtils.GetString("scene_main_popup_option_button_account");
+
+        _menuPopupView.UpdateTexts(
+            settingText: settingLabel,
+            accountText: accountLabel
         );
 
         _settingsPopupView.SetEvents(
-            onClosePopup: () => _settingsPopupView.ClosePopup(),
+            onClosePopup: _settingsPopupView.ClosePopup,
             onSoundToggle: OnSoundChanged
         );
     }
