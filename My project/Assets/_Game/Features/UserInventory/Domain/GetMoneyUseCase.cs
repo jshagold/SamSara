@@ -19,7 +19,7 @@ public class GetMoneyUseCase
     }
 
 
-    public UniTask<UserInventory> LoadInventoryAsync()
+    public UniTask<UserInventoryDto> LoadInventoryAsync()
     {
         return _userInventroyRepository.LoadDataAsync();
     }

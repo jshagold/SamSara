@@ -28,7 +28,7 @@ public class DailyStateRepository : IDailyStateRepository
     // -------
     // 데이터 불러오기
     // -------
-    public async UniTask<DailyState> LoadDataAsync()
+    public async UniTask<DailyStateDto> LoadDataAsync()
     {
         if(_cachedData != null)
         {

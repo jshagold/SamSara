@@ -24,7 +24,7 @@ public class UserInventoryRepository : IUserInventoryRepository
     }
 
     // 정보 가져오기
-    public async UniTask<UserInventory> LoadDataAsync()
+    public async UniTask<UserInventoryDto> LoadDataAsync()
     {
         if(_cachedData == null)
         {

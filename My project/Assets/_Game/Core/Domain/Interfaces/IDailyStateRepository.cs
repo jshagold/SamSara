@@ -30,7 +30,7 @@ public interface IDailyStateRepository
     // =================================================
 
     // 게임 실행할 때 데이터 읽어와서 메모리 변수에 세팅.
-    UniTask<DailyState> LoadDataAsync();
+    UniTask<DailyStateDto> LoadDataAsync();
 
     UniTask SaveDataAsync();
     void SaveDataSync();
