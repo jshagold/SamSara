@@ -37,4 +37,13 @@ public class HUDBootstrapper : MonoBehaviour
 
         Debug.Log("HUD 및 옵션 조립 완료");
     }
+
+    private void OnDestroy()
+    {
+        _hudPresenter?.Dispose();
+        _mainOptionPresenter?.Dispose();
+        _characterSummaryPresenter?.Dispose();
+
+        Debug.Log("[HUD] Bootstrapper Destroyed, Presenters Disposed");
+    }
 }

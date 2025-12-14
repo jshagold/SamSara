@@ -20,4 +20,9 @@ public class LobbyBootstrapper : MonoBehaviour
 
         _lobbyBtnPresenter.Initialize();
     }
+
+    private void OnDestroy()
+    {
+        _lobbyBtnPresenter?.Dispose();
+    }
 }

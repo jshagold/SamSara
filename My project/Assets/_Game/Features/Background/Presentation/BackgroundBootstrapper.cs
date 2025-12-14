@@ -13,4 +13,9 @@ public class BackgroundBootstrapper : MonoBehaviour
 
         Debug.Log("Background 조립 완료");
     }
+
+    private void OnDestroy()
+    {
+        _backgroundPresenter?.Dispose();
+    }
 }

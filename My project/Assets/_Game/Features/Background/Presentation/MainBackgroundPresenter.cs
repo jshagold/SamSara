@@ -1,6 +1,7 @@
+ï»¿using System;
 using UnityEngine;
 
-public class MainBackgroundPresenter
+public class MainBackgroundPresenter : IDisposable
 {
     private readonly MainBackgroundView _view;
 
@@ -11,18 +12,23 @@ public class MainBackgroundPresenter
 
     public void Initialize()
     {
-        // ÃÊ±â »óÅÂ´Â '³·'À¸·Î ¼³Á¤
+        // ì´ˆê¸° ìƒíƒœëŠ” 'ë‚®'ìœ¼ë¡œ ì„¤ì •
         ChangeToDay();
+    }
+
+    public void Dispose()
+    {
+
     }
 
     public void ChangeToDay()
     {
-        Debug.Log("¹è°æ º¯°æ: ³·");
+        Debug.Log("ë°°ê²½ ë³€ê²½: ë‚®");
         _view.SetBackground(BackgroundType.Day);
     }
 
 
-    // Á¶°Ç¿¡ µû¶ó º¯°æÇÏ´Â ·ÎÁ÷ ¿¹½Ã
+    // ì¡°ê±´ì— ë”°ë¼ ë³€ê²½í•˜ëŠ” ë¡œì§ ì˜ˆì‹œ
     public void ChangeByCondition(bool isHardMode)
     {
         if (isHardMode)

@@ -1,7 +1,8 @@
 ﻿using Cysharp.Threading.Tasks;
+using System;
 using UnityEngine;
 
-public class HUDPresenter
+public class HUDPresenter : IDisposable
 {
     private readonly HUDView _view;
 
@@ -30,7 +31,18 @@ public class HUDPresenter
         _view.UpdateDate(date: date);
         _view.UpdateCurreny(amount: money);
 
+        // TODO UseCase 이벤트는 여기서 += 연결한다.
+        // ex) _moneyUseCase.OnMoneyChanged += HandleMoneyChanged;
+
         _view.PlaySlideIn().Forget();
+    }
+
+    // [Dispose 패턴]
+    // Boostrapper의 OnDestroy에서 호출됨
+    public void Dispose()
+    {
+        // TODO 나중에 UseCase이벤트를 구독하면 여기서 해제해야한다.
+        // ex) _moneyUseCase.OnMoneyChanged -= HandleMoneyChanged;
     }
 
     

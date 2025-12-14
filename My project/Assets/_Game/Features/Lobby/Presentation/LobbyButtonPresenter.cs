@@ -1,7 +1,8 @@
-﻿using UnityEngine.UIElements;
+﻿using System;
+using UnityEngine.UIElements;
 using static LobbyButtonThemeConfig;
 
-public class LobbyButtonPresenter
+public class LobbyButtonPresenter : IDisposable
 {
     private readonly NavigationButtonView _maintenanceButtonView;
     private readonly NavigationButtonView _stageButtonView;
@@ -49,6 +50,11 @@ public class LobbyButtonPresenter
 
             RefreshUI(LobbyButtonType.CharacterInfo);
         }
+
+    }
+
+    public void Dispose()
+    {
 
     }
 

@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
-public class MainOptionPresenter
+public class MainOptionPresenter : IDisposable
 {
     private readonly string _logClass = "[MainOptionPresenter]";
 
@@ -43,6 +44,10 @@ public class MainOptionPresenter
         );
     }
 
+    public void Dispose()
+    {
+
+    }
 
     private void OnOpenSettings()
     {

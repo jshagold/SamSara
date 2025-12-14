@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
-public class MainSceneCharacterSummaryPresenter
+public class MainSceneCharacterSummaryPresenter : IDisposable
 {
     private readonly HUDView _hudView;
     private readonly GetCharacterSummaryUseCase _characterSummaryUseCase;
@@ -20,6 +21,11 @@ public class MainSceneCharacterSummaryPresenter
 
         // 2. 데이터 변경 감지 (예시: 옵저버 패턴이나 이벤트가 있다면 연결)
         // _charRepo.OnCharacterDataChanged += RefreshView;
+    }
+
+    public void Dispose()
+    {
+
     }
 
     private void RefreshList()
