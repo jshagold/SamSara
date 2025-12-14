@@ -19,4 +19,9 @@ public class IntroBootstrapper : MonoBehaviour
 
         _introPresenter.Initialize();
     }
+
+    private void OnDestroy()
+    {
+        _introPresenter?.Dispose();
+    }
 }

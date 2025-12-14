@@ -1,7 +1,8 @@
 ﻿using Cysharp.Threading.Tasks;
+using System;
 using UnityEngine.SceneManagement;
 
-public class IntroPresenter
+public class IntroPresenter : IDisposable
 {
     private IntroView _introView;
     private string _nextSceneName;
@@ -40,6 +41,11 @@ public class IntroPresenter
         await _introView.TransitionToTitle(isRestart: isRestartGame);
 
         _introView.SetOnClickStartButton(OnStartButtonClicked);
+    }
+
+    public void Dispose()
+    {
+
     }
 
     private void OnStartButtonClicked()
