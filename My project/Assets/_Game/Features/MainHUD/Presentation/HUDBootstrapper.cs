@@ -6,6 +6,7 @@ public class HUDBootstrapper : MonoBehaviour
     
     private HUDPresenter _hudPresenter;
     private MainOptionPresenter _mainOptionPresenter;
+    private MainSceneCharacterSummaryPresenter _characterSummaryPresenter;
 
     public void Initialize(
         GameContext gameContext,
@@ -26,6 +27,13 @@ public class HUDBootstrapper : MonoBehaviour
             settingsPopupView: settingsPopup
         );
         _mainOptionPresenter.Initialize();
+
+        _characterSummaryPresenter = new MainSceneCharacterSummaryPresenter(
+            hudView: _hudView,
+            charSummaryUseCase: gameContext.GetCharacterSummaryUseCase
+        );
+        _characterSummaryPresenter.Initialize();
+
 
         Debug.Log("HUD 및 옵션 조립 완료");
     }

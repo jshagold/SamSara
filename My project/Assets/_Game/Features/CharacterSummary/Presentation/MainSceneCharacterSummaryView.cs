@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-public class MainCharacterSummaryView : MonoBehaviour
+public class MainSceneCharacterSummaryView : MonoBehaviour
 {
     [Header("Dependencies")]
     [SerializeField] private CharacterAssetConfig _characterAssetConfig;
@@ -18,7 +18,7 @@ public class MainCharacterSummaryView : MonoBehaviour
     // 이미 생성된 아이콘들 재사용을 위한 리스트
     private List<ActionIconView> _spawnedIcons = new List<ActionIconView>();
 
-    public void Render(MainCharacterSummaryDto data)
+    public void Render(MainSceneCharacterSummaryDto data)
     {
         // 캐릭터 정보 갱신
         Sprite foundSprite = _characterAssetConfig.GetPortrait(data.CharacterId);

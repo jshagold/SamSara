@@ -1,4 +1,7 @@
-﻿public class GetCharacterSummaryUseCase
+﻿using System;
+using System.Collections.Generic;
+
+public class GetCharacterSummaryUseCase
 {
     // TODO CharacterRepository 필요
     private readonly IDailyStateRepository _dailyStateRepo;
@@ -9,15 +12,22 @@
         _dailyStateRepo = dailyStateRepo;
     }
 
-    public MainCharacterSummaryDto GetDto()
+    public List<MainSceneCharacterSummaryDto> GetCharacterSummaryList()
     {
-        return new MainCharacterSummaryDto
-        {
-            // TODO 캐릭터 정보 받아와야함
-            CharacterId = "",
-            CurrentHp = 0,
-            MaxHp = 0,
-            ActionFlags = _dailyStateRepo.GetActionSlot("")
-        };
+        List<MainSceneCharacterSummaryDto> dataList = new List<MainSceneCharacterSummaryDto>();
+
+        // TODO 데이터 가져오도록 수정해야함. 지금은 임시 데이터
+        string charId = "character_main_0";
+        bool[] actionSlots= _dailyStateRepo.GetActionSlot(charId: charId);
+
+        dataList.Add(new MainSceneCharacterSummaryDto(
+            characterId: charId,
+            currentHp: 1000,
+            maxHp: 1000,
+            actionFlags: actionSlots
+        ));
+
+
+        return dataList;
     }
 }

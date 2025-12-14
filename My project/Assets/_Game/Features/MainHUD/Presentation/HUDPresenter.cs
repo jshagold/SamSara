@@ -22,7 +22,7 @@ public class HUDPresenter
 
     public void Initialize()
     {
-        _view.SetOnClickOptionBtnAction(HandleOptionClick);
+        _view.SetOnClickHUDOnOffBtnAction(HandleOptionClick);
 
         int money = _moneyUseCase.GetInventoryMoneyAsync();
         int date = _dailyStateUseCase.GetCurrentDay();

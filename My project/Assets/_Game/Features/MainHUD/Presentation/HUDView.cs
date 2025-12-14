@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -24,9 +25,16 @@ public class HUDView : MonoBehaviour
     [Tooltip("1.0 = 패널 크기(가로, 세로)만큼 이동, 1.1 = 10% 여유 버퍼")]
     [SerializeField][Range(1.0f, 1.5f)] private float hideOffsetRatio = 1.1f;
 
+    [Header("Character List Settings")]
+    [SerializeField] private Transform _charListContainer;
+    [SerializeField] private MainSceneCharacterSummaryView _characterSummaryPrefab;
+
     // Presenter가 사용할 수 있게 프로퍼티로 노출
     public OptionButtonView OptionButton => _optionButton;
     public HUDOnOffButtonView OnOffButton => _hudOnOffButton;
+
+    // 캐릭터 뷰 리스트 (오브젝트 풀링, 재사용 목적)
+    private List<MainSceneCharacterSummaryView> _spawnedSummaryViews = new List<MainSceneCharacterSummaryView>();
 
     private Vector2 _abovePanelVisiblePos;
     private Vector2 _abovePanelHiddenPos;
@@ -35,6 +43,8 @@ public class HUDView : MonoBehaviour
 
     private void Awake()
     {
+        // 초기 위치와 숨겨질 위치 적용
+
         if(_abovePanelRect != null)
         {
             float abovePanelHeight = _abovePanelRect.rect.height;
@@ -66,21 +76,47 @@ public class HUDView : MonoBehaviour
         Debug.Log($"[TopHUDView] 에디터 자동 연결 완료 (Panel 연결 확인해야함): {name}");
     }
 
-    // Presenter가 버튼 이벤트를 구독할 수 있게 연결 통로(Proxy)를 열어줍니다.
+    // Presenter에서 이벤트 연결
+
+    public void UpdateCharacterList(List<MainSceneCharacterSummaryDto> dataList)
+    {
+        // 개수 맞추기 (오브젝트 풀링 개념: 모자르면 더만들고 남으면 끝)
+        while (_spawnedSummaryViews.Count < dataList.Count)
+        {
+            MainSceneCharacterSummaryView newView = Instantiate(_characterSummaryPrefab, _charListContainer);
+            _spawnedSummaryViews.Add(newView);
+        }
+
+        // 데이터 바인딩
+        for (int i = 0; i < _spawnedSummaryViews.Count; i++)
+        {
+            if(i < dataList.Count)
+            {
+                var view = _spawnedSummaryViews[i];
+                view.gameObject.SetActive(true);
+                view.Render(dataList[i]);   // 개별 View에 데이터 주입
+            }
+            else
+            {
+                // 데이터보다 뷰가 많으면 남는 View 숨김
+                _spawnedSummaryViews[i].gameObject.SetActive(false);
+            }
+        }
+    }
+
+    public void SetOnClickHUDOnOffBtnAction(UnityAction action)
+    {
+        if(_hudOnOffButton != null) _hudOnOffButton.SetOnClicked(action);
+    }
+
     public void SetOnClickOptionBtnAction(UnityAction action)
     {
-        if(_optionButton != null) _hudOnOffButton.SetOnClicked(action);
+        if(_optionButton != null) _optionButton.SetOnClickAction(action);
     }
 
-    public void UpdateCurreny(int amount)
-    {
-        _currencyView.SetMoneyText(amount);
-    }
-
-    public void UpdateDate(int date)
-    {
-        _dateDisplay.SetDateText(date);
-    }
+    // --- 데이터 갱신 ---
+    public void UpdateCurreny(int amount) =>_currencyView.SetMoneyText(amount);
+    public void UpdateDate(int date) => _dateDisplay.SetDateText(date);
 
     // --- 애니메이션 코드 (HUD 효과) ---
     
