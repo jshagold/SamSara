@@ -26,7 +26,7 @@ public class UserInventoryRepository : IUserInventoryRepository
     // 정보 가져오기
     public async UniTask<UserInventoryDto> LoadDataAsync()
     {
-        if(_cachedData == null)
+        if(_cachedData != null)
         {
             return _cachedData.ToDomain();
         }
