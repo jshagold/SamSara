@@ -1,4 +1,5 @@
-﻿using Unity.Profiling;
+﻿using Cysharp.Threading.Tasks;
+using Unity.Profiling;
 
 public class GameContext
 {
@@ -20,5 +21,13 @@ public class GameContext
         GetMoneyUseCase = new GetMoneyUseCase(inventory);
         DailyStateUseCase = new DailyStateUseCase(DailyStateRepo);
         GetCharacterSummaryUseCase = new GetCharacterSummaryUseCase(dailyStateRepo: DailyStateRepo);
+    }
+
+    public async UniTask LoadAllDataAsync()
+    {
+        var task1 = InventoryRepo.LoadDataAsync();
+        var task2 = DailyStateRepo.LoadDataAsync();
+
+        await UniTask.WhenAll(task1, task2);
     }
 }

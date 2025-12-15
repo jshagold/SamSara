@@ -27,7 +27,7 @@ public class IntroPresenter
             try
             {
                 // 2. 데이터 로딩 (최소 2초 보장)
-                var loadTask = GlobalBootstrapper.Instance.LoadAllGameDataAsync();
+                var loadTask = GlobalBootstrapper.Instance.InitializationTask;
                 var waitTask = UniTask.Delay(2000); // 로고 재생 시간
 
                 await UniTask.WhenAll(loadTask, waitTask);
@@ -47,7 +47,9 @@ public class IntroPresenter
 
                 if (isRetry)
                 {
-                    // firstButton 입력
+                    // firstButton 입력 (재시도)
+                    GlobalBootstrapper.Instance.RetryInitialization();
+                    UnityEngine.Debug.Log($"{_logClass} 재시도 시작...");
                     continue;
                 }
                 else

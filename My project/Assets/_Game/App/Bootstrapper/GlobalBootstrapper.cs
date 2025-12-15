@@ -11,6 +11,9 @@ public class GlobalBootstrapper : MonoBehaviour
 
     public GameContext GameContext { get; private set; }
 
+    // 다른 씬들이 초기화 완료를 기다릴 수 있게 하는 Task
+    public UniTask InitializationTask { get; private set; }
+
     private void Awake()
     {
         // 중복 생성 방지 (싱글톤 보장)
@@ -30,7 +33,9 @@ public class GlobalBootstrapper : MonoBehaviour
             dailyStateRepo: gameStateRepo
         );
 
-        if(_autoSaveManager != null)
+        RetryInitialization();
+
+        if (_autoSaveManager != null)
         {
             _autoSaveManager.Initialize(GameContext);
 
@@ -42,20 +47,9 @@ public class GlobalBootstrapper : MonoBehaviour
         Debug.Log("Global Bootstrapper Initialized");
     }
 
-    public async UniTask LoadAllGameDataAsync()
+    // 데이터 불러오기 재시도
+    public void RetryInitialization()
     {
-        Debug.Log("게임 데이터 로딩 시작...");
-
-        // 각 Repository의 로딩 함수들을 호출합니다.
-        // 이때 await를 바로 걸지 않고 Task(일감)만 받아옵니다.
-        var task1 = GameContext.InventoryRepo.LoadDataAsync();
-        var task2 = GameContext.DailyStateRepo.LoadDataAsync();
-        // TODO Repo 추가
-
-        // UniTask.WhenAll: 두 작업이 '모두' 끝날 때까지 병렬로 기다립니다.
-        // (하나가 1초, 다른 하나가 2초 걸리면 총 2초만 기다림)
-        await UniTask.WhenAll(task1, task2);
-
-        Debug.Log("모든 게임 데이터 로딩 완료! (캐시 생성됨)");
+        InitializationTask = GameContext.LoadAllDataAsync();
     }
 }

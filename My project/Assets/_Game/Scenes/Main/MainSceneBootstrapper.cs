@@ -12,13 +12,16 @@ public class MainSceneBootstrapper : MonoBehaviour
     [SerializeField] private OptionMenuPopupView _menuPopup;
     [SerializeField] private SettingsPopupView _settingsPopup;
 
-    private void Start() // Global이 Awake에서 초기화될 시간을 주기 위해 Start 권장
+    private async void Start() // Global이 Awake에서 초기화될 시간을 주기 위해 Start 권장
     {
         if(GlobalBootstrapper.Instance == null)
         {
             Debug.LogError("GlobalBootstrapper 선언되지 않음");
             return;
         }
+
+        await GlobalBootstrapper.Instance.InitializationTask;
+
         var gameContext = GlobalBootstrapper.Instance.GameContext;
 
         // Background Presenter 조립
