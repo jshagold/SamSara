@@ -817,8 +817,24 @@ PlayerSettings:
   webWasm2023: 0
   webEnableSubmoduleStrippingCompatibility: 0
   scriptingDefineSymbols:
-    Standalone: AMPLIFY_SHADER_EDITOR;UNITASK_DOTWEEN_SUPPORT
-    WebGL: AMPLIFY_SHADER_EDITOR
+    Android: DOTWEEN
+    EmbeddedLinux: DOTWEEN
+    GameCoreScarlett: DOTWEEN
+    GameCoreXboxOne: DOTWEEN
+    Kepler: DOTWEEN
+    LinuxHeadlessSimulation: DOTWEEN
+    Nintendo Switch: DOTWEEN
+    PS4: DOTWEEN
+    PS5: DOTWEEN
+    QNX: DOTWEEN
+    ReservedCFE: DOTWEEN
+    Standalone: AMPLIFY_SHADER_EDITOR;UNITASK_DOTWEEN_SUPPORT;DOTWEEN
+    VisionOS: DOTWEEN
+    WebGL: AMPLIFY_SHADER_EDITOR;DOTWEEN
+    Windows Store Apps: DOTWEEN
+    XboxOne: DOTWEEN
+    iPhone: DOTWEEN
+    tvOS: DOTWEEN
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
@@ -933,12 +949,12 @@ PlayerSettings:
   qnxGraphicConfPath: 
   apiCompatibilityLevel: 6
   captureStartupLogs: {}
-  activeInputHandler: 0
+  activeInputHandler: 2
   windowsGamepadBackendHint: 0
   cloudProjectId: 4745b652-c2b0-4eff-8079-75d7c26bb48c
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 
+  projectName: My project 2025-11-20_21-13-19
   organizationId: jshagold_unity
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0

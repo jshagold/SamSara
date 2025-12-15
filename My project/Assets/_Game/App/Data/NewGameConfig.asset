@@ -16,4 +16,4 @@ MonoBehaviour:
   StartDay: 1
   DefaultActionSlots: 3
   StartingCharacterIds:
-  - character_main
+  - character_main_0

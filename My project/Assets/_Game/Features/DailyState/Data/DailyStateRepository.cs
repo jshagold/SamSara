@@ -146,7 +146,7 @@ public class DailyStateRepository : IDailyStateRepository
             return slots;
         }
 
-        throw new InvalidOperationException("[CRITICAL] charId 가 등록되지 않음!");
+        throw new InvalidOperationException($"[CRITICAL] charId={charId} 가 등록되지 않음!");
     }
 
     // 행동력 횟수 소모

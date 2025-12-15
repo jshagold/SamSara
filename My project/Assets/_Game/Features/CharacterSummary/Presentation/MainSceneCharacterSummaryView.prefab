@@ -377,11 +377,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c74941cef8379104092704afae1b97ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainSceneCharacterSummaryView
-  _characterAssetConfig: {fileID: 0}
+  _characterAssetConfig: {fileID: 11400000, guid: 10613902b6835a048b937cfc5948a0b6,
+    type: 2}
   portraitImage: {fileID: 353572961666354264}
   hpSlider: {fileID: 7045650615342260880}
   iconContainer: {fileID: 62299677902184083}
-  actionIconPrefab: {fileID: 0}
+  actionIconPrefab: {fileID: 8386962122181008705, guid: 106502d7ac640f14097684152857c1ed,
+    type: 3}
 --- !u!114 &3183592645740273715
 MonoBehaviour:
   m_ObjectHideFlags: 0

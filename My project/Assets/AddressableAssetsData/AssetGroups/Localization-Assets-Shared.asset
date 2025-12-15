@@ -16,7 +16,7 @@ MonoBehaviour:
   m_GUID: 10e94ad38c0f960478da3aa476bc245e
   m_SerializeEntries:
   - m_GUID: c6206c213e90ada45a5dfc0c72690fb5
-    m_Address: Assets/Settings/Localization/Tables/UI Table Shared Data.asset
+    m_Address: Assets/Settings/Localization/Tables/UI_TABLE Shared Data.asset
     m_ReadOnly: 1
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

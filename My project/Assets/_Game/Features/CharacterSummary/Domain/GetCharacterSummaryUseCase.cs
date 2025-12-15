@@ -16,9 +16,10 @@ public class GetCharacterSummaryUseCase
     {
         List<MainSceneCharacterSummaryDto> dataList = new List<MainSceneCharacterSummaryDto>();
 
-        // TODO 데이터 가져오도록 수정해야함. 지금은 임시 데이터
+        // TODO 캐릭터 데이터 가져오도록 수정해야함. 지금은 임시 데이터
         string charId = "character_main_0";
-        bool[] actionSlots= _dailyStateRepo.GetActionSlot(charId: charId);
+        //bool[] actionSlots = _dailyStateRepo.GetActionSlot(charId: charId);
+        bool[] actionSlots = new bool[] { true, true, true };
 
         dataList.Add(new MainSceneCharacterSummaryDto(
             characterId: charId,

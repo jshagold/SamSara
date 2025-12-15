@@ -16,11 +16,9 @@ MonoBehaviour:
   m_GUID: 6f2b2f629bf2dcd4e8f1af035e80b7f7
   m_SerializeEntries:
   - m_GUID: a43836a27cfc3374e948d1c886028a3e
-    m_Address: UI_TABLE_en-US
+    m_Address: Assets/Settings/Localization/Tables/UI_TABLE_en-US.asset
     m_ReadOnly: 1
-    m_SerializedLabels:
-    - Locale-en-US
-    - Preload
+    m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 1
   m_Settings: {fileID: 11400000, guid: 7e65b7ddda3577f4ea50afcd9d7bc941, type: 2}
