@@ -50,6 +50,6 @@ public class GlobalBootstrapper : MonoBehaviour
     // 데이터 불러오기 재시도
     public void RetryInitialization()
     {
-        InitializationTask = GameContext.LoadAllDataAsync();
+        InitializationTask = GameContext.LoadAllDataAsync().Preserve();
     }
 }

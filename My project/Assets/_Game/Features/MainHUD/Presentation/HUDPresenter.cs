@@ -34,6 +34,9 @@ public class HUDPresenter : IDisposable
         // TODO UseCase 이벤트는 여기서 += 연결한다.
         // ex) _moneyUseCase.OnMoneyChanged += HandleMoneyChanged;
 
+        // 이미지 초기 설정
+        _view.OnOffButton.SetState(true);
+
         _view.PlaySlideIn().Forget();
     }
 
@@ -55,14 +58,16 @@ public class HUDPresenter : IDisposable
         if(_isShow)
         {
             // 보이고 있을때
-            await _view.PlaySlideOut();
             _isShow = false;
+            _view.OnOffButton.SetState(false);
+            await _view.PlaySlideOut();
         }
         else
         {
             // 숨겨져 있을때
-            await _view.PlaySlideIn();
             _isShow = true;
+            _view.OnOffButton.SetState(true);
+            await _view.PlaySlideIn();
         }
 
         _isAnimating = false;
