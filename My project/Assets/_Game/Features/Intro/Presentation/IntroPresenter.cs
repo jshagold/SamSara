@@ -1,10 +1,15 @@
+<<<<<<< HEAD
 ﻿using System;
 using System.Diagnostics;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+=======
+﻿using Cysharp.Threading.Tasks;
+using System;
+>>>>>>> feat/splashScreen
 using UnityEngine.SceneManagement;
 
-public class IntroPresenter
+public class IntroPresenter : IDisposable
 {
     private readonly string _logClass = "[IntroPresenter]";
 
@@ -84,6 +89,11 @@ public class IntroPresenter
         await _introView.TransitionToTitle(isRestart: isRestartGame);
 
         _introView.SetOnClickStartButton(OnStartButtonClicked);
+    }
+
+    public void Dispose()
+    {
+
     }
 
     private void OnStartButtonClicked()
