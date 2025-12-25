@@ -1,12 +1,5 @@
-<<<<<<< HEAD
 ﻿using System;
-using System.Diagnostics;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
-=======
-﻿using Cysharp.Threading.Tasks;
-using System;
->>>>>>> feat/splashScreen
 using UnityEngine.SceneManagement;
 
 public class IntroPresenter : IDisposable
