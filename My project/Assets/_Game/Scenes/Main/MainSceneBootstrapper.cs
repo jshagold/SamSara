@@ -12,6 +12,8 @@ public class MainSceneBootstrapper : MonoBehaviour
     [SerializeField] private OptionMenuPopupView _menuPopup;
     [SerializeField] private SettingsPopupView _settingsPopup;
 
+    private SettingsPopupPresenter _settingsPresenter;
+
     private async void Start() // Global이 Awake에서 초기화될 시간을 주기 위해 Start 권장
     {
         if(GlobalBootstrapper.Instance == null)
@@ -33,9 +35,17 @@ public class MainSceneBootstrapper : MonoBehaviour
         // HUD Bootstrapper
         _hudBootstrapper.Initialize(gameContext: gameContext, menuPopup: _menuPopup, settingsPopup: _settingsPopup);
 
+        _settingsPresenter = new SettingsPopupPresenter(_settingsPopup, gameContext);
+
+        _settingsPopup.Close();
 
 
         Debug.Log(">>> MainScene Bootstrapping Start");
+    }
+
+    public void OpenSettingsPopup()
+    {
+        _settingsPresenter.OpenPopup();
     }
 
     private void OnDestroy()
