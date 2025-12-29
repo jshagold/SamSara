@@ -11,5 +11,8 @@ public class SkillInfo
     public Sprite Icon;
     public float Cooldown;
 
+    public int LinkedQteId;
+    public bool HasQte => LinkedQteId > 0;
+
     public SkillInfo() { }
 }

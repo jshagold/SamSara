@@ -23,7 +23,7 @@ public class SkillMasterData : ScriptableObject
     public List<SkillEffectData> skillEffectList = new List<SkillEffectData>();
 
     [Header("References")]
-    [Tooltip("QTE 패턴 ID (QteMasterData 조회용)")]
-    public int qtePatternId;
+    [Tooltip("QTE 패턴 없으면 None")]
+    public QtePatternData linkedQtePattern;
     
 }
