@@ -3,19 +3,19 @@
 public class HUDBootstrapper : MonoBehaviour
 {
     [SerializeField] private HUDView _hudView;
-    
+
     private HUDPresenter _hudPresenter;
     private MainOptionPresenter _mainOptionPresenter;
     private MainSceneCharacterSummaryPresenter _characterSummaryPresenter;
 
     public void Initialize(
         GameContext gameContext,
-        // 외부 팝업들 받아옴
         OptionMenuPopupView menuPopup,
-        SettingsPopupView settingsPopup
-    ) {
+        SettingsPopupPresenter settingsPresenter
+    )
+    {
         _hudPresenter = new HUDPresenter(
-            view: _hudView, 
+            view: _hudView,
             moneyUseCase: gameContext.GetMoneyUseCase,
             dailyStateUseCase: gameContext.DailyStateUseCase
         );
@@ -24,7 +24,7 @@ public class HUDBootstrapper : MonoBehaviour
         _mainOptionPresenter = new MainOptionPresenter(
             optionButtonView: _hudView.OptionButton,
             menuPopupView: menuPopup,
-            settingsPopupView: settingsPopup
+            settingsPopupPresenter: settingsPresenter
         );
         _mainOptionPresenter.Initialize();
 
