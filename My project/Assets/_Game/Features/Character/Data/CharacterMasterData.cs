@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
+using UnityEngine;
 
 [CreateAssetMenu(fileName = "CharacterMasterData", menuName = "Samsara/Character Master Data")]
 public class CharacterMasterData : ScriptableObject
@@ -8,24 +11,13 @@ public class CharacterMasterData : ScriptableObject
     public string characterName;
     [TextArea] public string desc;
 
-    [Header("Visual")]
-    public Sprite portrait;
+    [Header("Evolution Graph")]
+    public List<CharacterEvolutionNode> evolutionNodes;
+    public int rootNodeId;
 
-    [Header("Base Stats")]
-    public float baseHp;
-    public int baseStrength;
-    public int baseToughness;
-    public int baseAgility;
-
-    [Header("Limit Stats")]
-    public float limitHp;
-    public int limitStrength;
-    public int limitToughness;
-    public int limitAgility;
-
-    [Header("Skills")]
-    public SkillMasterData mainSkill;
-    public SkillMasterData subSkill1;
-    public SkillMasterData subSkill2;
+    public CharacterEvolutionNode GetNode(int nodeId)
+    {
+        return evolutionNodes.FirstOrDefault(n => n.nodeId == nodeId);
+    }
 
 }
