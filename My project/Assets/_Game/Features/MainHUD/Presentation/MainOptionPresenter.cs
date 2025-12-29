@@ -7,23 +7,21 @@ public class MainOptionPresenter : IDisposable
 
     private readonly OptionButtonView _optionButtonView;
     private readonly OptionMenuPopupView _menuPopupView;
-    private readonly SettingsPopupView _settingsPopupView;
+    private readonly SettingsPopupPresenter _settingsPopupPresenter;
 
     public MainOptionPresenter(
         OptionButtonView optionButtonView,
         OptionMenuPopupView menuPopupView,
-        SettingsPopupView settingsPopupView)
+        SettingsPopupPresenter settingsPopupPresenter)
     {
         _optionButtonView = optionButtonView;
         _menuPopupView = menuPopupView;
-        _settingsPopupView = settingsPopupView;
+        _settingsPopupPresenter = settingsPopupPresenter;
     }
 
     public void Initialize()
     {
         _menuPopupView.HidePopup();
-        _settingsPopupView.Close();
-
         _optionButtonView.SetOnClickAction(action: () =>
         {
             _menuPopupView.ShowPopup();
@@ -46,13 +44,11 @@ public class MainOptionPresenter : IDisposable
 
     public void Dispose()
     {
-        
     }
 
     private void OnOpenSettings()
     {
         _menuPopupView.HidePopup();
-
-        _settingsPopupView.Open();
+        _settingsPopupPresenter.OpenPopup();
     }
 }

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System;
+using UnityEngine.Events;
 
 public class SettingsPopupView : MonoBehaviour
 {
@@ -16,28 +16,11 @@ public class SettingsPopupView : MonoBehaviour
     [SerializeField] private Toggle _autoBattleToggle;
     [SerializeField] private Toggle _qteToggle;
 
-    public event Action OnCloseClicked;
-    public event Action<float> OnBgmChanged;
-    public event Action<float> OnSfxChanged;
-    public event Action<bool> OnAutoBattleChanged;
-    public event Action<bool> OnQteChanged;
-
     private void Reset()
     {
         if (_canvasGroup == null) _canvasGroup = GetComponent<CanvasGroup>();
         if (_closeButton == null) _closeButton = GetComponentInChildren<Button>();
         if (_bgmSlider == null) _bgmSlider = GetComponentInChildren<Slider>();
-    }
-
-    private void Awake()
-    {
-        if (_closeButton) _closeButton.onClick.AddListener(() => OnCloseClicked?.Invoke());
-
-        if (_bgmSlider) _bgmSlider.onValueChanged.AddListener(val => OnBgmChanged?.Invoke(val));
-        if (_sfxSlider) _sfxSlider.onValueChanged.AddListener(val => OnSfxChanged?.Invoke(val));
-
-        if (_autoBattleToggle) _autoBattleToggle.onValueChanged.AddListener(val => OnAutoBattleChanged?.Invoke(val));
-        if (_qteToggle) _qteToggle.onValueChanged.AddListener(val => OnQteChanged?.Invoke(val));
     }
 
     private void OnDestroy()
@@ -49,6 +32,27 @@ public class SettingsPopupView : MonoBehaviour
         if (_qteToggle) _qteToggle.onValueChanged.RemoveAllListeners();
     }
 
+    public void SetEvents(
+        UnityAction onClose,
+        UnityAction<float> onBgmChanged,
+        UnityAction<float> onSfxChanged,
+        UnityAction<bool> onAutoBattleChanged,
+        UnityAction<bool> onQteChanged
+    )
+    {
+        _closeButton.onClick.RemoveAllListeners();
+        _bgmSlider.onValueChanged.RemoveAllListeners();
+        _sfxSlider.onValueChanged.RemoveAllListeners();
+        _autoBattleToggle.onValueChanged.RemoveAllListeners();
+        _qteToggle.onValueChanged.RemoveAllListeners();
+
+        _closeButton.onClick.AddListener(onClose);
+        _bgmSlider.onValueChanged.AddListener(onBgmChanged);
+        _sfxSlider.onValueChanged.AddListener(onSfxChanged);
+        _autoBattleToggle.onValueChanged.AddListener(onAutoBattleChanged);
+        _qteToggle.onValueChanged.AddListener(onQteChanged);
+    }
+
     public void InitView(SettingsData data)
     {
         if (_bgmSlider) _bgmSlider.value = data.bgmVolume;
@@ -57,10 +61,9 @@ public class SettingsPopupView : MonoBehaviour
         if (_qteToggle) _qteToggle.isOn = data.qteEnabled;
     }
 
-    public void Open()
+    public void OpenPopup()
     {
         gameObject.SetActive(true);
-
         if (_canvasGroup)
         {
             _canvasGroup.alpha = 1f;
@@ -68,8 +71,5 @@ public class SettingsPopupView : MonoBehaviour
         }
     }
 
-    public void Close()
-    {
-        gameObject.SetActive(false);
-    }
+    public void ClosePopup() => gameObject.SetActive(false);
 }

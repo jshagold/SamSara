@@ -33,11 +33,15 @@ public class MainSceneBootstrapper : MonoBehaviour
         _lobbyBootstrapper.Initialize();
 
         // HUD Bootstrapper
-        _hudBootstrapper.Initialize(gameContext: gameContext, menuPopup: _menuPopup, settingsPopup: _settingsPopup);
+        _hudBootstrapper.Initialize(
+             gameContext: gameContext,
+             menuPopup: _menuPopup,
+             settingsPresenter: _settingsPresenter
+        );
 
         _settingsPresenter = new SettingsPopupPresenter(_settingsPopup, gameContext);
 
-        _settingsPopup.Close();
+        _settingsPopup.ClosePopup();
 
 
         Debug.Log(">>> MainScene Bootstrapping Start");

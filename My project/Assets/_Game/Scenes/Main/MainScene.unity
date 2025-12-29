@@ -1492,7 +1492,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Toggle
+  m_Text: QTE
 --- !u!222 &634438526
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3338,7 +3338,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Toggle
+  m_Text: "\uC790\uB3D9\uC804\uD22C"
 --- !u!222 &1924104836
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4183,12 +4183,12 @@ PrefabInstance:
     - target: {fileID: 9142432301796904740, guid: 451c4d3f3258c37409bb818e923bade3,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 1070
+      value: 902
       objectReference: {fileID: 0}
     - target: {fileID: 9142432301796904740, guid: 451c4d3f3258c37409bb818e923bade3,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -201
+      value: -193
       objectReference: {fileID: 0}
     - target: {fileID: 9142432301796904740, guid: 451c4d3f3258c37409bb818e923bade3,
         type: 3}
