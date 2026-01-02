@@ -1,5 +1,4 @@
-﻿using Unity.Android.Gradle.Manifest;
-using UnityEngine;
+﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "ItemMasterData", menuName = "Samsara/Data/Item Master Data")]
 public class ItemMasterData : ScriptableObject
