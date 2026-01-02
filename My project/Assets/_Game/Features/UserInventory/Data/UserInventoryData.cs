@@ -1,14 +1,20 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 [Serializable]
 public class UserInventoryData
 {
-    public int money;
+    public List<UserItemData> ItemList;
+
+    public UserInventoryData()
+    {
+        this.ItemList = new List<UserItemData>();
+    }
 
     [JsonConstructor]
-    public UserInventoryData(int money)
+    public UserInventoryData(List<UserItemData> itemList)
     {
-        this.money = money;
+        this.ItemList = itemList;
     }   
 }

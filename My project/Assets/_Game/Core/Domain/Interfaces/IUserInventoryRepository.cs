@@ -4,16 +4,16 @@ using System;
 
 public interface IUserInventoryRepository
 {
-    int GetMoney();
+    int GetItemCount(int itemId);
+    UserInventoryInfo GetInventory();
 
-    public void AddMoney(int amount);
+    void AddItem(int itemId, int count);
+    void ConsumeItem(int itemId, int count);
 
-    // ===
-    // I/O
-    // ===
+    // =====
     UniTask<UserInventoryInfo> LoadDataAsync();
     UniTask SaveDataAsync();    // 일반 저장
-    void SaveDataSync();           // [긴급] 앱 일시정지(Pause) 시 저장
+    void SaveDataSync();        // [긴급] 앱 일시정지(Pause) 시 저장
 
     // ===
     // Event (AutoSaveManager 연동용)

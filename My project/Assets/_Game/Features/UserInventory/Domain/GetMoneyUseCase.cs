@@ -4,9 +4,9 @@ public class GetMoneyUseCase
 {
     private readonly IUserInventoryRepository _userInventroyRepository;
 
-    public GetMoneyUseCase(IUserInventoryRepository userInventroyRepository) 
+    public GetMoneyUseCase(IUserInventoryRepository userInventoryRepository) 
     {
-        _userInventroyRepository = userInventroyRepository;
+        _userInventroyRepository = userInventoryRepository;
     }
     
     /// <summary>
@@ -15,14 +15,13 @@ public class GetMoneyUseCase
     /// <returns></returns>
     public int GetInventoryMoneyAsync()
     {
-        return _userInventroyRepository.GetMoney();
+
+        return _userInventroyRepository.GetItemCount(ItemConstants.MONEY_ID);
     }
 
 
-    public UniTask<UserInventoryDto> LoadInventoryAsync()
+    public UniTask<UserInventoryInfo> LoadInventoryAsync()
     {
         return _userInventroyRepository.LoadDataAsync();
     }
-
-
 }

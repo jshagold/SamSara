@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -8,9 +10,9 @@ using UnityEngine;
 public class UserInventoryRepository : IUserInventoryRepository
 {
     private readonly string _logClass = "[UserInventoryRepository]";
-
     private readonly string _filePath;
     private readonly NewGameConfig _newGameConfig;
+
     private UserInventoryData _cachedData;
 
     // 데이터 변경 알림 이벤트
@@ -23,7 +25,69 @@ public class UserInventoryRepository : IUserInventoryRepository
         _filePath = Path.Combine(Application.persistentDataPath, "save_user_inventory_data.json");
     }
 
-    // 정보 가져오기
+    // ======================================================================================================
+    // Read
+    // ======================================================================================================
+    public int GetItemCount(int itemId)
+    {
+        CheckDataIntegrity();
+
+        var item = _cachedData.ItemList.FirstOrDefault(item => item.ItemId == itemId);
+        return item?.Count ?? 0;
+    }
+
+    public UserInventoryInfo GetInventory()
+    {
+        CheckDataIntegrity();
+        // Data 객체를 Domain 객체로 변환하여 반환 (외부에서 Data 객체 직접 수정 방지)
+        return UserInventoryMapper.ToDomain(_cachedData);
+    }
+
+
+    // ======================================================================================================
+    // Update
+    // ======================================================================================================
+    public void AddItem(int itemId, int count)
+    {
+        CheckDataIntegrity();
+
+        if (count <= 0) return;
+        
+        var item = _cachedData.ItemList.FirstOrDefault(item => item.ItemId == itemId);
+        if(item == null)
+        {
+            _cachedData.ItemList.Add(new UserItemData(itemId, count));
+        }
+        else
+        {
+             item.Count += count;
+        }
+
+        NotifyChanged();
+    }
+
+    public void ConsumeItem(int itemId, int count)
+    {
+        CheckDataIntegrity();
+
+        if(count <= 0) return;
+
+        var item = _cachedData.ItemList.FirstOrDefault(item => item.ItemId == itemId);
+        if (item == null || item.Count < count)
+        {
+            Debug.LogWarning($"{_logClass} ConsumeItem 실패 - 보유량 부족 (ID: {itemId}, 보유: {item?.Count ?? 0}, 필요: {count})");
+            return;
+        }
+
+        item.Count -= count;
+
+        NotifyChanged();
+    }
+
+
+    // ======================================================================================================
+    // Load / Save
+    // ======================================================================================================
     public async UniTask<UserInventoryInfo> LoadDataAsync()
     {
         if(_cachedData != null)
@@ -33,10 +97,7 @@ public class UserInventoryRepository : IUserInventoryRepository
 
         if (!File.Exists(_filePath))
         {
-            Debug.Log($"{_logClass}[LoadDataAsync] 세이브 파일 없어서 새로 생성.");
-
-            _cachedData = new UserInventoryData(money: _newGameConfig.InitialMoney);
-
+            InitializeNewData();
             return _cachedData.ToDomain();
         }
 
@@ -44,19 +105,24 @@ public class UserInventoryRepository : IUserInventoryRepository
         {
             string json = await UniTask.RunOnThreadPool(() => File.ReadAllText(_filePath));
 
-            var loadDto = JsonConvert.DeserializeObject<UserInventoryData>(json);
-            if (loadDto == null)
+            var loadData = JsonConvert.DeserializeObject<UserInventoryData>(json);
+            if (loadData == null)
             {
                 throw new System.InvalidOperationException("[LoadDataAsync] 데이터가 null입니다. 파일 손상 의심.");
             }
+            else
+            {
+                _cachedData = loadData;
 
-            _cachedData = loadDto;
+                // 리스트가 null일 경우 방어 코드 (생성자 호출 없이 역직렬화될 경우 대비)
+                if (_cachedData.ItemList == null) _cachedData.ItemList = new List<UserItemData>();
+            }
 
             Debug.Log($"{_logClass} 로드 완료");
 
             return _cachedData.ToDomain();
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Debug.LogError($"{_logClass}[CRITICAL] 로드 실패: {e.Message}");
             throw;
@@ -107,22 +173,26 @@ public class UserInventoryRepository : IUserInventoryRepository
         }
     }
 
-    public int GetMoney()
+
+    // ======================================================================================================
+    // 내부 유틸리티
+    // ======================================================================================================
+    private void InitializeNewData()
     {
-        CheckDataIntegrity();
-        return _cachedData.money;
+        Debug.Log($"{_logClass} 신규데이터 생성 (초기 자금: {_newGameConfig.InitialMoney})");
+
+        var initialItemList = new List<UserItemData>();
+
+        if(_newGameConfig.InitialMoney > 0)
+        {
+            initialItemList.Add(new UserItemData(ItemConstants.MONEY_ID, _newGameConfig.InitialMoney));
+        }
+
+        _cachedData = new UserInventoryData(initialItemList);
+
+        // 초기화 후 즉시 저장해서 파일 생성
+        SaveDataAsync().Forget();
     }
-
-    public void AddMoney(int amount)
-    {
-        CheckDataIntegrity();
-        if (amount < 0) throw new ArgumentException("음수는 추가할 수 없습니다.");
-
-        _cachedData.money += amount;
-
-        NotifyChanged();
-    }
-
 
     private void NotifyChanged()
     {
