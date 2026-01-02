@@ -19,17 +19,8 @@ public class CharacterEvolutionNode
     [Header("Branching")]
     public List<int> nextEvolutionNodeIds;
 
-    [Header("Base Stats")]
-    public float baseHp;
-    public int baseStrength;
-    public int baseToughness;
-    public int baseAgility;
-
-    [Header("Limit Stats")]
-    public float limitHp;
-    public int limitStrength;
-    public int limitToughness;
-    public int limitAgility;
+    [Header("Stats")]
+    public StatGroup stats;
 
     [Header("Skills")]
     public List<SkillMasterData> skillList;
