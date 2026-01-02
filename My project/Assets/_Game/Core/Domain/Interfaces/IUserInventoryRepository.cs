@@ -11,7 +11,7 @@ public interface IUserInventoryRepository
     // ===
     // I/O
     // ===
-    UniTask<UserInventoryDto> LoadDataAsync();
+    UniTask<UserInventoryInfo> LoadDataAsync();
     UniTask SaveDataAsync();    // 일반 저장
     void SaveDataSync();           // [긴급] 앱 일시정지(Pause) 시 저장
 

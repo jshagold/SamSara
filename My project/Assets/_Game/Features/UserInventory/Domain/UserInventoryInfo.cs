@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 
-public class UserInventoryDto
+public class UserInventoryInfo
 {
     public int Money;
 
-    public UserInventoryDto(int money)
+    public UserInventoryInfo(int money)
     { 
         this.Money = money; 
     }
