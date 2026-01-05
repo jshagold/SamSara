@@ -24,7 +24,7 @@ public class ItemMasterRepository : IItemMasterRepository
             return data;
         }
 
-        Debug.LogWarning($"[ItemMasterRepository] 존재하지 않는 ItemId 요청: {itemId}");
+        Debug.LogWarning($"{_logClass} 존재하지 않는 ItemId 요청: {itemId}");
         return null;
     }
 
@@ -42,13 +42,13 @@ public class ItemMasterRepository : IItemMasterRepository
         {
             if(_itemDictionary.ContainsKey(asset.ItemId))
             {
-                Debug.LogError($"[ItemMasterRepository] 중복된 ItemId 발견: {asset.ItemId} ({asset.Name})");
+                Debug.LogError($"{_logClass} 중복된 ItemId 발견: {asset.ItemId} ({asset.Name})");
                 continue;
             }
 
             _itemDictionary.Add(asset.ItemId, asset);
         }
 
-        Debug.Log($"[ItemMasterRepository] 아이템 데이터 {_itemDictionary.Count}개 로드 완료.");
+        Debug.Log($"{_logClass} 아이템 데이터 {_itemDictionary.Count}개 로드 완료.");
     }
 }

@@ -25,12 +25,16 @@ public class GlobalBootstrapper : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject); // Scene이 바뀌어도 파괴되지 않게하는 코드
 
+        MasterDataManager masterDataManager = new MasterDataManager();
+        masterDataManager.Initialize();
+
         IUserInventoryRepository userInventoryRepo = new UserInventoryRepository(config: _newGameConfig);
         IDailyStateRepository gameStateRepo = new DailyStateRepository(newGameConfig: _newGameConfig);
 
         GameContext = new GameContext(
             inventory: userInventoryRepo,
-            dailyStateRepo: gameStateRepo
+            dailyStateRepo: gameStateRepo,
+            masterDataManager: masterDataManager
         );
 
         RetryInitialization();

@@ -7,17 +7,17 @@ using UnityEngine;
 public class CharacterMasterData : ScriptableObject
 {
     [Header("Identity")]
-    public int id;
-    public string characterName;
-    [TextArea] public string desc;
+    public int CharacterId;
+    public string CharacterName;
+    [TextArea] public string Desc;
 
     [Header("Evolution Graph")]
-    public List<CharacterEvolutionNode> evolutionNodes;
-    public int rootNodeId;
+    public List<CharacterEvolutionNode> EvolutionNodes;
+    public int RootNodeId;
 
     public CharacterEvolutionNode GetNode(int nodeId)
     {
-        return evolutionNodes.FirstOrDefault(n => n.nodeId == nodeId);
+        return EvolutionNodes.FirstOrDefault(n => n.nodeId == nodeId);
     }
 
 }
