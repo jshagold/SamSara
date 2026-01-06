@@ -7,22 +7,22 @@ using Newtonsoft.Json;
 using UnityEngine;
 
 
-public class UserInventoryRepository : IUserInventoryRepository
+public class InventoryRepository : IUserInventoryRepository
 {
-    private readonly string _logClass = "[UserInventoryRepository]";
+    private readonly string _logClass = "[InventoryRepository]";
     private readonly string _filePath;
     private readonly NewGameConfig _newGameConfig;
 
-    private UserInventoryData _cachedData;
+    private InventoryData _cachedData;
 
     // 데이터 변경 알림 이벤트
     public event Action OnInventoryChanged;
 
-    public UserInventoryRepository(NewGameConfig config)
+    public InventoryRepository(NewGameConfig config)
     {
         _newGameConfig = config;
         // 안드로이드/IOS/PC 공용 경로
-        _filePath = Path.Combine(Application.persistentDataPath, "save_user_inventory_data.json");
+        _filePath = Path.Combine(Application.persistentDataPath, "save_inventory_data.json");
     }
 
     // ======================================================================================================
@@ -36,11 +36,11 @@ public class UserInventoryRepository : IUserInventoryRepository
         return item?.Count ?? 0;
     }
 
-    public UserInventoryInfo GetInventory()
+    public InventoryInfo GetInventory()
     {
         CheckDataIntegrity();
         // Data 객체를 Domain 객체로 변환하여 반환 (외부에서 Data 객체 직접 수정 방지)
-        return UserInventoryMapper.ToDomain(_cachedData);
+        return InventoryMapper.ToDomain(_cachedData);
     }
 
 
@@ -56,7 +56,7 @@ public class UserInventoryRepository : IUserInventoryRepository
         var item = _cachedData.ItemList.FirstOrDefault(item => item.ItemId == itemId);
         if(item == null)
         {
-            _cachedData.ItemList.Add(new UserItemData(itemId, count));
+            _cachedData.ItemList.Add(new ItemData(itemId, count));
         }
         else
         {
@@ -88,7 +88,7 @@ public class UserInventoryRepository : IUserInventoryRepository
     // ======================================================================================================
     // Load / Save
     // ======================================================================================================
-    public async UniTask<UserInventoryInfo> LoadDataAsync()
+    public async UniTask<InventoryInfo> LoadDataAsync()
     {
         if(_cachedData != null)
         {
@@ -105,7 +105,7 @@ public class UserInventoryRepository : IUserInventoryRepository
         {
             string json = await UniTask.RunOnThreadPool(() => File.ReadAllText(_filePath));
 
-            var loadData = JsonConvert.DeserializeObject<UserInventoryData>(json);
+            var loadData = JsonConvert.DeserializeObject<InventoryData>(json);
             if (loadData == null)
             {
                 throw new System.InvalidOperationException("[LoadDataAsync] 데이터가 null입니다. 파일 손상 의심.");
@@ -115,7 +115,7 @@ public class UserInventoryRepository : IUserInventoryRepository
                 _cachedData = loadData;
 
                 // 리스트가 null일 경우 방어 코드 (생성자 호출 없이 역직렬화될 경우 대비)
-                if (_cachedData.ItemList == null) _cachedData.ItemList = new List<UserItemData>();
+                if (_cachedData.ItemList == null) _cachedData.ItemList = new List<ItemData>();
             }
 
             Debug.Log($"{_logClass} 로드 완료");
@@ -181,14 +181,14 @@ public class UserInventoryRepository : IUserInventoryRepository
     {
         Debug.Log($"{_logClass} 신규데이터 생성 (초기 자금: {_newGameConfig.InitialMoney})");
 
-        var initialItemList = new List<UserItemData>();
+        var initialItemList = new List<ItemData>();
 
         if(_newGameConfig.InitialMoney > 0)
         {
-            initialItemList.Add(new UserItemData(ItemConstants.MONEY_ID, _newGameConfig.InitialMoney));
+            initialItemList.Add(new ItemData(ItemConstants.MONEY_ID, _newGameConfig.InitialMoney));
         }
 
-        _cachedData = new UserInventoryData(initialItemList);
+        _cachedData = new InventoryData(initialItemList);
 
         // 초기화 후 즉시 저장해서 파일 생성
         SaveDataAsync().Forget();

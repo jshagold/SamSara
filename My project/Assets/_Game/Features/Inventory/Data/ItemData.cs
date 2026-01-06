@@ -2,14 +2,14 @@
 using System;
 
 [Serializable]
-public class UserItemData
+public class ItemData
 {
     public int ItemId;
     public int Count;
 
-    public UserItemData() { }
+    public ItemData() { }
 
-    public UserItemData(int itemId, int count)
+    public ItemData(int itemId, int count)
     {
         ItemId = itemId;
         Count = count;

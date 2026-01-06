@@ -3,13 +3,13 @@ using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 
-public class UserInventoryInfo
+public class InventoryInfo
 {
-    public List<UserItemInfo> ItemList {  get; private set; }
+    public List<ItemInfo> ItemList {  get; private set; }
 
     public int Money => GetItemCount(ItemConstants.MONEY_ID);
 
-    public UserInventoryInfo(List<UserItemInfo> itemList)
+    public InventoryInfo(List<ItemInfo> itemList)
     { 
         this.ItemList = itemList; 
     }
@@ -22,7 +22,7 @@ public class UserInventoryInfo
         return item != null ? item.Count : 0;
     }
 
-    public UserItemInfo GetItem(int itemId)
+    public ItemInfo GetItem(int itemId)
     {
         return ItemList.FirstOrDefault(item => item.ItemId == itemId);
     }
