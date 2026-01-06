@@ -19,9 +19,10 @@ public class CharacterDetailInfo
     public StatGroup Stats;
 
     [Header("Skills")]
-    public List<SkillMasterData> SkillList = new List<SkillMasterData>();
+    public List<SkillInfo> SkillList = new List<SkillInfo>();
 
-    // TODO 인벤토리 추가해야함
+    [Header("Inventory")]
+    public InventoryInfo Inventory;
 
     public CharacterDetailInfo() { }
 }

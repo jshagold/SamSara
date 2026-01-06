@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class InventoryInfo
 {
-    public List<ItemInfo> ItemList {  get; private set; }
+    public List<ItemInfo> ItemList { get; private set; }
 
     public int Money => GetItemCount(ItemConstants.MONEY_ID);
 

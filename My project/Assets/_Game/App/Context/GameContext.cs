@@ -4,7 +4,7 @@ using Unity.Profiling;
 public class GameContext
 {
     // [Repositories]
-    public IUserInventoryRepository InventoryRepo { get; }
+    public IInventoryRepository InventoryRepo { get; }
     public IDailyStateRepository DailyStateRepo { get; }
 
     // [UseCases]
@@ -16,7 +16,7 @@ public class GameContext
     public MasterDataManager MasterDataManager { get; }
 
     public GameContext(
-        IUserInventoryRepository inventory, 
+        IInventoryRepository inventory, 
         IDailyStateRepository dailyStateRepo,
         MasterDataManager masterDataManager)
     {

@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 
 
-public class InventoryRepository : IUserInventoryRepository
+public class InventoryRepository : IInventoryRepository
 {
     private readonly string _logClass = "[InventoryRepository]";
     private readonly string _filePath;

@@ -2,7 +2,7 @@
 using Cysharp.Threading.Tasks;
 using System;
 
-public interface IUserInventoryRepository
+public interface IInventoryRepository
 {
     int GetItemCount(int itemId);
     InventoryInfo GetInventory();

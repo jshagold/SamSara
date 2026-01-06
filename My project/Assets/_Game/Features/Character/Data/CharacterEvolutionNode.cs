@@ -20,7 +20,8 @@ public class CharacterEvolutionNode
     public List<int> nextEvolutionNodeIds;
 
     [Header("Stats")]
-    public StatGroup stats;
+    public StatGroup StartStats;
+    public StatGroup MaxStats;
 
     [Header("Skills")]
     public List<SkillMasterData> skillList;

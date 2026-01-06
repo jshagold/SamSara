@@ -28,7 +28,7 @@ public class GlobalBootstrapper : MonoBehaviour
         MasterDataManager masterDataManager = new MasterDataManager();
         masterDataManager.Initialize();
 
-        IUserInventoryRepository userInventoryRepo = new InventoryRepository(config: _newGameConfig);
+        IInventoryRepository userInventoryRepo = new InventoryRepository(config: _newGameConfig);
         IDailyStateRepository gameStateRepo = new DailyStateRepository(newGameConfig: _newGameConfig);
 
         GameContext = new GameContext(

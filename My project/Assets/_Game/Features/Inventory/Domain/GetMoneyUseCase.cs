@@ -2,9 +2,9 @@
 
 public class GetMoneyUseCase
 {
-    private readonly IUserInventoryRepository _userInventroyRepository;
+    private readonly IInventoryRepository _userInventroyRepository;
 
-    public GetMoneyUseCase(IUserInventoryRepository userInventoryRepository) 
+    public GetMoneyUseCase(IInventoryRepository userInventoryRepository) 
     {
         _userInventroyRepository = userInventoryRepository;
     }

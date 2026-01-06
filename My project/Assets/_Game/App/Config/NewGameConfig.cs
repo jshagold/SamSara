@@ -12,7 +12,10 @@ public class NewGameConfig : ScriptableObject
     public int StartDay = 1; // 시작 날짜
     public int DefaultActionSlots = 3; // 기본 행동력 슬롯 개수
 
+
     [Header("Character Settings")]
+    public int StartingCharacterId = 1001;  // 시작 캐릭터 id
+    public int StartingCharacterNodeId = 101;   // 시작 캐릭터 Node id
     public List<string> StartingCharacterIds = new List<string> { "character_main" };
 
 }
