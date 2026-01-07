@@ -13,7 +13,7 @@ public class InventoryRepository : IInventoryRepository
     private readonly string _filePath;
     private readonly NewGameConfig _newGameConfig;
 
-    private InventoryData _cachedData;
+    private InventorySaveData _cachedData;
 
     // 데이터 변경 알림 이벤트
     public event Action OnInventoryChanged;
@@ -56,7 +56,7 @@ public class InventoryRepository : IInventoryRepository
         var item = _cachedData.ItemList.FirstOrDefault(item => item.ItemId == itemId);
         if(item == null)
         {
-            _cachedData.ItemList.Add(new ItemData(itemId, count));
+            _cachedData.ItemList.Add(new ItemSaveData(itemId, count));
         }
         else
         {
@@ -105,7 +105,7 @@ public class InventoryRepository : IInventoryRepository
         {
             string json = await UniTask.RunOnThreadPool(() => File.ReadAllText(_filePath));
 
-            var loadData = JsonConvert.DeserializeObject<InventoryData>(json);
+            var loadData = JsonConvert.DeserializeObject<InventorySaveData>(json);
             if (loadData == null)
             {
                 throw new System.InvalidOperationException("[LoadDataAsync] 데이터가 null입니다. 파일 손상 의심.");
@@ -115,7 +115,7 @@ public class InventoryRepository : IInventoryRepository
                 _cachedData = loadData;
 
                 // 리스트가 null일 경우 방어 코드 (생성자 호출 없이 역직렬화될 경우 대비)
-                if (_cachedData.ItemList == null) _cachedData.ItemList = new List<ItemData>();
+                if (_cachedData.ItemList == null) _cachedData.ItemList = new List<ItemSaveData>();
             }
 
             Debug.Log($"{_logClass} 로드 완료");
@@ -148,7 +148,7 @@ public class InventoryRepository : IInventoryRepository
             Debug.LogError($"{_logClass}[IO Error] 파일 쓰기 실패!!: {e.Message}");
         }
 
-        Debug.Log("[DailyStateRepository] 저장 완료");
+        Debug.Log($"{_logClass} 저장 완료");
     }
 
     // 긴급 저장 (OnApplicationPause 용) - 동기
@@ -181,14 +181,14 @@ public class InventoryRepository : IInventoryRepository
     {
         Debug.Log($"{_logClass} 신규데이터 생성 (초기 자금: {_newGameConfig.InitialMoney})");
 
-        var initialItemList = new List<ItemData>();
+        var initialItemList = new List<ItemSaveData>();
 
         if(_newGameConfig.InitialMoney > 0)
         {
-            initialItemList.Add(new ItemData(ItemConstants.MONEY_ID, _newGameConfig.InitialMoney));
+            initialItemList.Add(new ItemSaveData(ItemConstants.MONEY_ID, _newGameConfig.InitialMoney));
         }
 
-        _cachedData = new InventoryData(initialItemList);
+        _cachedData = new InventorySaveData(initialItemList);
 
         // 초기화 후 즉시 저장해서 파일 생성
         SaveDataAsync().Forget();

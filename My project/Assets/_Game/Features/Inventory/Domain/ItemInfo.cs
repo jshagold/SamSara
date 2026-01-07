@@ -1,16 +1,19 @@
-﻿public class ItemInfo
+﻿using UnityEngine;
+
+public class ItemInfo
 {
-    public int ItemId { get; private set; }
-    public int Count { get; private set; }
+    // Identity
+    public int Id;
 
-    public ItemInfo(int itemId, int count)
-    {
-        ItemId = itemId;
-        Count = count;
-    }
+    public string Name;
+    public string Description;
+    public ItemType Type;
+    public Sprite Icon;
+    public int MaxStackCount;
 
-    public void UpdateCount(int count)
-    {
-        Count = count;
-    }
+    public int Count;
+
+    public bool IsMaxStacked => Count >= MaxStackCount;
+
+    public ItemInfo() { }
 }

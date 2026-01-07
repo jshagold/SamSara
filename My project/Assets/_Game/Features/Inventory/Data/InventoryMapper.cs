@@ -3,8 +3,8 @@ using System.Linq;
 
 public static class InventoryMapper
 {
-    // SaveData(DTO) -> Domain
-    public static InventoryInfo ToDomain(this InventoryData data)
+    // SaveData(Data) -> Domain
+    public static InventoryInfo ToDomain(this InventorySaveData data)
     {
         if (data == null || data.ItemList == null)
         {
@@ -17,12 +17,12 @@ public static class InventoryMapper
         return new InventoryInfo(itemInfoList);
     }
 
-    // Domain -> SaveData(DTO)
-    public static InventoryData ToData(this InventoryInfo domain)
+    // Domain -> SaveData(Data)
+    public static InventorySaveData ToData(this InventoryInfo domain)
     {
         if(domain == null || domain.ItemList == null)
         {
-            return new InventoryData();
+            return new InventorySaveData();
         }
 
         var itemDataList = domain.ItemList

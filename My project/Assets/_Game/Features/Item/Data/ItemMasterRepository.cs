@@ -40,13 +40,13 @@ public class ItemMasterRepository : IItemMasterRepository
 
         foreach(var asset in assets)
         {
-            if(_itemDictionary.ContainsKey(asset.ItemId))
+            if(_itemDictionary.ContainsKey(asset.Id))
             {
-                Debug.LogError($"{_logClass} 중복된 ItemId 발견: {asset.ItemId} ({asset.Name})");
+                Debug.LogError($"{_logClass} 중복된 ItemId 발견: {asset.Id} ({asset.Name})");
                 continue;
             }
 
-            _itemDictionary.Add(asset.ItemId, asset);
+            _itemDictionary.Add(asset.Id, asset);
         }
 
         Debug.Log($"{_logClass} 아이템 데이터 {_itemDictionary.Count}개 로드 완료.");
