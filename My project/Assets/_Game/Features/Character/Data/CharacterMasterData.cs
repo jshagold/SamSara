@@ -12,12 +12,12 @@ public class CharacterMasterData : ScriptableObject
     [TextArea] public string Desc;
 
     [Header("Evolution Graph")]
-    public List<CharacterEvolutionNode> EvolutionNodes;
+    public List<EvolutionNodeData> EvolutionNodes;
     public int RootNodeId;
 
-    public CharacterEvolutionNode GetNode(int nodeId)
+    public EvolutionNodeData GetNode(int nodeId)
     {
-        return EvolutionNodes.FirstOrDefault(n => n.nodeId == nodeId);
+        return EvolutionNodes.FirstOrDefault(n => n.NodeId == nodeId);
     }
 
 }

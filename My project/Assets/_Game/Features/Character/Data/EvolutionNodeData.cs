@@ -5,24 +5,24 @@ using NUnit.Framework;
 using UnityEngine;
 
 [Serializable]
-public class CharacterEvolutionNode
+public class EvolutionNodeData
 {
     [Header("Node Info")]
-    public int nodeId; 
-    public string nodeName;
-    [TextArea] public string desc;
-    public Sprite portrait;
+    public int NodeId; 
+    public string NodeName;
+    [TextArea] public string Desc;
+    public Sprite Portrait;
 
     [Header("Level Info")]
-    public int level; // 진화 단계 레벨
+    public int Level; // 진화 단계 레벨
 
     [Header("Branching")]
-    public List<int> nextEvolutionNodeIds;
+    public List<int> NextEvolutionNodeIds;
 
     [Header("Stats")]
     public StatGroup StartStats;
     public StatGroup MaxStats;
 
     [Header("Skills")]
-    public List<SkillMasterData> skillList;
+    public List<SkillMasterData> SkillList;
 }

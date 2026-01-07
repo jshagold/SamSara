@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
 using UnityEngine;
 
 public class CharacterRepository : ICharacterRepository
@@ -24,32 +25,123 @@ public class CharacterRepository : ICharacterRepository
 
     public EvolutionNodeInfo GetCurrentNode()
     {
-        throw new NotImplementedException();
+        CheckDataIntegrity();
+
+        var masterData = _masterRepo.GetData(characterId: _cachedData.CharacterId);
+        if(masterData == null)
+        {
+            Debug.LogWarning($"{_logClass} GetCurrentNode - CharacterMasterData null characterId={_cachedData.CharacterId}");
+            return null;
+        }
+
+        EvolutionNodeData currentNode = masterData.EvolutionNodes.Find(node => node.NodeId == _cachedData.CurrentNodeId);
+        if(currentNode == null)
+        {
+            Debug.LogWarning($"{_logClass} GetCurrentNode - currentNode null CurrentNodeId={_cachedData.CurrentNodeId}");
+            return null;
+        }
+
+        return currentNode.ToDomain();
     }
 
     public StatGroup GetCurrentStat()
     {
-        throw new NotImplementedException();
+        CheckDataIntegrity();
+
+        return _cachedData.CurrentStats;
     }
 
     public void UpdateStat(StatGroup stat)
     {
-        throw new NotImplementedException();
+        CheckDataIntegrity();
+        if (stat == null)
+        {
+            Debug.LogWarning($"{_logClass} UpdateStat 실패 - Stat null");
+            return;
+        }
+
+        _cachedData.CurrentStats = stat;
+        NotifyChanged();
     }
 
-    public UniTask LoadDataAsync()
+    public async UniTask LoadDataAsync()
     {
-        throw new NotImplementedException();
+        if (_cachedData != null)
+        {
+            return;
+        }
+
+        if (!File.Exists(_filePath))
+        {
+            InitializeNewData();
+            return;
+        }
+
+        try
+        {
+            string json = await UniTask.RunOnThreadPool(() => File.ReadAllText(_filePath));
+
+            var loadData = JsonConvert.DeserializeObject<UserCharacterData>(json);
+            if (loadData == null)
+            {
+                throw new System.InvalidOperationException($"{_logClass} [LoadDataAsync] 데이터가 null입니다. 파일 손상 의심.");
+            }
+            else
+            {
+                _cachedData = loadData;
+            }
+
+            Debug.Log($"{_logClass} 로드 완료");
+
+            return;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"{_logClass}[CRITICAL] 로드 실패: {e.Message}");
+            throw;
+        }
     }
 
-    public UniTask SaveDataAsync()
+    public async UniTask SaveDataAsync()
     {
-        throw new NotImplementedException();
+        CheckDataIntegrity();
+
+        // 스레드 풀에서 저장. (게임 멈춤 방지)
+        try
+        {
+            await UniTask.RunOnThreadPool(() =>
+            {
+                string json = JsonConvert.SerializeObject(_cachedData, Formatting.Indented);
+                File.WriteAllText(_filePath, json);
+            });
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"{_logClass}[IO Error] 파일 쓰기 실패!!: {e.Message}");
+        }
+
+        Debug.Log($"{_logClass} 저장 완료");
     }
 
     public void SaveDataSync()
     {
-        throw new NotImplementedException();
+        if (_cachedData == null)
+        {
+            Debug.LogWarning($"{_logClass}[Save Skip] 로드된 데이터가 없어서 강제 저장 스킵");
+            return;
+        }
+
+        try
+        {
+            // 메인 스레드에서 즉시 씀
+            string json = JsonConvert.SerializeObject(_cachedData);
+            File.WriteAllText(_filePath, json);
+            Debug.Log($"{_logClass} 동기 저장 완료");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"{_logClass} 동기 저장 실패: {e.Message}");
+        }
     }
 
 
@@ -64,15 +156,17 @@ public class CharacterRepository : ICharacterRepository
         int startNodeId = _newGameConfig.StartingCharacterNodeId;
 
         CharacterMasterData masterData = _masterRepo.GetData(startCharacterId);
+        List<EvolutionNodeData> nodeList = masterData.EvolutionNodes;
+        EvolutionNodeData EvolutionNode = nodeList.Find(node => node.NodeId == startNodeId);
 
-        if(masterData != null)
+        if(masterData != null && EvolutionNode != null)
         {
             _cachedData = new UserCharacterData
             {
                 CharacterId = masterData.CharacterId,
-                CurrentNodeId = masterData.,
-                CurrentStats = ,
-            }
+                CurrentNodeId = EvolutionNode.NodeId,
+                CurrentStats = EvolutionNode.StartStats,
+            };
         }
         else
         {
