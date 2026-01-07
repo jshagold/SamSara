@@ -12,17 +12,4 @@
             NoteList = masterData.NoteList,
         };
     }
-
-    // Domain -> MasterData
-    public static QtePatternMasterData ToMasterData(this QtePatternInfo domain)
-    {
-        if(domain == null) return null;
-
-        return new QtePatternMasterData
-        {
-            Id = domain.Id,
-            Name = domain.Name,
-            NoteList = domain.NoteList,
-        };
-    }
 }

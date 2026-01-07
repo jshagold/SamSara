@@ -13,6 +13,7 @@ public class MasterDataManager
     public IItemMasterRepository ItemRepo { get; private set; }
     public ISkillMasterRepository SkillRepo { get; private set; }
     public ICharacterMasterRepository CharacterRepo { get; private set; }
+    public IQtePatternMasterRepository QtePatternRepo { get; private set; }
 
     public void Initialize()
     {
@@ -45,6 +46,7 @@ public class MasterDataManager
         ItemRepo = new ItemMasterRepository();
         SkillRepo = new SkillMasterRepository();
         CharacterRepo = new CharacterMasterRepository();
+        QtePatternRepo = new QtePatternMasterRepository();
     }
 
     private void LoadAllData()
@@ -52,5 +54,6 @@ public class MasterDataManager
         ItemRepo.LoadAll();
         SkillRepo.LoadAll();
         CharacterRepo.LoadAll();
+        QtePatternRepo.LoadAll();
     }
 }   
