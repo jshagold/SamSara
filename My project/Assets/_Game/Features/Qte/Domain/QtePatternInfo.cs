@@ -6,7 +6,7 @@ public class QtePatternInfo
     public int Id;
     public string Name;
 
-    public List<QteNoteData> NoteList = new List<QteNoteData>();
+    public List<QteNoteData> NoteList;
 
     public QtePatternInfo() { }
 }

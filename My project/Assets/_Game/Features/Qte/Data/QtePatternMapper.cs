@@ -1,4 +1,7 @@
-﻿public static class QtePatternMapper
+﻿using System.Collections.Generic;
+using System.Linq;
+
+public static class QtePatternMapper
 {
     // MasterData -> Domain
     public static QtePatternInfo ToDomain(this QtePatternMasterData masterData)
@@ -9,7 +12,9 @@
         {
             Id = masterData.Id,
             Name = masterData.Name,
-            NoteList = masterData.NoteList,
+            NoteList = masterData.NoteList != null
+                ? masterData.NoteList.ToList() 
+                : new List<QteNoteData>(),
         };
     }
 }

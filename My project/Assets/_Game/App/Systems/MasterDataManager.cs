@@ -1,6 +1,4 @@
-﻿
-
-using System;
+﻿using System;
 using UnityEngine;
 
 public class MasterDataManager
@@ -51,9 +49,13 @@ public class MasterDataManager
 
     private void LoadAllData()
     {
+        // 순서 중요: QTE가 다른 데이터(Skill 등)보다 먼저 로드되어야 한다면 위로 올릴 것.
+        // 현재 구조(ID 참조)상으로는 순서가 크게 상관없으나, 
+        // SkillMapper에서 즉시 조회가 필요하다면 QteRepo를 먼저 로드하는 게 안전함.
+
         ItemRepo.LoadAll();
+        QtePatternRepo.LoadAll();
         SkillRepo.LoadAll();
         CharacterRepo.LoadAll();
-        QtePatternRepo.LoadAll();
     }
 }   
