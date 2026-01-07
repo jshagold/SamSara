@@ -35,21 +35,21 @@ public class SkillMasterRepository : ISkillMasterRepository
 
         if (assets == null || assets.Length == 0)
         {
-            Debug.LogWarning($"{_logClass} '{RESOURCE_PATH}' 경로에서 아이템 데이터를 찾을 수 없습니다.");
+            Debug.LogWarning($"{_logClass} '{RESOURCE_PATH}' 경로에서 스킬 데이터를 찾을 수 없습니다.");
             return;
         }
 
         foreach (var asset in assets)
         {
-            if (_skillDictionary.ContainsKey(asset.SkillId))
+            if (_skillDictionary.ContainsKey(asset.Id))
             {
-                Debug.LogError($"[ItemMasterRepository] 중복된 ItemId 발견: {asset.SkillId} ({asset.SkillName})");
+                Debug.LogError($"{_logClass} 중복된 SkillId 발견: {asset.Id} ({asset.Name})");
                 continue;
             }
 
-            _skillDictionary.Add(asset.SkillId, asset);
+            _skillDictionary.Add(asset.Id, asset);
         }
 
-        Debug.Log($"[ItemMasterRepository] 아이템 데이터 {_skillDictionary.Count}개 로드 완료.");
+        Debug.Log($"{_logClass} 스킬 데이터 {_skillDictionary.Count}개 로드 완료.");
     }
 }

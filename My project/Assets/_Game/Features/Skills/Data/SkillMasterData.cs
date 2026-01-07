@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
-using NUnit.Framework;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "SkillMasterData", menuName = "Samsara/Skills/Skill Master Data")]
 public class SkillMasterData : ScriptableObject
 {
     [Header("Identity")]
-    public int SkillId;
-    public string SkillName;
+    public int Id;
+    public string Name;
     [TextArea] public string Desc;
 
     [Header("Visual")]
@@ -19,11 +18,10 @@ public class SkillMasterData : ScriptableObject
     public float DamageMultiplier;
 
     [Header("Cost/Effect")]
-    public List<SkillCostData> SkillCostList = new List<SkillCostData>();
-    public List<SkillEffectData> SkillEffectList = new List<SkillEffectData>();
+    public List<SkillCostData> CostList = new List<SkillCostData>();
+    public List<SkillEffectData> EffectList = new List<SkillEffectData>();
 
     [Header("References")]
     [Tooltip("QTE 패턴 없으면 None")]
-    public QtePatternData LinkedQtePattern;
-    
+    public QtePatternMasterData LinkedQtePattern;
 }

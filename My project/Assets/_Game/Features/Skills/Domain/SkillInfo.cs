@@ -1,5 +1,7 @@
 ﻿
 using System;
+using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
 
 [Serializable]
@@ -9,10 +11,16 @@ public class SkillInfo
     public string Name;
     public string Desc;
     public Sprite Icon;
-    public float Cooldown;
 
-    public int LinkedQteId;
-    public bool HasQte => LinkedQteId > 0;
+    public Sprite EffectVisual;
+
+    public float DamageMultiplier;
+
+    public List<SkillCostData> CostList = new List<SkillCostData>();
+    public List<SkillEffectData> EffectList = new List<SkillEffectData>();
+
+    public int LinkedQtePatternId;
+    public bool HasQte => LinkedQtePatternId > 0;
 
     public SkillInfo() { }
 }
