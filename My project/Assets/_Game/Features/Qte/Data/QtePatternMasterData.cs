@@ -2,12 +2,12 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "QtePatternData", menuName = "Samsara/Features/Qte/Qte Pattern Data")]
-public class QtePatternData : ScriptableObject
+public class QtePatternMasterData : ScriptableObject
 {
     [Header("Identity")]
-    public int id;
-    public string patternName;
+    public int Id;
+    public string Name;
 
     [Header("Sequence")]
-    public List<QteNoteData> notes = new List<QteNoteData>();
+    public List<QteNoteData> NoteList = new List<QteNoteData>();
 }
