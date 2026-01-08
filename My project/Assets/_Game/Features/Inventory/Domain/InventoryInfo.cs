@@ -11,19 +11,19 @@ public class InventoryInfo
 
     public InventoryInfo(List<ItemInfo> itemList)
     { 
-        this.ItemList = itemList; 
+        this.ItemList = itemList ?? new List<ItemInfo>(); 
     }
 
 
 
     public int GetItemCount(int itemId)
     {
-        var item = ItemList.FirstOrDefault(item => item.ItemId == itemId);
+        var item = ItemList.FirstOrDefault(item => item.Id == itemId);
         return item != null ? item.Count : 0;
     }
 
     public ItemInfo GetItem(int itemId)
     {
-        return ItemList.FirstOrDefault(item => item.ItemId == itemId);
+        return ItemList.FirstOrDefault(item => item.Id == itemId);
     }
 }

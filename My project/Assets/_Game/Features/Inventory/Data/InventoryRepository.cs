@@ -12,15 +12,17 @@ public class InventoryRepository : IInventoryRepository
     private readonly string _logClass = "[InventoryRepository]";
     private readonly string _filePath;
     private readonly NewGameConfig _newGameConfig;
+    private readonly IItemMasterRepository _itemMasterRepo;
 
     private InventorySaveData _cachedData;
 
     // 데이터 변경 알림 이벤트
     public event Action OnInventoryChanged;
 
-    public InventoryRepository(NewGameConfig config)
+    public InventoryRepository(NewGameConfig config, IItemMasterRepository itemMasterRepository)
     {
         _newGameConfig = config;
+        _itemMasterRepo = itemMasterRepository;
         // 안드로이드/IOS/PC 공용 경로
         _filePath = Path.Combine(Application.persistentDataPath, "save_inventory_data.json");
     }
@@ -32,15 +34,27 @@ public class InventoryRepository : IInventoryRepository
     {
         CheckDataIntegrity();
 
-        var item = _cachedData.ItemList.FirstOrDefault(item => item.ItemId == itemId);
+        var item = _cachedData.ItemList.FirstOrDefault(item => item.Id == itemId);
         return item?.Count ?? 0;
     }
 
     public InventoryInfo GetInventory()
     {
         CheckDataIntegrity();
-        // Data 객체를 Domain 객체로 변환하여 반환 (외부에서 Data 객체 직접 수정 방지)
-        return InventoryMapper.ToDomain(_cachedData);
+
+        var domainItemList = new List<ItemInfo>();
+
+        foreach(var saveItem in _cachedData.ItemList)
+        {
+            var masterItem = _itemMasterRepo.GetData(saveItem.Id);
+
+            if(masterItem != null)
+            {
+                domainItemList.Add(masterItem.ToDomain(count: saveItem.Count));
+            }
+        }
+
+        return new InventoryInfo(domainItemList);
     }
 
 
@@ -50,13 +64,23 @@ public class InventoryRepository : IInventoryRepository
     public void AddItem(int itemId, int count)
     {
         CheckDataIntegrity();
-
         if (count <= 0) return;
-        
-        var item = _cachedData.ItemList.FirstOrDefault(item => item.ItemId == itemId);
+
+        if (_itemMasterRepo.GetData(itemId: itemId) == null)
+        {
+            throw new InvalidOperationException($"{_logClass} AddItem 실패 - 존재하지 않는 ItemID: {itemId}");
+        }
+
+        var item = _cachedData.ItemList.FirstOrDefault(item => item.Id == itemId);
         if(item == null)
         {
-            _cachedData.ItemList.Add(new ItemSaveData(itemId, count));
+            _cachedData.ItemList.Add(
+                new ItemSaveData
+                {
+                    Id = itemId, 
+                    Count = count
+                }
+            );
         }
         else
         {
@@ -72,7 +96,7 @@ public class InventoryRepository : IInventoryRepository
 
         if(count <= 0) return;
 
-        var item = _cachedData.ItemList.FirstOrDefault(item => item.ItemId == itemId);
+        var item = _cachedData.ItemList.FirstOrDefault(item => item.Id == itemId);
         if (item == null || item.Count < count)
         {
             Debug.LogWarning($"{_logClass} ConsumeItem 실패 - 보유량 부족 (ID: {itemId}, 보유: {item?.Count ?? 0}, 필요: {count})");
@@ -81,6 +105,8 @@ public class InventoryRepository : IInventoryRepository
 
         item.Count -= count;
 
+        // [옵션] 개수가 0이 되면 리스트에서 삭제할지 여부는 기획에 따라 결정
+
         NotifyChanged();
     }
 
@@ -88,17 +114,14 @@ public class InventoryRepository : IInventoryRepository
     // ======================================================================================================
     // Load / Save
     // ======================================================================================================
-    public async UniTask<InventoryInfo> LoadDataAsync()
+    public async UniTask LoadDataAsync()
     {
-        if(_cachedData != null)
-        {
-            return _cachedData.ToDomain();
-        }
+        if(_cachedData != null) return;
 
         if (!File.Exists(_filePath))
         {
             InitializeNewData();
-            return _cachedData.ToDomain();
+            return;
         }
 
         try
@@ -119,8 +142,6 @@ public class InventoryRepository : IInventoryRepository
             }
 
             Debug.Log($"{_logClass} 로드 완료");
-
-            return _cachedData.ToDomain();
         }
         catch (Exception e)
         {
@@ -185,7 +206,13 @@ public class InventoryRepository : IInventoryRepository
 
         if(_newGameConfig.InitialMoney > 0)
         {
-            initialItemList.Add(new ItemSaveData(ItemConstants.MONEY_ID, _newGameConfig.InitialMoney));
+            initialItemList.Add(
+                new ItemSaveData
+                {
+                    Id = ItemConstants.MONEY_ID, 
+                    Count = _newGameConfig.InitialMoney
+                }
+            );
         }
 
         _cachedData = new InventorySaveData(initialItemList);
