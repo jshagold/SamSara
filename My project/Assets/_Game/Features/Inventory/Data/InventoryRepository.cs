@@ -131,7 +131,7 @@ public class InventoryRepository : IInventoryRepository
             var loadData = JsonConvert.DeserializeObject<InventorySaveData>(json);
             if (loadData == null)
             {
-                throw new System.InvalidOperationException("[LoadDataAsync] 데이터가 null입니다. 파일 손상 의심.");
+                throw new InvalidOperationException("[LoadDataAsync] 데이터가 null입니다. 파일 손상 의심.");
             }
             else
             {
@@ -164,7 +164,7 @@ public class InventoryRepository : IInventoryRepository
                 File.WriteAllText(_filePath, json);
             });
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Debug.LogError($"{_logClass}[IO Error] 파일 쓰기 실패!!: {e.Message}");
         }
@@ -202,20 +202,16 @@ public class InventoryRepository : IInventoryRepository
     {
         Debug.Log($"{_logClass} 신규데이터 생성 (초기 자금: {_newGameConfig.InitialMoney})");
 
-        var initialItemList = new List<ItemSaveData>();
+        _cachedData = new InventorySaveData();
 
         if(_newGameConfig.InitialMoney > 0)
         {
-            initialItemList.Add(
-                new ItemSaveData
-                {
-                    Id = ItemConstants.MONEY_ID, 
-                    Count = _newGameConfig.InitialMoney
-                }
-            );
+            _cachedData.ItemList.Add(new ItemSaveData
+            {
+                Id = ItemConstants.MONEY_ID, 
+                Count = _newGameConfig.InitialMoney
+            });
         }
-
-        _cachedData = new InventorySaveData(initialItemList);
 
         // 초기화 후 즉시 저장해서 파일 생성
         SaveDataAsync().Forget();

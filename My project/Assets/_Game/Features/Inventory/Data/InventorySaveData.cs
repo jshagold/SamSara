@@ -5,16 +5,7 @@ using System.Collections.Generic;
 [Serializable]
 public class InventorySaveData
 {
-    public List<ItemSaveData> ItemList;
+    public List<ItemSaveData> ItemList = new List<ItemSaveData>();
 
-    public InventorySaveData()
-    {
-        this.ItemList = new List<ItemSaveData>();
-    }
-
-    [JsonConstructor]
-    public InventorySaveData(List<ItemSaveData> itemList)
-    {
-        this.ItemList = itemList;
-    }   
+    public InventorySaveData() { }   
 }

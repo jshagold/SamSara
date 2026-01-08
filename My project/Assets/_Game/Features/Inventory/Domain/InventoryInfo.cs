@@ -1,29 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
-using UnityEngine;
 
+[Serializable]
 public class InventoryInfo
 {
-    public List<ItemInfo> ItemList { get; private set; }
-
-    public int Money => GetItemCount(ItemConstants.MONEY_ID);
-
-    public InventoryInfo(List<ItemInfo> itemList)
-    { 
-        this.ItemList = itemList ?? new List<ItemInfo>(); 
-    }
+    public List<ItemInfo> ItemList = new List<ItemInfo>();
 
 
-
-    public int GetItemCount(int itemId)
-    {
-        var item = ItemList.FirstOrDefault(item => item.Id == itemId);
-        return item != null ? item.Count : 0;
-    }
-
-    public ItemInfo GetItem(int itemId)
-    {
-        return ItemList.FirstOrDefault(item => item.Id == itemId);
-    }
+    public InventoryInfo() { }
 }
