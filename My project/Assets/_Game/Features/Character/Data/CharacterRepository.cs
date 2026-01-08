@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -10,48 +11,66 @@ public class CharacterRepository : ICharacterRepository
     private readonly string _logClass = "[CharacterRepository]";
     private readonly string _filePath;
     private readonly NewGameConfig _newGameConfig;
-    private readonly ICharacterMasterRepository _masterRepo;
+    private readonly ICharacterMasterRepository _characterMasterRepo;
 
-    private UserCharacterData _cachedData;
+    private CharacterSaveData _cachedData;
 
-    public event Action OnCharacterStatChanged;
+    public event Action OnCharacterUpdated;
 
-    public CharacterRepository(NewGameConfig config, ICharacterMasterRepository masterRepo)
+    public CharacterRepository(NewGameConfig config, ICharacterMasterRepository characterMasterRepo)
     {
         _newGameConfig = config;
+        _characterMasterRepo = characterMasterRepo;
         _filePath = Path.Combine(Application.persistentDataPath, "save_character_data.json");
-        _masterRepo = masterRepo;
     }
 
-    public EvolutionNodeInfo GetCurrentNode()
+    public CharacterInfo GetCharacterInfo()
     {
         CheckDataIntegrity();
 
-        var masterData = _masterRepo.GetData(characterId: _cachedData.CharacterId);
-        if(masterData == null)
+        var characterMasterData = _characterMasterRepo.GetData(characterId: _cachedData.CharacterId);
+        if(characterMasterData == null)
         {
-            Debug.LogWarning($"{_logClass} GetCurrentNode - CharacterMasterData null characterId={_cachedData.CharacterId}");
-            return null;
+            throw new InvalidOperationException($"{_logClass}[GetCharacterInfo] MasterData 누락 (CharacterId: {_cachedData.CharacterId})");
         }
 
-        EvolutionNodeData currentNode = masterData.EvolutionNodes.Find(node => node.NodeId == _cachedData.CurrentNodeId);
+        var currentNode = characterMasterData.EvolutionNodes.FirstOrDefault(node => node.Id == _cachedData.CurrentNodeId);
         if(currentNode == null)
         {
-            Debug.LogWarning($"{_logClass} GetCurrentNode - currentNode null CurrentNodeId={_cachedData.CurrentNodeId}");
-            return null;
+            throw new InvalidOperationException($"{_logClass}[GetCharacterInfo] NodeData 누락 (CurrentNodeId: {_cachedData.CurrentNodeId})");
         }
 
-        return currentNode.ToDomain();
+        return new CharacterInfo
+        {
+            Id = _cachedData.CharacterId,
+            Name = characterMasterData.Name,
+            Description = characterMasterData.Desc,
+
+            Portrait = currentNode.Portrait,
+            EvolutionLevel = currentNode.Level,
+            CurrentNodeId = currentNode.Id,
+
+            Stats = _cachedData.CurrentStats.Clone(),
+
+            SkillList = currentNode.SkillList
+                .Select(skillMasterData => new SkillInfo
+                {
+                    Id = skillMasterData.Id,
+                    Name = skillMasterData.Name,
+                    Desc = skillMasterData.Desc,
+                    Icon = skillMasterData.Icon,
+                    EffectVisual = skillMasterData.EffectVisual,
+                    DamageMultiplier = skillMasterData.DamageMultiplier,
+                    CostList = new List<SkillCostData>(skillMasterData.CostList),
+                    EffectList = new List<SkillEffectData>(skillMasterData.EffectList),
+                    LinkedQtePatternId = skillMasterData.LinkedQtePattern != null
+                        ? skillMasterData.LinkedQtePattern.Id
+                        : -1,
+                }).ToList(),
+        };
     }
 
-    public StatGroup GetCurrentStat()
-    {
-        CheckDataIntegrity();
-
-        return _cachedData.CurrentStats;
-    }
-
-    public void UpdateStat(StatGroup stat)
+    public void ModifyStat(StatGroup stat)
     {
         CheckDataIntegrity();
         if (stat == null)
@@ -60,16 +79,14 @@ public class CharacterRepository : ICharacterRepository
             return;
         }
 
-        _cachedData.CurrentStats = stat;
+        _cachedData.CurrentStats = stat.Clone();
+
         NotifyChanged();
     }
 
     public async UniTask LoadDataAsync()
     {
-        if (_cachedData != null)
-        {
-            return;
-        }
+        if(_cachedData != null) return;
 
         if (!File.Exists(_filePath))
         {
@@ -81,23 +98,18 @@ public class CharacterRepository : ICharacterRepository
         {
             string json = await UniTask.RunOnThreadPool(() => File.ReadAllText(_filePath));
 
-            var loadData = JsonConvert.DeserializeObject<UserCharacterData>(json);
+            var loadData = JsonConvert.DeserializeObject<CharacterSaveData>(json);
             if (loadData == null)
             {
-                throw new System.InvalidOperationException($"{_logClass} [LoadDataAsync] 데이터가 null입니다. 파일 손상 의심.");
-            }
-            else
-            {
-                _cachedData = loadData;
+                throw new InvalidOperationException($"{_logClass} [LoadDataAsync] 데이터가 null입니다. 파일 손상 의심.");
             }
 
+            _cachedData = loadData;
             Debug.Log($"{_logClass} 로드 완료");
-
-            return;
         }
         catch (Exception e)
         {
-            Debug.LogError($"{_logClass}[CRITICAL] 로드 실패: {e.Message}");
+            Debug.LogError($"{_logClass}[LoadDataAsync] 로드 실패: {e.Message}");
             throw;
         }
     }
@@ -114,13 +126,12 @@ public class CharacterRepository : ICharacterRepository
                 string json = JsonConvert.SerializeObject(_cachedData, Formatting.Indented);
                 File.WriteAllText(_filePath, json);
             });
+            Debug.Log($"{_logClass} 저장 완료");
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Debug.LogError($"{_logClass}[IO Error] 파일 쓰기 실패!!: {e.Message}");
         }
-
-        Debug.Log($"{_logClass} 저장 완료");
     }
 
     public void SaveDataSync()
@@ -150,28 +161,31 @@ public class CharacterRepository : ICharacterRepository
     // ======================================================================================================
     private void InitializeNewData()
     {
-        Debug.Log($"{_logClass} 신규데이터 생성 (초기 캐릭터: {_newGameConfig.StartingCharacterId})");
 
         int startCharacterId = _newGameConfig.StartingCharacterId;
         int startNodeId = _newGameConfig.StartingCharacterNodeId;
+        
+        Debug.Log($"{_logClass} 신규 생성 시작 (CharacterId: {startCharacterId}, NodeID: {startNodeId})");
 
-        CharacterMasterData masterData = _masterRepo.GetData(startCharacterId);
-        List<EvolutionNodeData> nodeList = masterData.EvolutionNodes;
-        EvolutionNodeData EvolutionNode = nodeList.Find(node => node.NodeId == startNodeId);
+        CharacterMasterData characterMasterData = _characterMasterRepo.GetData(startCharacterId);
+        if (characterMasterData == null)
+        {
+            throw new InvalidOperationException($"{_logClass} 초기화 실패! MasterData 없음 (CharacterId: {startCharacterId})");
+        }
 
-        if(masterData != null && EvolutionNode != null)
+        EvolutionNodeData startNode = characterMasterData.EvolutionNodes.FirstOrDefault(node => node.Id == startNodeId);
+        if(startNode == null)
         {
-            _cachedData = new UserCharacterData
-            {
-                CharacterId = masterData.CharacterId,
-                CurrentNodeId = EvolutionNode.NodeId,
-                CurrentStats = EvolutionNode.StartStats,
-            };
+            throw new InvalidOperationException($"{_logClass} 초기화 실패! NodeID를 찾을수 없음 (NodeID: {startNodeId})");
         }
-        else
+
+        _cachedData = new CharacterSaveData
         {
-            throw new InvalidOperationException($"{_logClass} 데이터 초기화 실패! (CharacterMasterData 확인 필요 startCharacterId={startCharacterId})");
-        }
+            CharacterId = characterMasterData.Id,
+            CurrentNodeId = startNode.Id,
+
+            CurrentStats = startNode.StartStats.Clone(),
+        };
 
         // 초기화 후 즉시 저장해서 파일 생성
         SaveDataAsync().Forget();
@@ -180,7 +194,7 @@ public class CharacterRepository : ICharacterRepository
 
     private void NotifyChanged()
     {
-        OnCharacterStatChanged?.Invoke();
+        OnCharacterUpdated?.Invoke();
     }
 
     // 데이터 무결성 체크 (Fail Fast)

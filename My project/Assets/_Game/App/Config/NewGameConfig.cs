@@ -16,6 +16,4 @@ public class NewGameConfig : ScriptableObject
     [Header("Character Settings")]
     public int StartingCharacterId = 1001;  // 시작 캐릭터 id
     public int StartingCharacterNodeId = 101;   // 시작 캐릭터 Node id
-    public List<string> StartingCharacterIds = new List<string> { "character_main" };
-
 }

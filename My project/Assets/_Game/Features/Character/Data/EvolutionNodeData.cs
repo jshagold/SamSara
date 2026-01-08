@@ -1,15 +1,14 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using UnityEngine;
 
 [Serializable]
 public class EvolutionNodeData
 {
     [Header("Node Info")]
-    public int NodeId; 
-    public string NodeName;
+    public int Id; 
+    public string Name;
     [TextArea] public string Desc;
     public Sprite Portrait;
 
@@ -17,12 +16,12 @@ public class EvolutionNodeData
     public int Level; // 진화 단계 레벨
 
     [Header("Branching")]
-    public List<int> NextEvolutionNodeIds;
+    public List<int> NextEvolutionNodeIds = new List<int>();
 
     [Header("Stats")]
-    public StatGroup StartStats;
-    public StatGroup MaxStats;
+    public StatGroup StartStats = new StatGroup();
+    public StatGroup MaxStats = new StatGroup();
 
     [Header("Skills")]
-    public List<SkillMasterData> SkillList;
+    public List<SkillMasterData> SkillList = new List<SkillMasterData>();
 }

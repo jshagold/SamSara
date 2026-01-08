@@ -39,13 +39,13 @@ public class CharacterMasterRepository : ICharacterMasterRepository
 
         foreach (var asset in assets)
         {
-            if (_characterDictionary.ContainsKey(asset.CharacterId))
+            if (_characterDictionary.ContainsKey(asset.Id))
             {
-                Debug.LogError($"{_logClass} 중복된 CharacterId 발견: {asset.CharacterId} ({asset.CharacterName})");
+                Debug.LogError($"{_logClass} 중복된 CharacterId 발견: {asset.Id} ({asset.Name})");
                 continue;
             }
 
-            _characterDictionary.Add(asset.CharacterId, asset);
+            _characterDictionary.Add(asset.Id, asset);
         }
 
         Debug.Log($"{_logClass} 캐릭터 데이터 {_characterDictionary.Count}개 로드 완료.");

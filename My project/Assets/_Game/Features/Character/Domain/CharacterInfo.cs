@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class CharacterDetailInfo
+public class CharacterInfo
 {
     [Header("Identity")]
-    public int CharacterId;
+    public int Id;
     public string Name;
     public string Description;
 
@@ -16,13 +16,10 @@ public class CharacterDetailInfo
     public int CurrentNodeId;
 
     [Header("Stats")]
-    public StatGroup Stats;
+    public StatGroup Stats = new StatGroup();
 
     [Header("Skills")]
     public List<SkillInfo> SkillList = new List<SkillInfo>();
 
-    [Header("Inventory")]
-    public InventoryInfo Inventory;
-
-    public CharacterDetailInfo() { }
+    public CharacterInfo() { }
 }

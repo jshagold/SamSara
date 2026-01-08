@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using Newtonsoft.Json;
 
 [Serializable]
@@ -17,11 +16,4 @@ public struct StatInfo
 
     [JsonIgnore]
     public bool IsMax => Value >= Limit;
-
-    public StatInfo(string label, float value, float limit)
-    {
-        Label = label;
-        Value = value; 
-        Limit = limit;
-    }
 }

@@ -3,13 +3,11 @@ using Cysharp.Threading.Tasks;
 
 public interface ICharacterRepository
 {
-    EvolutionNodeInfo GetCurrentNode();
+    CharacterInfo GetCharacterInfo();
 
-    StatGroup GetCurrentStat();
+    void ModifyStat(StatGroup stat);
 
-    void UpdateStat(StatGroup stat);
-
-    event Action OnCharacterStatChanged;
+    event Action OnCharacterUpdated;
 
     UniTask LoadDataAsync();
     UniTask SaveDataAsync();    // 일반 저장

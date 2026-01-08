@@ -9,9 +9,9 @@ public class MasterDataManager
 
     // Repository
     public IItemMasterRepository ItemRepo { get; private set; }
+    public IQtePatternMasterRepository QtePatternRepo { get; private set; }
     public ISkillMasterRepository SkillRepo { get; private set; }
     public ICharacterMasterRepository CharacterRepo { get; private set; }
-    public IQtePatternMasterRepository QtePatternRepo { get; private set; }
 
     public void Initialize()
     {
@@ -42,9 +42,9 @@ public class MasterDataManager
     private void CreateRepositories()
     {
         ItemRepo = new ItemMasterRepository();
+        QtePatternRepo = new QtePatternMasterRepository();
         SkillRepo = new SkillMasterRepository();
         CharacterRepo = new CharacterMasterRepository();
-        QtePatternRepo = new QtePatternMasterRepository();
     }
 
     private void LoadAllData()

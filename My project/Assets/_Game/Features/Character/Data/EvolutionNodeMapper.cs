@@ -1,52 +1,45 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
+using System.Linq;
 
 public static class EvolutionNodeMapper
 {
-    // SaveData (Data) -> Domain
+    // Data -> Domain
     public static EvolutionNodeInfo ToDomain(this EvolutionNodeData data)
     {
-        if (data == null)
-        {
-            return null;
-        }
+        if(data == null) return null;
 
         // TODO Skill List 변경해야함 (MasterData -> Domain)
         return new EvolutionNodeInfo
         {
-            NodeId = data.NodeId,
-            NodeName = data.NodeName,
+            Id = data.Id,
+            Name = data.Name,
             Desc = data.Desc,
             Portrait = data.Portrait,
             EvolutionLevel = data.Level,
-            NextEvolutionNodeIds = data.NextEvolutionNodeIds,
-            StartStats = data.StartStats,
-            MaxStats = data.MaxStats,
-            SkillList = data.SkillList,
+            NextEvolutionNodeIds = new List<int>(data.NextEvolutionNodeIds),
+
+            StartStats = data.StartStats.Clone(),
+            MaxStats = data.MaxStats.Clone(),
+
+            SkillList = data.SkillList
+                .Select(skillMasterData => new SkillInfo
+                {
+                    Id = skillMasterData.Id,
+                    Name = skillMasterData.Name,
+                    Desc = skillMasterData.Desc,
+                    Icon = skillMasterData.Icon,
+                    EffectVisual = skillMasterData.EffectVisual,
+
+                    DamageMultiplier = skillMasterData.DamageMultiplier,
+
+                    CostList = new List<SkillCostData>(skillMasterData.CostList),
+                    EffectList = new List<SkillEffectData>(skillMasterData.EffectList),
+
+                    LinkedQtePatternId = skillMasterData.LinkedQtePattern != null
+                        ? skillMasterData.LinkedQtePattern.Id 
+                        : -1
+                })
+                .ToList(),
         };
     }
-
-    // Domain -> SaveData (Data)
-    public static EvolutionNodeData ToData(this EvolutionNodeInfo domain)
-    {
-        if (domain == null)
-        {
-            return null;
-        }
-
-        // TODO Skill List 변경해야함 (Domain -> MasterData)
-        return new EvolutionNodeData
-        {
-            NodeId = domain.NodeId,
-            NodeName = domain.NodeName,
-            Desc = domain.Desc,
-            Portrait = domain.Portrait,
-            Level = domain.EvolutionLevel,
-            NextEvolutionNodeIds = domain.NextEvolutionNodeIds,
-            StartStats = domain.StartStats,
-            MaxStats = domain.MaxStats,
-            SkillList = domain.SkillList,
-        };
-    }
-
 }
