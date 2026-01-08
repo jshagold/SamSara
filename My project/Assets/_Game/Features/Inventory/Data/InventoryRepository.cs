@@ -54,7 +54,10 @@ public class InventoryRepository : IInventoryRepository
             }
         }
 
-        return new InventoryInfo(domainItemList);
+        return new InventoryInfo
+        {
+            ItemList = domainItemList,
+        };
     }
 
 

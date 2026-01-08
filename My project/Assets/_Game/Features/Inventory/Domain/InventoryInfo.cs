@@ -7,6 +7,5 @@ public class InventoryInfo
 {
     public List<ItemInfo> ItemList = new List<ItemInfo>();
 
-
     public InventoryInfo() { }
 }

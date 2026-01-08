@@ -18,8 +18,8 @@ public class SkillInfo
     public List<SkillCostData> CostList = new List<SkillCostData>();
     public List<SkillEffectData> EffectList = new List<SkillEffectData>();
 
-    public int LinkedQtePatternId;
-    public bool HasQte => LinkedQtePatternId > 0;
+    public int LinkedQtePatternId = -1;
+    public bool HasQte => LinkedQtePatternId >= 0;
 
     public SkillInfo() { }
 }

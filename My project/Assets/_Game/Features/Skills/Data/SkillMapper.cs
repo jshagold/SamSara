@@ -28,7 +28,7 @@ public static class SkillMapper
 
             LinkedQtePatternId = masterData.LinkedQtePattern != null
                 ? masterData.LinkedQtePattern.Id
-                : 0,
+                : -1,
         };
     }
 }
