@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CharacterMasterRepository : ICharacterMasterRepository
 {
-    private readonly string _logClass = "[CharacterMasterRepository]";
+    private readonly string _logClass = $"[{nameof(CharacterMasterRepository)}]";
 
     // 검색용 Dictionary
     private Dictionary<int, CharacterMasterData> _characterDictionary = new Dictionary<int, CharacterMasterData>();

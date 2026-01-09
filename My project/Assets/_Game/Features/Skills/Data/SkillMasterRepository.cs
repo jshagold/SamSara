@@ -5,7 +5,7 @@ using static UnityEditor.Progress;
 
 public class SkillMasterRepository : ISkillMasterRepository
 {
-    private string _logClass = "[SkillMasterRepository]";
+    private string _logClass = $"[{nameof(SkillMasterRepository)}]";
 
     // 검색용 Dictionary
     private Dictionary<int, SkillMasterData> _skillDictionary = new Dictionary<int, SkillMasterData>();

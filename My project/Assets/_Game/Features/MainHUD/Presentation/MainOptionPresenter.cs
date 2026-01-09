@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class MainOptionPresenter : IDisposable
 {
-    private readonly string _logClass = "[MainOptionPresenter]";
+    private readonly string _logClass = $"[{nameof(MainOptionPresenter)}]";
 
     private readonly OptionButtonView _optionButtonView;
     private readonly OptionMenuPopupView _menuPopupView;

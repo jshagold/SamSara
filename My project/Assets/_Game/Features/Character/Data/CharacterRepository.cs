@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class CharacterRepository : ICharacterRepository
 {
-    private readonly string _logClass = "[CharacterRepository]";
+    private readonly string _logClass = $"[{nameof(CharacterRepository)}]";
     private readonly string _filePath;
     private readonly NewGameConfig _newGameConfig;
     private readonly ICharacterMasterRepository _characterMasterRepo;

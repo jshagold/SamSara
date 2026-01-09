@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class QtePatternMasterRepository : IQtePatternMasterRepository
 {
-    private readonly string _logClass = "[QtePatternMasterRepository]";
+    private readonly string _logClass = $"[{nameof(QtePatternMasterRepository)}]";
 
     private Dictionary<int, QtePatternMasterData> _qtePatternDictionary = new Dictionary<int, QtePatternMasterData>();
     // (Assets/Resources/MasterData/QtePatterns)

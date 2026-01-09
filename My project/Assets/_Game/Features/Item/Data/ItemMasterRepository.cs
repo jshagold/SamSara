@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ItemMasterRepository : IItemMasterRepository
 {
-    private string _logClass = "[ItemMasterRepository]";
+    private string _logClass = $"[{nameof(ItemMasterRepository)}]";
 
     // 검색용 Dictionary
     private Dictionary<int, ItemMasterData> _itemDictionary = new Dictionary<int, ItemMasterData>();

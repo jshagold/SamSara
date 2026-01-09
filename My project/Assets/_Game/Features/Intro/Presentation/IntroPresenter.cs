@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class IntroPresenter : IDisposable
 {
-    private readonly string _logClass = "[IntroPresenter]";
+    private readonly string _logClass = $"[{nameof(IntroPresenter)}]";
 
     private IntroView _introView;
     private string _nextSceneName;
@@ -91,7 +91,6 @@ public class IntroPresenter : IDisposable
 
     private void OnStartButtonClicked()
     {
-        UnityEngine.Debug.Log(">> 버튼 클릭 씬이동중");
         SceneManager.LoadScene( _nextSceneName );
     }
 
