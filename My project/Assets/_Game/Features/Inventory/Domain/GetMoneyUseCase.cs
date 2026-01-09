@@ -18,10 +18,4 @@ public class GetMoneyUseCase
 
         return _userInventroyRepository.GetItemCount(ItemConstants.MONEY_ID);
     }
-
-
-    public UniTask LoadInventoryAsync()
-    {
-        return _userInventroyRepository.LoadDataAsync();
-    }
 }
