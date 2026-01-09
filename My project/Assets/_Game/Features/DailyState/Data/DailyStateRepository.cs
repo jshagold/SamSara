@@ -7,7 +7,7 @@ using System;
 
 public class DailyStateRepository : IDailyStateRepository
 {
-    private readonly string _logClass = "[DailyStateRepository]";
+    private readonly string _logClass = $"[{nameof(DailyStateRepository)}]";
 
     private readonly string _filePath;
     private readonly NewGameConfig _newGameConfig;
@@ -88,7 +88,7 @@ public class DailyStateRepository : IDailyStateRepository
             Debug.LogError($"{_logClass}[IO Error] 파일 쓰기 실패!!: {e.Message}");
         }
 
-        Debug.Log("[DailyStateRepository] 저장 완료");
+        Debug.Log($"{_logClass} 저장 완료");
     }
 
     // 데이터 저장 - 동기 (긴급 저장)

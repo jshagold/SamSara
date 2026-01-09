@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class InventoryRepository : IInventoryRepository
 {
-    private readonly string _logClass = "[InventoryRepository]";
+    private readonly string _logClass = $"[{nameof(InventoryRepository)}]";
     private readonly string _filePath;
     private readonly NewGameConfig _newGameConfig;
     private readonly IItemMasterRepository _itemMasterRepo;

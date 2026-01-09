@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AutoSaveManager : MonoBehaviour
 {
-    private readonly string _logClass = "[AutoSaveManager]";
+    private readonly string _logClass = $"[{nameof(AutoSaveManager)}]";
 
     private GameContext _gameContext;
 

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class MasterDataManager
 {
-    private readonly string _logClass = "[MasterDataManager]";
+    private readonly string _logClass = $"[{nameof(MasterDataManager)}]";
 
     private bool _isInitialized = false;    // 초기화 여부
 
