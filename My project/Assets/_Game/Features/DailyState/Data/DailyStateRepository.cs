@@ -37,18 +37,7 @@ public class DailyStateRepository : IDailyStateRepository
 
         if (!File.Exists(_filePath))
         {
-            Debug.Log($"{_logClass}[LoadDataAsync] 세이브 파일 없어서 새로 생성.");
-
-            var initialMap = new Dictionary<string, bool[]>();
-            foreach(var charId in _newGameConfig.StartingCharacterIds)
-            {
-                bool[] slots = new bool[_newGameConfig.DefaultActionSlots];
-                for (int i = 0; i < slots.Length; i++) slots[i] = true;
-
-                initialMap.Add(charId, slots);
-            }
-
-            _cachedData = new DailyStateData(currentDay: _newGameConfig.StartDay, characterActionMap: initialMap);
+            InitializeNewData();
             return _cachedData.ToDomain();
         }
 
@@ -157,7 +146,7 @@ public class DailyStateRepository : IDailyStateRepository
         bool[] slots = _cachedData.characterActionMap[charId];
         if (slotIndex < 0 || slotIndex >= slots.Length)
         {
-            throw new IndexOutOfRangeException($"[CRITICAL] 잘못된 슬롯 인덱스입니다. CharID: {charId}, Request: {slotIndex}, Max: {slots.Length - 1}");
+            throw new IndexOutOfRangeException($"[ConsumeActionSlot] 잘못된 슬롯 인덱스입니다. CharID: {charId}, Request: {slotIndex}, Max: {slots.Length - 1}");
         }
         slots[slotIndex] = false;
 
@@ -167,6 +156,21 @@ public class DailyStateRepository : IDailyStateRepository
     }
 
 
+
+    private void InitializeNewData()
+    {
+        Debug.Log($"{_logClass}[InitializeNewData] 세이브 파일 없어서 새로 생성.");
+
+        var initialMap = new Dictionary<string, bool[]>();
+        int characterId = _newGameConfig.StartingCharacterId;
+
+        bool[] slots = new bool[_newGameConfig.DefaultActionSlots];
+        for (int i = 0; i < slots.Length; i++) slots[i] = true;
+
+        initialMap.Add(characterId.ToString(), slots);
+
+        _cachedData = new DailyStateData(currentDay: _newGameConfig.StartDay, characterActionMap: initialMap);
+    }
 
     private void NotifyChanged()
     {

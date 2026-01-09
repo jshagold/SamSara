@@ -134,7 +134,7 @@ public class InventoryRepository : IInventoryRepository
             var loadData = JsonConvert.DeserializeObject<InventorySaveData>(json);
             if (loadData == null)
             {
-                throw new InvalidOperationException("[LoadDataAsync] 데이터가 null입니다. 파일 손상 의심.");
+                throw new InvalidOperationException($"{_logClass}[LoadDataAsync] 데이터가 null입니다. 파일 손상 의심.");
             }
             else
             {
