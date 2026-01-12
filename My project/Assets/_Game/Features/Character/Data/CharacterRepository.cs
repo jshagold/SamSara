@@ -53,20 +53,7 @@ public class CharacterRepository : ICharacterRepository
             Stats = _cachedData.CurrentStats.Clone(),
 
             SkillList = currentNode.SkillList
-                .Select(skillMasterData => new SkillInfo
-                {
-                    Id = skillMasterData.Id,
-                    Name = skillMasterData.Name,
-                    Desc = skillMasterData.Desc,
-                    Icon = skillMasterData.Icon,
-                    EffectVisual = skillMasterData.EffectVisual,
-                    DamageMultiplier = skillMasterData.DamageMultiplier,
-                    CostList = new List<SkillCostData>(skillMasterData.CostList),
-                    EffectList = new List<SkillEffectData>(skillMasterData.EffectList),
-                    LinkedQtePatternId = skillMasterData.LinkedQtePattern != null
-                        ? skillMasterData.LinkedQtePattern.Id
-                        : -1,
-                }).ToList(),
+                .Select(skillMasterData => skillMasterData.ToDomain()).ToList(),
         };
     }
 

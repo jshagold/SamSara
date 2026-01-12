@@ -13,8 +13,8 @@ public static class SkillMapper
             Id = masterData.Id,
             Name = masterData.Name,
             Desc = masterData.Desc,
-            Icon = masterData.Icon,
-            EffectVisual = masterData.EffectVisual,
+            IconName = masterData.Icon != null ? masterData.Icon.name : "null",
+            EffectVisualName = masterData.EffectVisual != null ? masterData.EffectVisual.name : "null",
 
             DamageMultiplier = masterData.DamageMultiplier,
 

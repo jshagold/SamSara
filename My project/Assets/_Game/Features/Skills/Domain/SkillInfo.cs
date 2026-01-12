@@ -8,9 +8,9 @@ public class SkillInfo
     public int Id;
     public string Name;
     public string Desc;
-    public Sprite Icon;
+    public string IconName;
 
-    public Sprite EffectVisual;
+    public string EffectVisualName;
 
     public float DamageMultiplier;
 
