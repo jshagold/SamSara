@@ -14,7 +14,7 @@ public static class EvolutionNodeMapper
             Id = data.Id,
             Name = data.Name,
             Desc = data.Desc,
-            Portrait = data.Portrait,
+            PortraitName = data.Portrait != null ? data.Portrait.name : "null",
             EvolutionLevel = data.Level,
             NextEvolutionNodeIds = new List<int>(data.NextEvolutionNodeIds),
 

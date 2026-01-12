@@ -10,7 +10,7 @@ public class ItemInfo
     public string Name;
     public string Description;
     public ItemType Type;
-    public Sprite Icon;
+    public string IconName;
     public int MaxStackCount;
 
     public int Count;

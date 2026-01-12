@@ -46,14 +46,8 @@ public class CharacterRepository : ICharacterRepository
             Name = characterMasterData.Name,
             Description = characterMasterData.Desc,
 
-            Portrait = currentNode.Portrait,
-            EvolutionLevel = currentNode.Level,
-            CurrentNodeId = currentNode.Id,
-
-            Stats = _cachedData.CurrentStats.Clone(),
-
-            SkillList = currentNode.SkillList
-                .Select(skillMasterData => skillMasterData.ToDomain()).ToList(),
+            CurrentEvolutionNode = currentNode.ToDomain(),
+            CurrentStats = _cachedData.CurrentStats.Clone(),
         };
     }
 

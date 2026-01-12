@@ -10,16 +10,11 @@ public class CharacterInfo
     public string Name;
     public string Description;
 
-    [Header("Visual")]
-    public Sprite Portrait;
-    public int EvolutionLevel;
-    public int CurrentNodeId;
+    [Header("EvolutionNode")]
+    public EvolutionNodeInfo CurrentEvolutionNode;
 
     [Header("Stats")]
-    public StatGroup Stats = new StatGroup();
-
-    [Header("Skills")]
-    public List<SkillInfo> SkillList = new List<SkillInfo>();
+    public StatGroup CurrentStats = new StatGroup();
 
     public CharacterInfo() { }
 }

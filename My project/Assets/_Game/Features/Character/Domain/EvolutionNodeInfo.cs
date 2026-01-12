@@ -8,7 +8,7 @@ public class EvolutionNodeInfo
     public int Id;
     public string Name;
     public string Desc;
-    public Sprite Portrait;
+    public string PortraitName;
 
     public int EvolutionLevel;
 

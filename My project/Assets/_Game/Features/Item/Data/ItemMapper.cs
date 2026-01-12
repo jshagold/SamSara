@@ -13,7 +13,7 @@ public static class ItemMapper
             Name = masterData.Name,
             Description = masterData.Description,
             Type = masterData.Type,
-            Icon = masterData.Icon,
+            IconName = masterData.Icon != null ? masterData.Icon.name : "null",
             MaxStackCount = masterData.MaxStackCount,
 
             Count = count,
