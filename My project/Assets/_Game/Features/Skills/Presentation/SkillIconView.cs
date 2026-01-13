@@ -78,15 +78,23 @@ public class SkillIconView : MonoBehaviour
     }
 
     // TODO === 전투 로직 ===
+  
     // 쿨타임설정
-    public void SetCooldown()
+    public void SetCooldown(float fillAmount, string cooldownText)
     {
+        bool isCooldown = fillAmount > 0f;
 
+        if(_cooldownDim != null) _cooldownDim.fillAmount = fillAmount;
+        if(_cooldownText != null)
+        {
+            _cooldownText.gameObject.SetActive(isCooldown);
+            if (isCooldown) _cooldownText.text = cooldownText;
+        }
     }
 
     // 스킬선택시 UI 수정
-    public void SetSelected()
+    public void SetSelected(bool isSelected)
     {
-
+        if(_selectedEffect != null) _selectedEffect.SetActive(isSelected);
     }
 }
