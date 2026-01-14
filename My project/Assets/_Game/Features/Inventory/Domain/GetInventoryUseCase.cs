@@ -1,4 +1,6 @@
-﻿public class GetInventoryUseCase
+﻿using System;
+
+public class GetInventoryUseCase
 {
     private readonly IInventoryRepository _inventoryRepo;
 
@@ -10,5 +12,11 @@
     public InventoryInfo Execute()
     {
         return _inventoryRepo.GetInventory();
+    }
+
+    public event Action OnInventoryChanged
+    {
+        add => _inventoryRepo.OnInventoryChanged += value;
+        remove => _inventoryRepo.OnInventoryChanged -= value;
     }
 }
