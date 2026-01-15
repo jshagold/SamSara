@@ -3,7 +3,11 @@ using Cysharp.Threading.Tasks;
 
 public interface ICharacterRepository
 {
-    CharacterInfo GetCharacterInfo();
+    CharacterSaveData GetCharacterData();
+
+    void InitializeData(CharacterSaveData initData);
+
+    bool HasSaveData();
 
     void ModifyStat(StatGroup stat);
 

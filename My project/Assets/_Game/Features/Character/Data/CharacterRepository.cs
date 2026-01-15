@@ -10,50 +10,45 @@ public class CharacterRepository : ICharacterRepository
 {
     private readonly string _logClass = $"[{nameof(CharacterRepository)}]";
     private readonly string _filePath;
-    private readonly NewGameConfig _newGameConfig;
-    private readonly ICharacterMasterRepository _characterMasterRepo;
 
     private CharacterSaveData _cachedData;
 
     public event Action OnCharacterUpdated;
 
-    public CharacterRepository(NewGameConfig config, ICharacterMasterRepository characterMasterRepo)
+    public CharacterRepository()
     {
-        _newGameConfig = config;
-        _characterMasterRepo = characterMasterRepo;
         _filePath = Path.Combine(Application.persistentDataPath, "save_character_data.json");
     }
 
-    public CharacterInfo GetCharacterInfo()
+    public CharacterSaveData GetCharacterData()
     {
         CheckDataIntegrity();
 
-        var characterMasterData = _characterMasterRepo.GetData(characterId: _cachedData.CharacterId);
-        if(characterMasterData == null)
+        return _cachedData;
+    }
+
+    public void InitializeData(CharacterSaveData initData)
+    {
+        if(initData == null)
         {
-            throw new InvalidOperationException($"{_logClass}[GetCharacterInfo] MasterData 누락 (CharacterId: {_cachedData.CharacterId})");
+            throw new InvalidOperationException($"{_logClass} InitializeData fail - initData 데이터 null");
         }
 
-        var currentNode = characterMasterData.EvolutionNodes.FirstOrDefault(node => node.Id == _cachedData.CurrentNodeId);
-        if(currentNode == null)
-        {
-            throw new InvalidOperationException($"{_logClass}[GetCharacterInfo] NodeData 누락 (CurrentNodeId: {_cachedData.CurrentNodeId})");
-        }
+        _cachedData = initData;
+        NotifyChanged();
 
-        return new CharacterInfo
-        {
-            Id = _cachedData.CharacterId,
-            Name = characterMasterData.Name,
-            Description = characterMasterData.Desc,
+        SaveDataAsync().Forget();
+    }
 
-            CurrentEvolutionNode = currentNode.ToDomain(),
-            CurrentStats = _cachedData.CurrentStats.Clone(),
-        };
+    public bool HasSaveData()
+    {
+        return File.Exists(_filePath);
     }
 
     public void ModifyStat(StatGroup stat)
     {
         CheckDataIntegrity();
+
         if (stat == null)
         {
             Debug.LogWarning($"{_logClass} UpdateStat 실패 - Stat null");
@@ -71,8 +66,7 @@ public class CharacterRepository : ICharacterRepository
 
         if (!File.Exists(_filePath))
         {
-            InitializeNewData();
-            return;
+            throw new InvalidOperationException($"{_logClass} [LoadDataAsync] 저장 데이터 파일 존재하지않음");
         }
 
         try
@@ -119,8 +113,7 @@ public class CharacterRepository : ICharacterRepository
     {
         if (_cachedData == null)
         {
-            Debug.LogWarning($"{_logClass}[Save Skip] 로드된 데이터가 없어서 강제 저장 스킵");
-            return;
+            throw new InvalidOperationException($"{_logClass}[SaveDataSync] _cachedData == null");
         }
 
         try
@@ -140,39 +133,7 @@ public class CharacterRepository : ICharacterRepository
     // ======================================================================================================
     // 내부 유틸리티
     // ======================================================================================================
-    private void InitializeNewData()
-    {
-
-        int startCharacterId = _newGameConfig.StartingCharacterId;
-        int startNodeId = _newGameConfig.StartingCharacterNodeId;
-        
-        Debug.Log($"{_logClass} 신규 생성 시작 (CharacterId: {startCharacterId}, NodeID: {startNodeId})");
-
-        CharacterMasterData characterMasterData = _characterMasterRepo.GetData(startCharacterId);
-        if (characterMasterData == null)
-        {
-            throw new InvalidOperationException($"{_logClass} 초기화 실패! MasterData 없음 (CharacterId: {startCharacterId})");
-        }
-
-        EvolutionNodeData startNode = characterMasterData.EvolutionNodes.FirstOrDefault(node => node.Id == startNodeId);
-        if(startNode == null)
-        {
-            throw new InvalidOperationException($"{_logClass} 초기화 실패! NodeID를 찾을수 없음 (NodeID: {startNodeId})");
-        }
-
-        _cachedData = new CharacterSaveData
-        {
-            CharacterId = characterMasterData.Id,
-            CurrentNodeId = startNode.Id,
-
-            CurrentStats = startNode.StartStats.Clone(),
-        };
-
-        // 초기화 후 즉시 저장해서 파일 생성
-        SaveDataAsync().Forget();
-    }
-
-
+    
     private void NotifyChanged()
     {
         OnCharacterUpdated?.Invoke();
