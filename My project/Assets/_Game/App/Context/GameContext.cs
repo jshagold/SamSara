@@ -5,6 +5,7 @@ public class GameContext
 {
     // [Repositories]
     public IInventoryRepository InventoryRepo { get; }
+    public ICharacterRepository CharacterRepo { get; }
     public IDailyStateRepository DailyStateRepo { get; }
 
     // [UseCases]
@@ -16,11 +17,13 @@ public class GameContext
     public MasterDataManager MasterDataManager { get; }
 
     public GameContext(
-        IInventoryRepository inventory, 
+        IInventoryRepository inventoryRepo, 
+        ICharacterRepository characterRepo,
         IDailyStateRepository dailyStateRepo,
         MasterDataManager masterDataManager)
     {
-        InventoryRepo = inventory;
+        InventoryRepo = inventoryRepo;
+        CharacterRepo = characterRepo;
         DailyStateRepo = dailyStateRepo;
 
         GetMoneyUseCase = new GetMoneyUseCase(userInventoryRepository: InventoryRepo);
@@ -32,9 +35,10 @@ public class GameContext
 
     public async UniTask LoadAllDataAsync()
     {
-        var task1 = InventoryRepo.LoadDataAsync();
-        var task2 = DailyStateRepo.LoadDataAsync();
+        var taskInventory = InventoryRepo.LoadDataAsync();
+        var taskCharacter = CharacterRepo.LoadDataAsync();
+        var taskDailyState = DailyStateRepo.LoadDataAsync();
 
-        await UniTask.WhenAll(task1, task2);
+        await UniTask.WhenAll(taskInventory, taskCharacter, taskDailyState);
     }
 }

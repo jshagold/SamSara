@@ -3,17 +3,23 @@ using UnityEngine;
 
 public class GlobalBootstrapper : MonoBehaviour
 {
+    private readonly string _logClass = $"{nameof(GlobalBootstrapper)}";
+
     [SerializeField] private AutoSaveManager _autoSaveManager;
     [SerializeField] private NewGameConfig _newGameConfig;
 
     // SingleTon 패턴
     public static GlobalBootstrapper Instance { get; private set; }
-
     public GameContext GameContext { get; private set; }
 
     // 다른 씬들이 초기화 완료를 기다릴 수 있게 하는 Task
     public UniTask InitializationTask { get; private set; }
 
+
+    // 게임 초기 데이터 UseCase
+    private CreateNewCharacterUseCase _newCharacterUseCase;
+
+    
     private void Awake()
     {
         // 중복 생성 방지 (싱글톤 보장)
@@ -25,28 +31,37 @@ public class GlobalBootstrapper : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject); // Scene이 바뀌어도 파괴되지 않게하는 코드
 
+        // MasterData 초기화
         MasterDataManager masterDataManager = new MasterDataManager();
         masterDataManager.Initialize();
 
+        // Repository 생성
+        ICharacterRepository characterRepo = new CharacterRepository();
+        // TODO masterDataManager, newGameConfig 따로 빼야함.
         IInventoryRepository userInventoryRepo = new InventoryRepository(config: _newGameConfig, itemMasterRepository: masterDataManager.ItemRepo);
         IDailyStateRepository gameStateRepo = new DailyStateRepository(newGameConfig: _newGameConfig);
 
+        // GameContext 조립
         GameContext = new GameContext(
-            inventory: userInventoryRepo,
+            inventoryRepo: userInventoryRepo,
+            characterRepo: characterRepo,
             dailyStateRepo: gameStateRepo,
             masterDataManager: masterDataManager
         );
 
-        RetryInitialization();
-
+        // 자동저장 연동
         if (_autoSaveManager != null)
         {
             _autoSaveManager.Initialize(GameContext);
 
             GameContext.InventoryRepo.OnInventoryChanged += () => _autoSaveManager.MakeDirty();
             GameContext.DailyStateRepo.OnDailyStateChanged += () => _autoSaveManager.MakeDirty();
+            GameContext.CharacterRepo.OnCharacterUpdated += () => _autoSaveManager.MakeDirty();
             // TODO Repo 추가
         }
+
+        // 초기화 실행
+        RetryInitialization();
 
         Debug.Log("Global Bootstrapper Initialized");
     }
@@ -54,6 +69,29 @@ public class GlobalBootstrapper : MonoBehaviour
     // 데이터 불러오기 재시도
     public void RetryInitialization()
     {
-        InitializationTask = GameContext.LoadAllDataAsync().Preserve();
+        InitializationTask = InitializeGameFlowAsync().Preserve();
+    }
+
+    private async UniTask InitializeGameFlowAsync()
+    {
+        var charRepo = GameContext.CharacterRepo;
+        var charMasterRepo = GameContext.MasterDataManager.CharacterRepo;
+
+        if (!charRepo.HasSaveData())
+        {
+            Debug.Log($"{_logClass}[InitializeGameFlowAsync] 세이브 데이터 없음 -> 신규 데이터 생성");
+
+            var createNewGameCharacterUC = new CreateNewCharacterUseCase(
+                characterRepo: charRepo,
+                characterMasterRepo: charMasterRepo,
+                newGameConfig: _newGameConfig
+            );
+        }
+        else
+        {
+            Debug.Log($"{_logClass}[InitializeGameFlowAsync] 세이브 데이터 존재");
+        }
+
+        await GameContext.LoadAllDataAsync();
     }
 }
