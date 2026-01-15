@@ -1,4 +1,6 @@
-﻿public class CharacterDetailView
+﻿using UnityEngine;
+
+public class CharacterDetailView : MonoBehaviour
 {
     
 }
