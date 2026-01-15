@@ -12,8 +12,7 @@ public class CreateNewCharacterUseCase
     public CreateNewCharacterUseCase(
         ICharacterRepository characterRepo,
         ICharacterMasterRepository characterMasterRepo,
-        NewGameConfig newGameConfig
-        )
+        NewGameConfig newGameConfig)
     {
         _characterRepo = characterRepo;
         _characterMasterRepo = characterMasterRepo;

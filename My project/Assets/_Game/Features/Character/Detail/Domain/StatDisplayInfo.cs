@@ -2,6 +2,7 @@
 
 public struct StatDisplayInfo
 {
+    public StatType Type;
     public string Label;
     public float CurrentValue;
     public float StartValue;

@@ -13,7 +13,7 @@ public class GetSkillListUseCase
 
     public List<SkillInfo> Execute()
     {
-        CharacterInfo characterInfo = _characterRepo.GetCharacterInfo();
+        CharacterInfo characterInfo = _characterRepo.GetCharacterData();
         EvolutionNodeInfo currentNodeInfo = characterInfo.CurrentEvolutionNode;
 
         return currentNodeInfo.SkillList;

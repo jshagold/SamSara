@@ -4,8 +4,8 @@ using Newtonsoft.Json;
 [Serializable]
 public struct StatInfo
 {
-    [JsonIgnore]
-    public string Label;
+    [JsonProperty("type")]
+    public StatType Type;
     [JsonProperty("value")]
     public float Value;
 }
