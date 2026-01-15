@@ -1,8 +1,8 @@
-﻿public class GetCharacterInfoUseCase
+﻿public class GetCharacterDetailUseCase
 {
     private readonly ICharacterRepository _characterRepo;
 
-    public GetCharacterInfoUseCase(ICharacterRepository characterRepo)
+    public GetCharacterDetailUseCase(ICharacterRepository characterRepo)
     {
         _characterRepo = characterRepo;
     }
