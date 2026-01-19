@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public struct StatDisplayInfo
+public class StatDisplayInfo
 {
     public StatType Type;
     public string Label;
