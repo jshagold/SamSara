@@ -83,24 +83,16 @@ public class GetCharacterDetailUseCase
         return new StatDisplayInfo
         {
             Type = type,
-            Label = GetStatLabel(type),
+            Label = null,
             CurrentValue = currentStat.Value,
             StartValue = startStat.Value,
             MaxValue = maxStat.Value
         };
     }
 
-
-    // TODO LocalizationManager등으로 변환해야함.
-    private string GetStatLabel(StatType type)
+    public event Action OnCharacterUpdated
     {
-        return type switch
-        {
-            StatType.Hp => "",
-            StatType.Strength => "",
-            StatType.Toughness => "",
-            StatType.Agility => "",
-            _ => type.ToString(),
-        };
+        add => _characterRepo.OnCharacterUpdated += value;
+        remove => _characterRepo.OnCharacterUpdated -= value;
     }
 }
