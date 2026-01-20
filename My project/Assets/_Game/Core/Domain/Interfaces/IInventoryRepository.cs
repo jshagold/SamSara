@@ -4,7 +4,7 @@ using System;
 
 public interface IInventoryRepository
 {
-    InventoryInfo GetInventory();
+    InventorySaveData GetInventory();
     void InitializeData(InventorySaveData initData);
     bool HasSaveData();
     int GetItemCount(int itemId);

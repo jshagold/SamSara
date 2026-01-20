@@ -9,18 +9,17 @@ public class InventoryPresenter : IDisposable
     // UseCases
     private readonly GetInventoryUseCase _getInventoryUseCase;
 
-    // MasterData
-    IItemMasterRepository _itemMasterDataRepo;
-
+    // Resource Provider
+    private readonly IItemResourceProvider _itemResourceProvider;
 
     public InventoryPresenter(
         InventoryView inventoryView, 
         GetInventoryUseCase getInventoryUseCase,
-        IItemMasterRepository itemMasterDataRepo) 
+        IItemResourceProvider itemResourceProvider) 
     { 
         _inventoryView = inventoryView;
         _getInventoryUseCase = getInventoryUseCase;
-        _itemMasterDataRepo = itemMasterDataRepo;
+        _itemResourceProvider = itemResourceProvider;
     }
 
     public void Initialize()
@@ -40,7 +39,7 @@ public class InventoryPresenter : IDisposable
 
         foreach (var item in inventory.ItemList)
         {
-            Sprite icon = _itemMasterDataRepo.GetData(itemId: item.Id).Icon;
+            Sprite icon = _itemResourceProvider.GetIconSprite(itemId: item.Id);
 
             _inventoryView.AddItem(info: item, iconImage: icon, onClickItemAction: () => OnClickItem(item));
         }
