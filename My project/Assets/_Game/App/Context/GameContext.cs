@@ -14,6 +14,7 @@ public class GameContext
     public GetCharacterSummaryUseCase GetCharacterSummaryUseCase { get; }
     public GetCharacterDetailUseCase GetCharacterDetailUseCase {  get; }
     public GetSkillListUseCase GetSkillListUseCase { get; }
+    public GetInventoryUseCase GetInventoryUseCase { get; }
 
     // [MasterDataManager]
     public MasterDataManager MasterDataManager { get; }
@@ -40,6 +41,10 @@ public class GameContext
         GetSkillListUseCase = new GetSkillListUseCase(
             characterRepo: characterRepo,
             characterMasterRepo: masterDataManager.CharacterRepo
+        );
+        GetInventoryUseCase = new GetInventoryUseCase(
+            inventoryRepo: InventoryRepo,
+            itemMasterRepo: masterDataManager.ItemRepo
         );
     }
 

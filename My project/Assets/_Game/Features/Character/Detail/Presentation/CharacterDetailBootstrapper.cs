@@ -8,19 +8,61 @@ public class CharacterDetailBootstrapper: MonoBehaviour
 
     // Presenters
     private CharacterDetailPresenter _characterDetailPresenter;
+    private SkillListPresenter _skillListPresenter;
+    private InventoryPresenter _inventoryPresenter;
 
-    public void Initialize(
-        GameContext gameContext)
+    // ResourceProvider
+    private ICharacterResourceProvider _characterResourceProvider;
+    private ISkillResourceProvider _skillResourceProvider;
+    private IItemResourceProvider _itemResourceProvider;
+
+    public void Initialize(GameContext gameContext)
     {
-        Debug.Log($"{_logClass} Initialize");
+        // UseCases
+        var getCharacterDetailUseCase = gameContext.GetCharacterDetailUseCase;
+        var getSkillListUseCase = gameContext.GetSkillListUseCase;
+        var getInventoryUseCase = gameContext.GetInventoryUseCase;
+
+        // ResourceProviders
+        var masterDataManager = gameContext.MasterDataManager;
+        _characterResourceProvider = new CharacterResourceProvider(masterRepo: masterDataManager.CharacterRepo);
+        _skillResourceProvider = new SkillResourceProvider(skillMasterRepo: masterDataManager.SkillRepo);
+        _itemResourceProvider = new ItemResourceProvider(masterRepo: masterDataManager.ItemRepo);
+
+        // Presenters
         _characterDetailPresenter = new CharacterDetailPresenter(
             characterDetailView: _characterDetailView,
-            getCharacterDetailUseCase: ,
-            characterMasterRepository:);
+            getCharacterDetailUseCase: getCharacterDetailUseCase,
+            resourceProvider: _characterResourceProvider);
+        _characterDetailPresenter.Initialize();
+
+        _skillListPresenter = new SkillListPresenter(
+            skillListView: _characterDetailView.SkillListView,
+            getSkillListUseCase: getSkillListUseCase,
+            skillResourceProvider: _skillResourceProvider);
+        _skillListPresenter.Initialize();
+
+        _inventoryPresenter = new InventoryPresenter(
+            inventoryView: _characterDetailView.InventoryView,
+            getInventoryUseCase: getInventoryUseCase,
+            itemResourceProvider: _itemResourceProvider);
+        _inventoryPresenter.Initialize();
+
+        Debug.Log($"{_logClass} Initialize");
     }
 
     private void OnDestroy()
     {
-        
+        _characterDetailPresenter.Dispose();
+        _characterDetailPresenter = null;
+        _characterResourceProvider = null;
+
+        _skillListPresenter.Dispose();
+        _skillListPresenter = null;
+        _skillResourceProvider = null;
+
+        _inventoryPresenter?.Dispose();
+        _inventoryPresenter = null;
+        _itemResourceProvider = null;
     }
 }
