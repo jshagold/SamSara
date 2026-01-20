@@ -12,6 +12,8 @@ public class GameContext
     public GetMoneyUseCase GetMoneyUseCase { get; }
     public DailyStateUseCase DailyStateUseCase { get; }
     public GetCharacterSummaryUseCase GetCharacterSummaryUseCase { get; }
+    public GetCharacterDetailUseCase GetCharacterDetailUseCase {  get; }
+    public GetSkillListUseCase GetSkillListUseCase { get; }
 
     // [MasterDataManager]
     public MasterDataManager MasterDataManager { get; }
@@ -22,6 +24,8 @@ public class GameContext
         IDailyStateRepository dailyStateRepo,
         MasterDataManager masterDataManager)
     {
+        MasterDataManager = masterDataManager;
+
         InventoryRepo = inventoryRepo;
         CharacterRepo = characterRepo;
         DailyStateRepo = dailyStateRepo;
@@ -29,8 +33,14 @@ public class GameContext
         GetMoneyUseCase = new GetMoneyUseCase(userInventoryRepository: InventoryRepo);
         DailyStateUseCase = new DailyStateUseCase(gameStateRepository: DailyStateRepo);
         GetCharacterSummaryUseCase = new GetCharacterSummaryUseCase(dailyStateRepo: DailyStateRepo);
-
-        MasterDataManager = masterDataManager;
+        GetCharacterDetailUseCase = new GetCharacterDetailUseCase(
+            characterRepo: characterRepo,
+            characterMasterRepo: masterDataManager.CharacterRepo
+        );
+        GetSkillListUseCase = new GetSkillListUseCase(
+            characterRepo: characterRepo,
+            characterMasterRepo: masterDataManager.CharacterRepo
+        );
     }
 
     public async UniTask LoadAllDataAsync()
