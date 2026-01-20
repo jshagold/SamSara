@@ -46,19 +46,19 @@ public class OptionMenuPopupView : MonoBehaviour
     public void ShowPopup() => gameObject.SetActive(true);
     public void HidePopup() => gameObject.SetActive(false);
 
-    public void SetActions(UnityAction onSettingsClicked,UnityAction onAccountClicked, UnityAction onBackgroundClicked)
+    public void SetActions(Action onSettingsClicked, Action onAccountClicked, Action onBackgroundClicked)
     {
         _settingButton.onClick.RemoveAllListeners();
-        _settingButton.onClick.AddListener(onSettingsClicked);
+        _settingButton.onClick.AddListener(() => onSettingsClicked.Invoke());
 
         _accountButton.onClick.RemoveAllListeners();
-        _accountButton.onClick.AddListener(onAccountClicked);
+        _accountButton.onClick.AddListener(() => onAccountClicked.Invoke());
 
         // 팝업 밖 영역 누르면 메뉴 닫기 기능 연결
         if(_dimmedBackground != null)
         {
             _dimmedBackground.onClick.RemoveAllListeners();
-            _dimmedBackground.onClick.AddListener(onBackgroundClicked);
+            _dimmedBackground.onClick.AddListener(() => onBackgroundClicked.Invoke());
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
@@ -16,9 +17,9 @@ public class OptionButtonView : MonoBehaviour
         _button.onClick.RemoveAllListeners();
     }
 
-    public void SetOnClickAction(UnityAction action)
+    public void SetOnClickAction(Action action)
     {
         _button.onClick.RemoveAllListeners();
-        _button.onClick.AddListener(action);    
+        _button.onClick.AddListener(() => action.Invoke());    
     }
 }

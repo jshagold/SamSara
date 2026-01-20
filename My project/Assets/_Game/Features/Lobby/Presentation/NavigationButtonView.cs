@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine.Localization.Settings;
+using System;
 
 public class NavigationButtonView : MonoBehaviour
 {
@@ -10,10 +11,10 @@ public class NavigationButtonView : MonoBehaviour
     [SerializeField] private Image iconImg;
     [SerializeField] private TextMeshProUGUI label;
 
-    public void SetOnClickAction(UnityAction action)
+    public void SetOnClickAction(Action action)
     {
         btn.onClick.RemoveAllListeners();
-        btn.onClick.AddListener(action);
+        btn.onClick.AddListener(() => action.Invoke());
     }
 
     // --- 화면 갱신용 함수들 ---

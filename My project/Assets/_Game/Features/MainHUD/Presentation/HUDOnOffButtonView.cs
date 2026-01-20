@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
@@ -36,9 +37,9 @@ public class HUDOnOffButtonView : MonoBehaviour
         }
     }
 
-    public void SetOnClicked(UnityAction action)
+    public void SetOnClicked(Action action)
     {
         _button.onClick.RemoveAllListeners();
-        _button.onClick.AddListener(action);
+        _button.onClick.AddListener(() => action.Invoke());
     }
 }

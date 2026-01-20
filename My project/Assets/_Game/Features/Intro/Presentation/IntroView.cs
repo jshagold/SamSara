@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -90,10 +91,10 @@ public class IntroView : MonoBehaviour
     }
 
     // 게임시작 버튼 이벤트 연결
-    public void SetOnClickStartButton(UnityAction action)
+    public void SetOnClickStartButton(Action action)
     {
         startButton.onClick.RemoveAllListeners();
-        startButton.onClick.AddListener(action);
+        startButton.onClick.AddListener(() => action.Invoke());
     }
 
     // 일반 시작화면 설정

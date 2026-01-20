@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -104,12 +105,12 @@ public class HUDView : MonoBehaviour
         }
     }
 
-    public void SetOnClickHUDOnOffBtnAction(UnityAction action)
+    public void SetOnClickHUDOnOffBtnAction(Action action)
     {
         if(_hudOnOffButton != null) _hudOnOffButton.SetOnClicked(action);
     }
 
-    public void SetOnClickOptionBtnAction(UnityAction action)
+    public void SetOnClickOptionBtnAction(Action action)
     {
         if(_optionButton != null) _optionButton.SetOnClickAction(action);
     }

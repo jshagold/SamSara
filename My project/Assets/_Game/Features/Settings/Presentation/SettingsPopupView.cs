@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
@@ -38,12 +39,12 @@ public class SettingsPopupView : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void SetEvents(UnityAction onClosePopup, UnityAction<bool> onSoundToggle)
+    public void SetEvents(Action onClosePopup, Action<bool> onSoundToggle)
     {
         _closeButton.onClick.RemoveAllListeners();
-        _closeButton.onClick.AddListener(onClosePopup);
+        _closeButton.onClick.AddListener(() => onClosePopup.Invoke());
 
         _soundToggle.onValueChanged.RemoveAllListeners();
-        _soundToggle.onValueChanged.AddListener(onSoundToggle);
+        _soundToggle.onValueChanged.AddListener((isOn) => onSoundToggle.Invoke(isOn));
     }
 }
