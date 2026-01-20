@@ -55,14 +55,15 @@ public class CharacterDetailBootstrapper: MonoBehaviour
     {
         _characterDetailPresenter.Dispose();
         _characterDetailPresenter = null;
-        _characterResourceProvider = null;
 
         _skillListPresenter.Dispose();
         _skillListPresenter = null;
-        _skillResourceProvider = null;
 
         _inventoryPresenter?.Dispose();
         _inventoryPresenter = null;
+
+        _characterResourceProvider = null;
+        _skillResourceProvider = null;
         _itemResourceProvider = null;
     }
 }

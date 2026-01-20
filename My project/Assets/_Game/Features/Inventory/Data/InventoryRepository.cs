@@ -11,25 +11,43 @@ public class InventoryRepository : IInventoryRepository
 {
     private readonly string _logClass = $"[{nameof(InventoryRepository)}]";
     private readonly string _filePath;
-    private readonly NewGameConfig _newGameConfig;
-    private readonly IItemMasterRepository _itemMasterRepo;
 
     private InventorySaveData _cachedData;
 
     // 데이터 변경 알림 이벤트
     public event Action OnInventoryChanged;
 
-    public InventoryRepository(NewGameConfig config, IItemMasterRepository itemMasterRepository)
+    public InventoryRepository()
     {
-        _newGameConfig = config;
-        _itemMasterRepo = itemMasterRepository;
         // 안드로이드/IOS/PC 공용 경로
         _filePath = Path.Combine(Application.persistentDataPath, "save_inventory_data.json");
     }
 
-    // ======================================================================================================
-    // Read
-    // ======================================================================================================
+    public InventorySaveData GetInventory()
+    {
+        CheckDataIntegrity();
+
+        return _cachedData;
+    }
+
+    public void InitializeData(InventorySaveData initData)
+    {
+        if (initData == null)
+        {
+            throw new InvalidOperationException($"{_logClass} InitializeData fail - initData 데이터 null");
+        }
+
+        _cachedData = initData;
+        NotifyChanged();
+
+        SaveDataAsync().Forget();
+    }
+
+    public bool HasSaveData()
+    {
+        return File.Exists(_filePath);
+    }
+
     public int GetItemCount(int itemId)
     {
         CheckDataIntegrity();
@@ -38,41 +56,10 @@ public class InventoryRepository : IInventoryRepository
         return item?.Count ?? 0;
     }
 
-    public InventoryInfo GetInventory()
-    {
-        CheckDataIntegrity();
-
-        var domainItemList = new List<ItemInfo>();
-
-        foreach(var saveItem in _cachedData.ItemList)
-        {
-            var masterItem = _itemMasterRepo.GetData(saveItem.Id);
-
-            if(masterItem != null)
-            {
-                domainItemList.Add(masterItem.ToDomain(count: saveItem.Count));
-            }
-        }
-
-        return new InventoryInfo
-        {
-            ItemList = domainItemList,
-        };
-    }
-
-
-    // ======================================================================================================
-    // Update
-    // ======================================================================================================
     public void AddItem(int itemId, int count)
     {
         CheckDataIntegrity();
         if (count <= 0) return;
-
-        if (_itemMasterRepo.GetData(itemId: itemId) == null)
-        {
-            throw new InvalidOperationException($"{_logClass} AddItem 실패 - 존재하지 않는 ItemID: {itemId}");
-        }
 
         var item = _cachedData.ItemList.FirstOrDefault(item => item.Id == itemId);
         if(item == null)
@@ -123,8 +110,7 @@ public class InventoryRepository : IInventoryRepository
 
         if (!File.Exists(_filePath))
         {
-            InitializeNewData();
-            return;
+            throw new InvalidOperationException($"{_logClass} [LoadDataAsync] 저장 데이터 파일 존재하지않음");
         }
 
         try
@@ -201,24 +187,6 @@ public class InventoryRepository : IInventoryRepository
     // ======================================================================================================
     // 내부 유틸리티
     // ======================================================================================================
-    private void InitializeNewData()
-    {
-        Debug.Log($"{_logClass} 신규데이터 생성 (초기 자금: {_newGameConfig.InitialMoney})");
-
-        _cachedData = new InventorySaveData();
-
-        if(_newGameConfig.InitialMoney > 0)
-        {
-            _cachedData.ItemList.Add(new ItemSaveData
-            {
-                Id = ItemConstants.MONEY_ID, 
-                Count = _newGameConfig.InitialMoney
-            });
-        }
-
-        // 초기화 후 즉시 저장해서 파일 생성
-        SaveDataAsync().Forget();
-    }
 
     private void NotifyChanged()
     {
