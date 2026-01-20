@@ -40,8 +40,6 @@ public class CreateNewCharacterUseCase
         {
             CharacterId = charId,
             CurrentNodeId = nodeId,
-
-
             CurrentStats = startNode.StartStats.Clone()
         };
 

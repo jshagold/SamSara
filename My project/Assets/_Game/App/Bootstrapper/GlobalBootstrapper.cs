@@ -74,23 +74,10 @@ public class GlobalBootstrapper : MonoBehaviour
 
     private async UniTask InitializeGameFlowAsync()
     {
-        var charRepo = GameContext.CharacterRepo;
-        var charMasterRepo = GameContext.MasterDataManager.CharacterRepo;
-
-        if (!charRepo.HasSaveData())
-        {
-            Debug.Log($"{_logClass}[InitializeGameFlowAsync] 세이브 데이터 없음 -> 신규 데이터 생성");
-
-            var createNewGameCharacterUC = new CreateNewCharacterUseCase(
-                characterRepo: charRepo,
-                characterMasterRepo: charMasterRepo,
-                newGameConfig: _newGameConfig
-            );
-        }
-        else
-        {
-            Debug.Log($"{_logClass}[InitializeGameFlowAsync] 세이브 데이터 존재");
-        }
+        var initUserDataUC = new InitializeUserDataUseCase(
+            gameContext: GameContext,
+            newGameConfig: _newGameConfig);
+        initUserDataUC.Execute();
 
         await GameContext.LoadAllDataAsync();
     }

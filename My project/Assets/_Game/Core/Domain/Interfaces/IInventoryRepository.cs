@@ -4,9 +4,10 @@ using System;
 
 public interface IInventoryRepository
 {
-    int GetItemCount(int itemId);
     InventoryInfo GetInventory();
-
+    void InitializeData(InventorySaveData initData);
+    bool HasSaveData();
+    int GetItemCount(int itemId);
     void AddItem(int itemId, int count);
     void ConsumeItem(int itemId, int count);
 
