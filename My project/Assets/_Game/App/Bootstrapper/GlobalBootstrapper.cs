@@ -38,8 +38,7 @@ public class GlobalBootstrapper : MonoBehaviour
         // Repository 생성
         ICharacterRepository characterRepo = new CharacterRepository();
         IInventoryRepository userInventoryRepo = new InventoryRepository();
-        // TODO masterDataManager, newGameConfig 따로 빼야함.
-        IDailyStateRepository gameStateRepo = new DailyStateRepository(newGameConfig: _newGameConfig);
+        IDailyStateRepository gameStateRepo = new DailyStateRepository();
 
         // GameContext 조립
         GameContext = new GameContext(

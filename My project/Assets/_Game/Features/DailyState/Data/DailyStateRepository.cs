@@ -10,16 +10,14 @@ public class DailyStateRepository : IDailyStateRepository
     private readonly string _logClass = $"[{nameof(DailyStateRepository)}]";
 
     private readonly string _filePath;
-    private readonly NewGameConfig _newGameConfig;
     // 메모리에 가지고 있는 데이터
     private DailyStateSaveData _cachedData;
 
     // 데이터 변경 알림 이벤트
     public event Action OnDailyStateChanged;
 
-    public DailyStateRepository(NewGameConfig newGameConfig)
+    public DailyStateRepository()
     {
-        _newGameConfig = newGameConfig;
         // 안드로이드/IOS/PC 공용 경로
         _filePath = Path.Combine(Application.persistentDataPath, "save_daily_state_data.json");
         
