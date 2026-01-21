@@ -23,8 +23,8 @@ public class MainSceneCharacterSummaryView : MonoBehaviour
         // 캐릭터 정보 갱신
         Sprite foundSprite = _characterAssetConfig.GetPortrait(data.CharacterId);
         portraitImage.sprite = foundSprite;
-        hpSlider.maxValue = data.MaxHp;
-        hpSlider.value = data.CurrentHp;
+        hpSlider.maxValue = data.MaxHp.Value;
+        hpSlider.value = data.CurrentHp.Value;
 
         // 행동 횟수 UI 갱신
         UpdateActionIcons(data.ActionFlags);

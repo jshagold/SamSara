@@ -81,6 +81,15 @@ public class HUDView : MonoBehaviour
 
     public void UpdateCharacterList(List<MainSceneCharacterSummaryInfo> dataList)
     {
+        if(dataList == null)
+        {
+            foreach(var view in _spawnedSummaryViews)
+            {
+                view.gameObject.SetActive(false);
+            }
+            return;
+        }
+
         // 개수 맞추기 (오브젝트 풀링 개념: 모자르면 더만들고 남으면 끝)
         while (_spawnedSummaryViews.Count < dataList.Count)
         {

@@ -9,7 +9,7 @@ public class CharacterAssetConfig : ScriptableObject
     [System.Serializable]
     public class PortraitData
     {
-        public string id;
+        public int id;
         public Sprite sprite;
     }
 
@@ -17,7 +17,7 @@ public class CharacterAssetConfig : ScriptableObject
     [SerializeField] private List<PortraitData> portraits;
     [SerializeField] private Sprite defaultSprite;
 
-    public Sprite GetPortrait(string id)
+    public Sprite GetPortrait(int id)
     {
         var data = portraits.FirstOrDefault(x => x.id == id);
 
