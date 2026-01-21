@@ -7,6 +7,12 @@ public class GetInventoryUseCase
     private readonly IInventoryRepository _inventoryRepo;
     private readonly IItemMasterRepository _itemMasterRepo;
 
+    public event Action OnInventoryChanged
+    {
+        add => _inventoryRepo.OnInventoryChanged += value;
+        remove => _inventoryRepo.OnInventoryChanged -= value;
+    }
+
     public GetInventoryUseCase(
         IInventoryRepository inventoryRepo,
         IItemMasterRepository itemMasterRepo)
@@ -41,11 +47,5 @@ public class GetInventoryUseCase
         {
             ItemList = domainItemList,
         };
-    }
-
-    public event Action OnInventoryChanged
-    {
-        add => _inventoryRepo.OnInventoryChanged += value;
-        remove => _inventoryRepo.OnInventoryChanged -= value;
     }
 }

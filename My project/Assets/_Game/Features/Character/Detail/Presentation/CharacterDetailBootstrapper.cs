@@ -53,10 +53,10 @@ public class CharacterDetailBootstrapper: MonoBehaviour
 
     private void OnDestroy()
     {
-        _characterDetailPresenter.Dispose();
+        _characterDetailPresenter?.Dispose();
         _characterDetailPresenter = null;
 
-        _skillListPresenter.Dispose();
+        _skillListPresenter?.Dispose();
         _skillListPresenter = null;
 
         _inventoryPresenter?.Dispose();

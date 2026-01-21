@@ -16,11 +16,6 @@ public class MainBackgroundPresenter : IDisposable
         ChangeToDay();
     }
 
-    public void Dispose()
-    {
-
-    }
-
     public void ChangeToDay()
     {
         Debug.Log("배경 변경: 낮");
@@ -35,5 +30,10 @@ public class MainBackgroundPresenter : IDisposable
             _view.SetBackground(BackgroundType.Day);
         else
             _view.SetBackground(BackgroundType.Day);
+    }
+
+    public void Dispose()
+    {
+
     }
 }

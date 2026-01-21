@@ -1,12 +1,18 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System;
 
 public class GetMoneyUseCase
 {
-    private readonly IInventoryRepository _userInventroyRepository;
+    private readonly IInventoryRepository _inventoryRepo;
 
-    public GetMoneyUseCase(IInventoryRepository userInventoryRepository) 
+    public event Action OnInventoryChanged
     {
-        _userInventroyRepository = userInventoryRepository;
+        add => _inventoryRepo.OnInventoryChanged += value;
+        remove => _inventoryRepo.OnInventoryChanged -= value;
+    }
+
+    public GetMoneyUseCase(IInventoryRepository inventoryRepo) 
+    {
+        _inventoryRepo = inventoryRepo;
     }
     
     /// <summary>
@@ -16,6 +22,6 @@ public class GetMoneyUseCase
     public int GetInventoryMoneyAsync()
     {
 
-        return _userInventroyRepository.GetItemCount(ItemConstants.MONEY_ID);
+        return _inventoryRepo.GetItemCount(ItemConstants.MONEY_ID);
     }
 }

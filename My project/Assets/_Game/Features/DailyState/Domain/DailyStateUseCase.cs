@@ -1,6 +1,14 @@
-﻿public class DailyStateUseCase
+﻿using System;
+
+public class DailyStateUseCase
 {
     private readonly IDailyStateRepository _gameStateRepository;
+
+    public event Action OnCharacterUpdated
+    {
+        add => _gameStateRepository.OnDailyStateChanged += value;
+        remove => _gameStateRepository.OnDailyStateChanged -= value;
+    }
 
     public DailyStateUseCase(IDailyStateRepository gameStateRepository)
     {

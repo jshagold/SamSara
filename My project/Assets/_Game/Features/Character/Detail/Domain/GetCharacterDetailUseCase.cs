@@ -8,6 +8,12 @@ public class GetCharacterDetailUseCase
     private readonly ICharacterRepository _characterRepo;
     private readonly ICharacterMasterRepository _masterRepo;
 
+    public event Action OnCharacterUpdated
+    {
+        add => _characterRepo.OnCharacterUpdated += value;
+        remove => _characterRepo.OnCharacterUpdated -= value;
+    }
+
     public GetCharacterDetailUseCase(
         ICharacterRepository characterRepo,
         ICharacterMasterRepository characterMasterRepo)
@@ -88,11 +94,5 @@ public class GetCharacterDetailUseCase
             StartValue = startStat.Value,
             MaxValue = maxStat.Value
         };
-    }
-
-    public event Action OnCharacterUpdated
-    {
-        add => _characterRepo.OnCharacterUpdated += value;
-        remove => _characterRepo.OnCharacterUpdated -= value;
     }
 }

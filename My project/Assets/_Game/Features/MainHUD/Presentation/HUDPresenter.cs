@@ -25,29 +25,24 @@ public class HUDPresenter : IDisposable
     {
         _view.SetOnClickHUDOnOffBtnAction(HandleOptionClick);
 
+        RefreshUI();
+
+        _moneyUseCase.OnInventoryChanged += RefreshUI;
+        _dailyStateUseCase.OnCharacterUpdated += RefreshUI;
+
+        // 이미지 초기 설정
+        _view.OnOffButton.SetState(true);
+        _view.PlaySlideIn().Forget();
+    }
+
+    private void RefreshUI()
+    {
         int money = _moneyUseCase.GetInventoryMoneyAsync();
         int date = _dailyStateUseCase.GetCurrentDay();
 
         _view.UpdateDate(date: date);
         _view.UpdateCurreny(amount: money);
-
-        // TODO UseCase 이벤트는 여기서 += 연결한다.
-        // ex) _moneyUseCase.OnMoneyChanged += HandleMoneyChanged;
-
-        // 이미지 초기 설정
-        _view.OnOffButton.SetState(true);
-
-        _view.PlaySlideIn().Forget();
     }
-
-    // [Dispose 패턴]
-    // Boostrapper의 OnDestroy에서 호출됨
-    public void Dispose()
-    {
-        // TODO 나중에 UseCase이벤트를 구독하면 여기서 해제해야한다.
-        // ex) _moneyUseCase.OnMoneyChanged -= HandleMoneyChanged;
-    }
-
     
     public async void ToggleHUD()
     {
@@ -73,7 +68,6 @@ public class HUDPresenter : IDisposable
         _isAnimating = false;
     }
 
-
     private void HandleOptionClick()
     {
         Debug.Log("[HUD] 옵션 버튼 클릭됨 -> 팝업을 띄우거나 씬 이동");
@@ -82,4 +76,18 @@ public class HUDPresenter : IDisposable
         ToggleHUD();
     }
 
+    // [Dispose 패턴]
+    // Boostrapper의 OnDestroy에서 호출됨
+    public void Dispose()
+    {
+        if(_moneyUseCase != null)
+        {
+            _moneyUseCase.OnInventoryChanged -= RefreshUI;
+        }
+        
+        if(_dailyStateUseCase != null)
+        {
+            _dailyStateUseCase.OnCharacterUpdated -= RefreshUI;
+        }
+    }
 }

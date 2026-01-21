@@ -23,17 +23,18 @@ public class MainSceneCharacterSummaryPresenter : IDisposable
         // _charRepo.OnCharacterDataChanged += RefreshView;
     }
 
-    public void Dispose()
-    {
-
-    }
-
     private void RefreshList()
     {
-        // DTO 생성 (Repository에서 가져온 데이터로 조립)
-        // 예시 데이터입니다. 실제 로직에 맞게 연결하세요.
-        List<MainSceneCharacterSummaryDto> characterData = _characterSummaryUseCase.GetCharacterSummaryList();
+        List<MainSceneCharacterSummaryInfo> characterData = _characterSummaryUseCase.GetCharacterSummaryList();
 
         _hudView.UpdateCharacterList(characterData);
+    }
+
+    public void Dispose()
+    {
+        if (_characterSummaryUseCase != null)
+        {
+            _characterSummaryUseCase.OnCharacterUpdated -= RefreshList;
+        }
     }
 }

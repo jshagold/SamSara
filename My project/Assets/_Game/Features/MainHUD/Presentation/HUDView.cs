@@ -79,7 +79,7 @@ public class HUDView : MonoBehaviour
 
     // Presenter에서 이벤트 연결
 
-    public void UpdateCharacterList(List<MainSceneCharacterSummaryDto> dataList)
+    public void UpdateCharacterList(List<MainSceneCharacterSummaryInfo> dataList)
     {
         // 개수 맞추기 (오브젝트 풀링 개념: 모자르면 더만들고 남으면 끝)
         while (_spawnedSummaryViews.Count < dataList.Count)

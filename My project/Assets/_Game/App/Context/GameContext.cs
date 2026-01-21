@@ -31,9 +31,13 @@ public class GameContext
         CharacterRepo = characterRepo;
         DailyStateRepo = dailyStateRepo;
 
-        GetMoneyUseCase = new GetMoneyUseCase(userInventoryRepository: InventoryRepo);
+        GetMoneyUseCase = new GetMoneyUseCase(inventoryRepo: InventoryRepo);
         DailyStateUseCase = new DailyStateUseCase(gameStateRepository: DailyStateRepo);
-        GetCharacterSummaryUseCase = new GetCharacterSummaryUseCase(dailyStateRepo: DailyStateRepo);
+        GetCharacterSummaryUseCase = new GetCharacterSummaryUseCase(
+            characterRepo: CharacterRepo,
+            characterMasterRepo: masterDataManager.CharacterRepo,
+            dailyStateRepo: DailyStateRepo
+        );
         GetCharacterDetailUseCase = new GetCharacterDetailUseCase(
             characterRepo: characterRepo,
             characterMasterRepo: masterDataManager.CharacterRepo

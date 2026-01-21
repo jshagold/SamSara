@@ -53,11 +53,6 @@ public class LobbyButtonPresenter : IDisposable
 
     }
 
-    public void Dispose()
-    {
-
-    }
-
     // 정비 씬으로 이동
     public void OnMaintenanceBtnClicked()
     {
@@ -104,5 +99,10 @@ public class LobbyButtonPresenter : IDisposable
         }
 
         
+    }
+
+    public void Dispose()
+    {
+
     }
 }

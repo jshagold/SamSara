@@ -84,11 +84,6 @@ public class IntroPresenter : IDisposable
         _introView.SetOnClickStartButton(OnStartButtonClicked);
     }
 
-    public void Dispose()
-    {
-
-    }
-
     private void OnStartButtonClicked()
     {
         SceneManager.LoadScene( _nextSceneName );
@@ -99,5 +94,10 @@ public class IntroPresenter : IDisposable
         // TODO Repository에서 값 받아와야함
 
         return false;
+    }
+
+    public void Dispose()
+    {
+
     }
 }

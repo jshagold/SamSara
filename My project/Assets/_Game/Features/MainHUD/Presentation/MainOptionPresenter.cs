@@ -51,11 +51,6 @@ public class MainOptionPresenter : IDisposable
         );
     }
 
-    public void Dispose()
-    {
-
-    }
-
     private void OnOpenSettings()
     {
         _menuPopupView.HidePopup();
@@ -76,5 +71,10 @@ public class MainOptionPresenter : IDisposable
         // TODO 실제 오디오 매니저에 적용해야함.
         // ex) AudioManager.Instance.SetMute(!isOn);
         Debug.Log($"{_logClass} 소리 설정 변경: {isOn}");
+    }
+
+    public void Dispose()
+    {
+
     }
 }

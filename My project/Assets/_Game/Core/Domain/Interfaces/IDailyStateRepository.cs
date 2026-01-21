@@ -28,6 +28,8 @@ public interface IDailyStateRepository
     // =================================================
     void ConsumeActionSlot(int charId, int slotIndex);
 
+    event Action OnDailyStateChanged;
+
     // =================================================
     // I/O (비동기)
     // =================================================
@@ -37,6 +39,4 @@ public interface IDailyStateRepository
 
     UniTask SaveDataAsync();
     void SaveDataSync();
-
-    event Action OnDailyStateChanged;
 }
