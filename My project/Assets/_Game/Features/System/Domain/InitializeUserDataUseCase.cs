@@ -37,5 +37,15 @@ public class InitializeUserDataUseCase
                 newGameConfig: _newGameConfig
             ).Execute();
         }
+
+        if (!_gameContext.DailyStateRepo.HasSaveData())
+        {
+            Debug.Log($"{_logClass} Daily 세이브 데이터 없음 -> 신규 데이터 생성");
+
+            new CreateNewDailyStateUseCase(
+                newGameConfig: _newGameConfig,
+                dailyStateRepo: _gameContext.DailyStateRepo
+            ).Execute();
+        }
     }
 }

@@ -21,8 +21,26 @@ public class DailyStateRepository : IDailyStateRepository
     {
         _newGameConfig = newGameConfig;
         // 안드로이드/IOS/PC 공용 경로
-        _filePath = Path.Combine(Application.persistentDataPath, "save_game_state_data.json");
+        _filePath = Path.Combine(Application.persistentDataPath, "save_daily_state_data.json");
         
+    }
+
+    public void InitializeData(DailyStateSaveData initData)
+    {
+        if (initData == null)
+        {
+            throw new InvalidOperationException($"{_logClass} InitializeData fail - initData 데이터 null");
+        }
+
+        _cachedData = initData;
+        NotifyChanged();
+
+        SaveDataAsync().Forget();
+    }
+
+    public bool HasSaveData()
+    {
+        return File.Exists(_filePath);
     }
 
     // -------
@@ -37,8 +55,7 @@ public class DailyStateRepository : IDailyStateRepository
 
         if (!File.Exists(_filePath))
         {
-            InitializeNewData();
-            return _cachedData.ToDomain();
+            throw new InvalidOperationException($"{_logClass} [LoadDataAsync] 저장 데이터 파일 존재하지않음");
         }
 
         try
@@ -153,27 +170,6 @@ public class DailyStateRepository : IDailyStateRepository
         _cachedData.characterActionMap[charId] = slots;
 
         NotifyChanged();
-    }
-
-
-
-    private void InitializeNewData()
-    {
-        Debug.Log($"{_logClass}[InitializeNewData] 세이브 파일 없어서 새로 생성.");
-
-        var initialMap = new Dictionary<int, bool[]>();
-        int characterId = _newGameConfig.StartingCharacterId;
-
-        bool[] slots = new bool[_newGameConfig.DefaultActionSlots];
-        for (int i = 0; i < slots.Length; i++) slots[i] = true;
-
-        initialMap.Add(characterId, slots);
-
-        _cachedData = new DailyStateSaveData
-        {
-            currentDay = _newGameConfig.StartDay,
-            characterActionMap = initialMap
-        };
     }
 
     private void NotifyChanged()

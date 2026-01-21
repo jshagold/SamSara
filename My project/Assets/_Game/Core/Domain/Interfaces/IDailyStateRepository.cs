@@ -7,6 +7,9 @@ public interface IDailyStateRepository
     // Getter (동기)
     // =================================================
 
+    void InitializeData(DailyStateSaveData initData);
+    bool HasSaveData();
+
     /// <summary>
     /// 현재 Day를 return
     /// </summary> 
