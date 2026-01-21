@@ -12,7 +12,7 @@
         return _gameStateRepository.GetCurrentDay();
     }
 
-    public bool[] GetActionSlot(string charId)
+    public bool[] GetActionSlot(int charId)
     {
         return _gameStateRepository.GetActionSlot(charId: charId);
     }

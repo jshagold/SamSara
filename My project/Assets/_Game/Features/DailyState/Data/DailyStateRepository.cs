@@ -12,7 +12,7 @@ public class DailyStateRepository : IDailyStateRepository
     private readonly string _filePath;
     private readonly NewGameConfig _newGameConfig;
     // 메모리에 가지고 있는 데이터
-    private DailyStateData _cachedData;
+    private DailyStateSaveData _cachedData;
 
     // 데이터 변경 알림 이벤트
     public event Action OnDailyStateChanged;
@@ -28,7 +28,7 @@ public class DailyStateRepository : IDailyStateRepository
     // -------
     // 데이터 불러오기
     // -------
-    public async UniTask<DailyStateDto> LoadDataAsync()
+    public async UniTask<DailyStateInfo> LoadDataAsync()
     {
         if(_cachedData != null)
         {
@@ -47,7 +47,7 @@ public class DailyStateRepository : IDailyStateRepository
             string json = await UniTask.RunOnThreadPool(() => File.ReadAllText(_filePath));
 
             // JsonConvert 사용
-            var loadedDto = JsonConvert.DeserializeObject<DailyStateData>(json);
+            var loadedDto = JsonConvert.DeserializeObject<DailyStateSaveData>(json);
 
             if (loadedDto == null)
             {
@@ -121,7 +121,7 @@ public class DailyStateRepository : IDailyStateRepository
     }
 
     // 행동력 횟수 가져오기
-    public bool[] GetActionSlot(string charId)
+    public bool[] GetActionSlot(int charId)
     {
         CheckDataIntegrity();
 
@@ -139,7 +139,7 @@ public class DailyStateRepository : IDailyStateRepository
     }
 
     // 행동력 횟수 소모
-    public void ConsumeActionSlot(string charId, int slotIndex)
+    public void ConsumeActionSlot(int charId, int slotIndex)
     {
         CheckDataIntegrity();
 
@@ -161,15 +161,19 @@ public class DailyStateRepository : IDailyStateRepository
     {
         Debug.Log($"{_logClass}[InitializeNewData] 세이브 파일 없어서 새로 생성.");
 
-        var initialMap = new Dictionary<string, bool[]>();
+        var initialMap = new Dictionary<int, bool[]>();
         int characterId = _newGameConfig.StartingCharacterId;
 
         bool[] slots = new bool[_newGameConfig.DefaultActionSlots];
         for (int i = 0; i < slots.Length; i++) slots[i] = true;
 
-        initialMap.Add(characterId.ToString(), slots);
+        initialMap.Add(characterId, slots);
 
-        _cachedData = new DailyStateData(currentDay: _newGameConfig.StartDay, characterActionMap: initialMap);
+        _cachedData = new DailyStateSaveData
+        {
+            currentDay = _newGameConfig.StartDay,
+            characterActionMap = initialMap
+        };
     }
 
     private void NotifyChanged()

@@ -3,18 +3,18 @@
 public static class DailyStateMapper
 {
     // SaveData(DTO) -> Domain
-    public static DailyStateDto ToDomain(this DailyStateData dto)
+    public static DailyStateInfo ToDomain(this DailyStateSaveData dto)
     {
         if (dto == null)
         {
-            return new DailyStateDto(currentDay: 0, characterActionMap: new Dictionary<string, bool[]>());
+            return new DailyStateInfo(currentDay: 0, characterActionMap: new Dictionary<string, bool[]>());
         }
         return new DailyStateDto(currentDay: dto.currentDay, characterActionMap: dto.characterActionMap);
     }
 
     // Domain -> SaveData(DTO)
-    public static DailyStateData ToData(this DailyStateDto domain)
+    public static DailyStateSaveData ToData(this DailyStateInfo domain)
     {
-        return new DailyStateData(currentDay: domain.currentDay, characterActionMap: domain.characterActionMap);
+        return new DailyStateSaveData(currentDay: domain.currentDay, characterActionMap: domain.characterActionMap);
     }
 }

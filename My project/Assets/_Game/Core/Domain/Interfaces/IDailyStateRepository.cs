@@ -18,19 +18,19 @@ public interface IDailyStateRepository
     /// </summary> 
     /// <param name="charId">캐릭터 Id 값 - int</param>
     /// <returns>캐릭터의 행동 횟수 return - bool[]</returns>
-    bool[] GetActionSlot(string charId);
+    bool[] GetActionSlot(int charId);
 
     // =================================================
     // Command (동기)
     // =================================================
-    void ConsumeActionSlot(string charId, int slotIndex);
+    void ConsumeActionSlot(int charId, int slotIndex);
 
     // =================================================
     // I/O (비동기)
     // =================================================
 
     // 게임 실행할 때 데이터 읽어와서 메모리 변수에 세팅.
-    UniTask<DailyStateDto> LoadDataAsync();
+    UniTask<DailyStateInfo> LoadDataAsync();
 
     UniTask SaveDataAsync();
     void SaveDataSync();
