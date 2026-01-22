@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Localization.Settings;
 
 public class GlobalBootstrapper : MonoBehaviour
 {
@@ -73,6 +74,10 @@ public class GlobalBootstrapper : MonoBehaviour
 
     private async UniTask InitializeGameFlowAsync()
     {
+        // Localization
+        await LocalizationSettings.InitializationOperation;
+        await LocalizationSettings.StringDatabase.GetTableAsync(LocalizationUtils.TextTableName);
+
         var initUserDataUC = new InitializeUserDataUseCase(
             gameContext: GameContext,
             newGameConfig: _newGameConfig);
