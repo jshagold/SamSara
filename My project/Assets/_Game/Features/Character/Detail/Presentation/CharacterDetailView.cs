@@ -7,7 +7,6 @@ public class CharacterDetailView : MonoBehaviour
 {
     [Header("Top Area")]
     [SerializeField] private Button _backButton;
-    [SerializeField] private OptionButtonView _optionButton;
     [SerializeField] private Image _portraitImage;
     [SerializeField] private Button _evolutionSceneButton;
 
@@ -24,7 +23,6 @@ public class CharacterDetailView : MonoBehaviour
     [SerializeField] private InventoryView _inventoryView;
 
     // Presenter가 사용할 수 있게 프로퍼티로 노출
-    public OptionButtonView OptionButton => _optionButton;
     public StatListView StatListView => _statListView;
     public SkillListView SkillListView => _skillListView;
     public InventoryView InventoryView => _inventoryView;
@@ -38,8 +36,6 @@ public class CharacterDetailView : MonoBehaviour
             if(_backButton == null && objName.Contains("back")) _backButton = button;
             if(_evolutionSceneButton == null && objName.Contains("evolution")) _evolutionSceneButton = button;
         }
-
-        if (_optionButton == null) _optionButton = GetComponentInChildren<OptionButtonView>();
 
         Image[] images = GetComponentsInChildren<Image>(true);
         foreach(Image image in images)
