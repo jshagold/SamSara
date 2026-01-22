@@ -29,7 +29,7 @@ public class HUDBootstrapper : MonoBehaviour
         _mainOptionPresenter.Initialize();
 
         _characterSummaryPresenter = new MainSceneCharacterSummaryPresenter(
-            hudView: _hudView,
+            characterListView: _hudView.CharacterListView,
             charSummaryUseCase: gameContext.GetCharacterSummaryUseCase
         );
         _characterSummaryPresenter.Initialize();

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 public class MainSceneCharacterSummaryPresenter : IDisposable
 {
-    private readonly HUDView _hudView;
+    private readonly MainSceneCharacterListView _characterListView;
     private readonly GetCharacterSummaryUseCase _characterSummaryUseCase;
 
     public MainSceneCharacterSummaryPresenter(
-        HUDView hudView,
+        MainSceneCharacterListView characterListView,
         GetCharacterSummaryUseCase charSummaryUseCase)
     {
-        _hudView = hudView;
+        _characterListView = characterListView;
         _characterSummaryUseCase = charSummaryUseCase;
     }
 
@@ -20,14 +20,14 @@ public class MainSceneCharacterSummaryPresenter : IDisposable
         RefreshList();
 
         // 2. 데이터 변경 감지 (예시: 옵저버 패턴이나 이벤트가 있다면 연결)
-        // _charRepo.OnCharacterDataChanged += RefreshView;
+        _characterSummaryUseCase.OnCharacterUpdated += RefreshList;
     }
 
     private void RefreshList()
     {
         List<MainSceneCharacterSummaryInfo> characterData = _characterSummaryUseCase.GetCharacterSummaryList();
 
-        _hudView.UpdateCharacterList(characterData);
+        _characterListView.UpdateList(characterData);
     }
 
     public void Dispose()

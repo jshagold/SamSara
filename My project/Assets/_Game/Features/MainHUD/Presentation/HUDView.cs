@@ -26,13 +26,13 @@ public class HUDView : MonoBehaviour
     [Tooltip("1.0 = 패널 크기(가로, 세로)만큼 이동, 1.1 = 10% 여유 버퍼")]
     [SerializeField][Range(1.0f, 1.5f)] private float hideOffsetRatio = 1.1f;
 
-    [Header("Character List Settings")]
-    [SerializeField] private Transform _charListContainer;
-    [SerializeField] private MainSceneCharacterSummaryView _characterSummaryPrefab;
+    [Header("Character List View")]
+    [SerializeField] private MainSceneCharacterListView _characterListView;
 
     // Presenter가 사용할 수 있게 프로퍼티로 노출
     public OptionButtonView OptionButton => _optionButton;
     public HUDOnOffButtonView OnOffButton => _hudOnOffButton;
+    public MainSceneCharacterListView CharacterListView => _characterListView;
 
     // 캐릭터 뷰 리스트 (오브젝트 풀링, 재사용 목적)
     private List<MainSceneCharacterSummaryView> _spawnedSummaryViews = new List<MainSceneCharacterSummaryView>();
@@ -73,45 +73,9 @@ public class HUDView : MonoBehaviour
         if (_dateDisplay == null) _dateDisplay = GetComponentInChildren<DateDisplayView>();
         if (_currencyView == null) _currencyView = GetComponentInChildren<CurrencyView>();
         if (_optionButton == null) _optionButton = GetComponentInChildren<OptionButtonView>();
+        if (_characterListView == null) _characterListView = GetComponentInChildren<MainSceneCharacterListView>();
 
         Debug.Log($"[TopHUDView] 에디터 자동 연결 완료 (Panel 연결 확인해야함): {name}");
-    }
-
-    // Presenter에서 이벤트 연결
-
-    public void UpdateCharacterList(List<MainSceneCharacterSummaryInfo> dataList)
-    {
-        if(dataList == null)
-        {
-            foreach(var view in _spawnedSummaryViews)
-            {
-                view.gameObject.SetActive(false);
-            }
-            return;
-        }
-
-        // 개수 맞추기 (오브젝트 풀링 개념: 모자르면 더만들고 남으면 끝)
-        while (_spawnedSummaryViews.Count < dataList.Count)
-        {
-            MainSceneCharacterSummaryView newView = Instantiate(_characterSummaryPrefab, _charListContainer);
-            _spawnedSummaryViews.Add(newView);
-        }
-
-        // 데이터 바인딩
-        for (int i = 0; i < _spawnedSummaryViews.Count; i++)
-        {
-            if(i < dataList.Count)
-            {
-                var view = _spawnedSummaryViews[i];
-                view.gameObject.SetActive(true);
-                view.Render(dataList[i]);   // 개별 View에 데이터 주입
-            }
-            else
-            {
-                // 데이터보다 뷰가 많으면 남는 View 숨김
-                _spawnedSummaryViews[i].gameObject.SetActive(false);
-            }
-        }
     }
 
     public void SetOnClickHUDOnOffBtnAction(Action action)
