@@ -38,6 +38,7 @@ public class CharacterDetailBootstrapper: MonoBehaviour
 
         _skillListPresenter = new SkillListPresenter(
             skillListView: _characterDetailView.SkillListView,
+            popupView: _characterDetailView.SkillDescPopupView,
             getSkillListUseCase: getSkillListUseCase,
             skillResourceProvider: _skillResourceProvider);
         _skillListPresenter.Initialize();

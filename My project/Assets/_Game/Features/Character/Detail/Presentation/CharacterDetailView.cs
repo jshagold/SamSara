@@ -20,11 +20,13 @@ public class CharacterDetailView : MonoBehaviour
     [Header("Sub Views")]
     [SerializeField] private StatListView _statListView;
     [SerializeField] private SkillListView _skillListView;
+    [SerializeField] private SkillDescPopupView _skillDescPopupView;
     [SerializeField] private InventoryView _inventoryView;
 
     // Presenter가 사용할 수 있게 프로퍼티로 노출
     public StatListView StatListView => _statListView;
     public SkillListView SkillListView => _skillListView;
+    public SkillDescPopupView SkillDescPopupView => _skillDescPopupView;
     public InventoryView InventoryView => _inventoryView;
 
     private void Reset()
@@ -59,6 +61,7 @@ public class CharacterDetailView : MonoBehaviour
         if (_statListView == null) _statListView = GetComponentInChildren<StatListView>(true);
         if (_skillListView == null) _skillListView = GetComponentInChildren<SkillListView>(true);
         if (_inventoryView == null) _inventoryView = GetComponentInChildren<InventoryView>(true);
+        if (_skillDescPopupView == null) _skillDescPopupView = GetComponentInChildren<SkillDescPopupView>(true);
     }
 
     public void OnClickBackButton(Action action)
