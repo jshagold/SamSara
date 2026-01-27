@@ -12,12 +12,14 @@ public class EvolutionNodeInfo
 
     public int EvolutionLevel;
 
-    public List<int> NextEvolutionNodeIds = new List<int>();
-
-    public StatGroup StartStats = new StatGroup();
-    public StatGroup MaxStats = new StatGroup();
+    public StatGroup StartStats = new StatGroup();  // 진화 조건
+    public StatGroup MaxStats = new StatGroup();    // 노드의 최대 스탯
 
     public List<SkillInfo> SkillList = new List<SkillInfo>();
+
+    public List<int> NextNodeIds = new List<int>();
+    public Vector2 Position;            // UI 배치 좌표
+    public EvolutionStateType State;    // 현재 노드 해금상태
 
     public EvolutionNodeInfo() { }
 }

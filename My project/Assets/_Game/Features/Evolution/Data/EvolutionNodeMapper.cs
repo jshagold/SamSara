@@ -16,7 +16,6 @@ public static class EvolutionNodeMapper
             Desc = data.Desc,
             PortraitName = data.Portrait != null ? data.Portrait.name : "null",
             EvolutionLevel = data.Level,
-            NextEvolutionNodeIds = new List<int>(data.NextEvolutionNodeIds),
 
             StartStats = data.StartStats.Clone(),
             MaxStats = data.MaxStats.Clone(),
@@ -24,6 +23,10 @@ public static class EvolutionNodeMapper
             SkillList = data.SkillList
                 .Select(skillMasterData => skillMasterData.ToDomain())
                 .ToList(),
+
+            NextNodeIds = new List<int>(data.NextNodeIds),
+            Position = data.Position,
+            State = EvolutionStateType.None,
         };
     }
 }
