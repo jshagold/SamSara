@@ -1,5 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using Unity.Profiling;
 
 public class GameContext
 {
@@ -15,6 +14,7 @@ public class GameContext
     public GetCharacterDetailUseCase GetCharacterDetailUseCase {  get; }
     public GetSkillListUseCase GetSkillListUseCase { get; }
     public GetInventoryUseCase GetInventoryUseCase { get; }
+    public GetEvolutionTreeUseCase GetEvolutionTreeUseCase { get; }
 
     // [MasterDataManager]
     public MasterDataManager MasterDataManager { get; }
@@ -50,6 +50,9 @@ public class GameContext
             inventoryRepo: InventoryRepo,
             itemMasterRepo: masterDataManager.ItemRepo
         );
+        GetEvolutionTreeUseCase = new GetEvolutionTreeUseCase(
+            characterRepository: characterRepo,
+            characterMasterRepository: masterDataManager.CharacterRepo);
     }
 
     public async UniTask LoadAllDataAsync()
