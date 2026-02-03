@@ -10,14 +10,34 @@ public class EvolutionView : MonoBehaviour
 
     [Header("Scroll Area")]
     [SerializeField] private ScrollRect _scrollRect;
+    [SerializeField] private RectTransform _contentRoot;
+
+    [Header("Layer Containers (BG -> Line -> Node 순서)")]
+    [SerializeField] private RectTransform _bgContainer;
+    [SerializeField] private RectTransform _lineContainer;
     [SerializeField] private RectTransform _nodeContainer;
 
-    [Header("Node")]
+    [Header("Prefabs")]
     [SerializeField] private EvolutionNodeSlotView _nodePrefab;
+    [SerializeField] private EvolutionLineView _linePrefab;
+    [SerializeField] private EvolutionBackgroundView _bgPrefab;
+
+    [Header("Settings")]
+    [SerializeField] private List<Color> _levelColorList;
+    [SerializeField] private Color _lineColor = Color.black;
+    [SerializeField] private float _lineThickness = 8f;
+    [SerializeField] private float _nodePadding = 200f;
+    [SerializeField] private Vector2 _mapPadding = new Vector2(300f, 300f);
 
     private List<EvolutionNodeSlotView> _spawnedNodeList = new List<EvolutionNodeSlotView>();
+    private List<EvolutionLineView> _spawnedLineList = new List<EvolutionLineView>();
+    private List<EvolutionBackgroundView> _spawnedBgList = new List<EvolutionBackgroundView>();
 
-    public RectTransform NodeContainer => _nodeContainer;
+    public RectTransform ContentRoot => _contentRoot;
+    public Color LineColor => _lineColor;
+    public float LineThickness => _lineThickness;
+    public float NodePadding => _nodePadding;
+    public Vector2 MapPadding => _mapPadding;
 
     private void Reset()
     {
@@ -28,13 +48,7 @@ public class EvolutionView : MonoBehaviour
             if (_backButton == null && objName.Contains("back")) _backButton = button;
         }
 
-        // 2. Scroll Area 자동 할당
         if (_scrollRect == null) _scrollRect = GetComponentInChildren<ScrollRect>(true);
-
-        if (_scrollRect != null && _nodeContainer == null)
-        {
-            _nodeContainer = _scrollRect.content;
-        }
     }
 
     private void Awake()
@@ -54,13 +68,21 @@ public class EvolutionView : MonoBehaviour
         _backButton.onClick.AddListener(() => action?.Invoke());
     }
 
-    public void ClearNodeList()
+    public void ClearAll()
     {
         foreach(var node in _spawnedNodeList)
         {
             if(node != null) Destroy(node.gameObject);
         }
+
+        foreach(var bg in _spawnedBgList)
+        { 
+            if(bg != null) Destroy(bg.gameObject); 
+        }
+
+
         _spawnedNodeList.Clear();
+        _spawnedBgList.Clear();
     }
 
     public EvolutionNodeSlotView CreateNode()
@@ -74,6 +96,34 @@ public class EvolutionView : MonoBehaviour
 
         _spawnedNodeList.Add(slot);
         return slot;
+    }
+
+    public EvolutionLineView CreateLine()
+    {
+        EvolutionLineView lineView = Instantiate(_linePrefab, _lineContainer);
+        lineView.transform.localScale = Vector3.one;
+        lineView.transform.localPosition = Vector3.zero;
+        _spawnedLineList.Add(lineView);
+        return lineView;
+    }
+
+    public EvolutionBackgroundView CreateBackground(int level, float yCenter, float height, float contentWidth)
+    {
+        EvolutionBackgroundView bgView = Instantiate(_bgPrefab, _bgContainer);
+        bgView.transform.localScale = Vector3.one;
+        bgView.transform.localPosition = Vector3.zero;
+
+        // 레벨에 맞는 색 가져오기
+        Color bgColor = Color.gray;
+        if(_levelColorList != null && level >= 0 && level < _levelColorList.Count)
+        {
+            bgColor = _levelColorList[level];
+        }
+
+        bgView.SetArea(yPosition: yCenter, height: height, width: contentWidth, color: bgColor);
+        _spawnedBgList.Add(bgView);
+
+        return bgView;
     }
 
     /// <summary>
