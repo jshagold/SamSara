@@ -75,6 +75,12 @@ public class EvolutionView : MonoBehaviour
             if(node != null) Destroy(node.gameObject);
         }
 
+        foreach(var line in _spawnedLineList)
+        {
+            if(line != null) Destroy(line.gameObject);
+        }
+
+
         foreach(var bg in _spawnedBgList)
         { 
             if(bg != null) Destroy(bg.gameObject); 
@@ -82,6 +88,7 @@ public class EvolutionView : MonoBehaviour
 
 
         _spawnedNodeList.Clear();
+        _spawnedLineList.Clear();
         _spawnedBgList.Clear();
     }
 
@@ -131,7 +138,7 @@ public class EvolutionView : MonoBehaviour
     /// </summary>
     public void SetContentSize(Vector2 size)
     {
-        _nodeContainer.sizeDelta = size;
+        _contentRoot.sizeDelta = size;
     }
 
     /// <summary>

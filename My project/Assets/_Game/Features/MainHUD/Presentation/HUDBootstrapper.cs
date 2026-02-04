@@ -5,7 +5,7 @@ public class HUDBootstrapper : MonoBehaviour
     [SerializeField] private HUDView _hudView;
     
     private HUDPresenter _hudPresenter;
-    private MainOptionPresenter _mainOptionPresenter;
+    private OptionPresenter _mainOptionPresenter;
     private MainSceneCharacterSummaryPresenter _characterSummaryPresenter;
 
     public void Initialize(
@@ -21,7 +21,7 @@ public class HUDBootstrapper : MonoBehaviour
         );
         _hudPresenter.Initialize();
 
-        _mainOptionPresenter = new MainOptionPresenter(
+        _mainOptionPresenter = new OptionPresenter(
             optionButtonView: _hudView.OptionButton,
             menuPopupView: menuPopup,
             settingsPopupView: settingsPopup

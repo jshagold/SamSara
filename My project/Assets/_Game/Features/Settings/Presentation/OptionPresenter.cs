@@ -1,9 +1,9 @@
 ﻿using System;
 using UnityEngine;
 
-public class MainOptionPresenter : IDisposable
+public class OptionPresenter : IDisposable
 {
-    private readonly string _logClass = $"[{nameof(MainOptionPresenter)}]";
+    private readonly string _logClass = $"[{nameof(OptionPresenter)}]";
 
     private readonly OptionButtonView _optionButtonView;
     private readonly OptionMenuPopupView _menuPopupView;
@@ -12,7 +12,7 @@ public class MainOptionPresenter : IDisposable
     // Data (간단하게 PlayerPrefs 래퍼 사용 가정, 나중에 정식 Repo로 교체)
     // private readonly ISettingsRepository _settingsRepo;
 
-    public MainOptionPresenter(
+    public OptionPresenter(
         OptionButtonView optionButtonView,
         OptionMenuPopupView menuPopupView,
         SettingsPopupView settingsPopupView)

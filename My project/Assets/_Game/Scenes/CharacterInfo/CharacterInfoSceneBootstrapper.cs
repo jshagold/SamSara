@@ -14,7 +14,7 @@ public class CharacterInfoSceneBootstrapper : MonoBehaviour
     [SerializeField] private OptionButtonView _optionButton;
 
     // Presenters
-    private MainOptionPresenter _mainOptionPresenter;
+    private OptionPresenter _mainOptionPresenter;
 
     private async void Start()
     {
@@ -52,7 +52,7 @@ public class CharacterInfoSceneBootstrapper : MonoBehaviour
             Debug.LogError($"{_logClass} CharacterDetailBootstrapper가 연결되지 않았습니다.");
         }
 
-        _mainOptionPresenter = new MainOptionPresenter(
+        _mainOptionPresenter = new OptionPresenter(
             optionButtonView: _optionButton,
             menuPopupView: _menuPopup,
             settingsPopupView: _settingsPopup

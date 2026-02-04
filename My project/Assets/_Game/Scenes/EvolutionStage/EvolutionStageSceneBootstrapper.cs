@@ -1,15 +1,24 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EvolutionStageSceneBootstrapper : MonoBehaviour
 {
     private readonly string _logClass = $"{nameof(EvolutionStageSceneBootstrapper)}";
 
-    [Header("Views")]
+    [Header("Content Views")]
     [SerializeField] private EvolutionView _evolutionView;
+
+    [Header("HUD Views")]
+    [SerializeField] private Button _backButton;
+    [SerializeField] private OptionButtonView _optionButton;
+    [SerializeField] private OptionMenuPopupView _optionMenuPopup;
+    [SerializeField] private SettingsPopupView _settingsPopup;
+
 
     // Presenters
     private EvolutionPresenter _evolutionPresenter;
+    private OptionPresenter _optionPresenter;
 
     // ResourceProviders
     private ICharacterResourceProvider _characterResourceProvider;
@@ -50,10 +59,18 @@ public class EvolutionStageSceneBootstrapper : MonoBehaviour
             getEvolutionTreeUseCase: gameContext.GetEvolutionTreeUseCase,
             resourceProvider: _characterResourceProvider);
         _evolutionPresenter.Initialize();
+
+        _optionPresenter = new OptionPresenter(
+            optionButtonView: _optionButton,
+            menuPopupView: _optionMenuPopup,
+            settingsPopupView: _settingsPopup
+        );
+        _optionPresenter.Initialize();
     }
 
     private void OnDestroy()
     {
         _evolutionPresenter?.Dispose();
+        _optionPresenter?.Dispose();
     }
 }

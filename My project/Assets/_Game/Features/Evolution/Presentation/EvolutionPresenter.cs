@@ -148,8 +148,8 @@ public class EvolutionPresenter : IDisposable
 
     private void OnClickBack()
     {
-        // TODO: 씬 이동 처리
         Debug.Log("[EvolutionPresenter] Back Button Clicked");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("CharacterInfoScene");
     }
 
     public void Dispose()
