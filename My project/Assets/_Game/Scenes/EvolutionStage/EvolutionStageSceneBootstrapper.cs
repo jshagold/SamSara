@@ -55,6 +55,7 @@ public class EvolutionStageSceneBootstrapper : MonoBehaviour
 
         _evolutionPresenter = new EvolutionPresenter(
             evolutionView: _evolutionView,
+            evolutionPopupView: ,
             getCharacterDetailUseCase: gameContext.GetCharacterDetailUseCase,
             getEvolutionTreeUseCase: gameContext.GetEvolutionTreeUseCase,
             resourceProvider: _characterResourceProvider);

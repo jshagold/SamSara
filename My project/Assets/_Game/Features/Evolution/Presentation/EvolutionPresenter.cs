@@ -8,6 +8,7 @@ public class EvolutionPresenter : IDisposable
 
     // Views
     private readonly EvolutionView _evolutionView;
+    private readonly EvolutionPopupView _evolutionPopupView;
 
     // UseCases
     private readonly GetCharacterDetailUseCase _getCharacterDetailUseCase;
@@ -16,13 +17,18 @@ public class EvolutionPresenter : IDisposable
     // Resource Provider
     private readonly ICharacterResourceProvider _resourceProvider;
 
+    // 멤버 변수 캐시 (라인 그리기 + 클릭 이벤트용 공용)
+    private Dictionary<int, EvolutionNodeInfo> _nodeDataCache = new Dictionary<int, EvolutionNodeInfo>();
+
     public EvolutionPresenter(
         EvolutionView evolutionView,
+        EvolutionPopupView evolutionPopupView,
         GetCharacterDetailUseCase getCharacterDetailUseCase,
         GetEvolutionTreeUseCase getEvolutionTreeUseCase,
         ICharacterResourceProvider resourceProvider)
     {
         _evolutionView = evolutionView;
+        _evolutionPopupView = evolutionPopupView;
         _getCharacterDetailUseCase = getCharacterDetailUseCase;
         _getTreeUseCase = getEvolutionTreeUseCase;
         _resourceProvider = resourceProvider;
@@ -47,6 +53,7 @@ public class EvolutionPresenter : IDisposable
         List<EvolutionNodeInfo> nodeInfoList = _getTreeUseCase.Execute();
 
         _evolutionView.ClearAll();
+        _nodeDataCache.Clear();
 
         // 맵 크기 계산용 변수
         float maxAbsX = 0f;
@@ -55,13 +62,10 @@ public class EvolutionPresenter : IDisposable
         // 레벨별 Y좌표 범위 계산 Key: EvolutionLevel, Value: Vector2(Min Y, Max Y)
         Dictionary<int, Vector2> levelYBounds = new Dictionary<int, Vector2>();
 
-        // 라인 그리기를 위한 부모 노드 빠른 검색용 딕셔너리
-        Dictionary<int, EvolutionNodeInfo> nodeDict = new Dictionary<int, EvolutionNodeInfo>();
-
         foreach(var nodeInfo in nodeInfoList)
         {
             // Dictionary에 노드등록
-            nodeDict[nodeInfo.Id] = nodeInfo;
+            _nodeDataCache[nodeInfo.Id] = nodeInfo;
 
             // 전체 맵의 최대 크기 갱신
             if(Mathf.Abs(nodeInfo.Position.x) > maxAbsX) maxAbsX = Mathf.Abs(nodeInfo.Position.x);
@@ -107,9 +111,9 @@ public class EvolutionPresenter : IDisposable
         {
             foreach(int childId in parentNode.NextNodeIds)
             {
-                if(nodeDict.ContainsKey(childId))
+                if(_nodeDataCache.ContainsKey(childId))
                 {
-                    EvolutionNodeInfo childNode = nodeDict[childId];
+                    EvolutionNodeInfo childNode = _nodeDataCache[childId];
 
                     var lineView = _evolutionView.CreateLine();
 
@@ -143,7 +147,85 @@ public class EvolutionPresenter : IDisposable
     private void OnClickNode(int nodeId)
     {
         Debug.Log($"[EvolutionPresenter] Node Clicked: {nodeId}");
-        // TODO: 상세 팝업 오픈
+        if (_nodeDataCache.ContainsKey(nodeId))
+        {
+            EvolutionNodeInfo nodeInfo = _nodeDataCache[nodeId];
+
+            // 캐릭터의 현재 스탯 정보 가져오기 (비교용)
+            CharacterInfo charInfo = _getCharacterDetailUseCase.Execute().Info;
+
+            // 진화 가능 여부 및 상태 체크
+            bool isUnlocked = nodeInfo.State == EvolutionStateType.Possible;
+            bool canEvolve = !isUnlocked && CheckEvolutionConditions(charInfo, nodeInfo);
+            // TODO 텍스트 하드코딩 수정
+            string requireLabel = "요구 조건";
+            string evolveLabel = isUnlocked ? "완료" : "진화";
+            string requirementsText = FormatRequirements(nodeInfo.StartStats);
+
+            Debug.Log($"[{_logClass}] Open Popup for: {nodeInfo.Name}, CanEvolve: {canEvolve}");
+
+            // 팝업 오픈
+            _evolutionPopupView.OpenPopup(
+                requireLabel: requireLabel,
+                evolveLabel: evolveLabel,
+                name: nodeInfo.Name,
+                desc: nodeInfo.Desc,
+                requirements: requirementsText,
+                iconSprite: _resourceProvider.GetPortrait(charInfo.Id, nodeInfo.Id),
+                canEvolve: canEvolve,
+                onEvolveClick: () => OnEvolve(nodeInfo.Id)
+            );
+        }
+    }
+
+    private void OnEvolve(int nodeId)
+    {
+        Debug.Log($"[{_logClass}] Evolve Request: {nodeId}");
+
+        // TODO: 1. 진화 UseCase 실행 (재화 소모, 스탯 반영 등)
+        // TODO: 2. 성공 시 Refresh() 호출하여 트리 및 팝업 상태 갱신
+        // _evolveUseCase.Execute(nodeId); 
+        // Refresh();
+
+        _evolutionPopupView.ClosePopup();
+    }
+
+    /// <summary>
+    /// 진화 조건(요구 스탯) 달성 여부 체크
+    /// </summary>
+    private bool CheckEvolutionConditions(CharacterInfo charInfo, EvolutionNodeInfo nodeInfo)
+    {
+        // TODO 이전 단계(부모)가 잠겨있으면 진화 불가 로직 등이 여기에 추가될 수 있음.
+        if (nodeInfo.State == EvolutionStateType.Locked) return false;
+
+        StatGroup currentStats = charInfo.CurrentStats;
+        StatGroup reqStats = nodeInfo.StartStats;
+
+        bool isConditionMet = (currentStats.Hp.Value >= reqStats.Hp.Value) 
+            && (currentStats.Strength.Value >= reqStats.Strength.Value)
+            && (currentStats.Toughness.Value >= reqStats.Toughness.Value)
+            && (currentStats.Agility.Value >= reqStats.Agility.Value);
+
+        return isConditionMet;
+    }
+
+    /// <summary>
+    /// 요구 스탯 정보를 UI 표시용 문자열로 변환
+    /// </summary>
+    private string FormatRequirements(StatGroup reqStats)
+    {
+        // TODO 텍스트 하드코딩 수정
+        // 값이 0보다 큰 경우에만 표시하도록 필터링 가능
+        List<string> reqs = new List<string>
+        {
+            "Require Stat: ",
+            $"HP {reqStats.Hp}",
+            $"Strength {reqStats.Strength}",
+            $"Toughness {reqStats.Toughness}",
+            $"Agility {reqStats.Agility}"
+        };
+
+        return string.Join("\n", reqs);
     }
 
     private void OnClickBack()
