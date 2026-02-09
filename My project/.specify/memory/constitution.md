@@ -1,50 +1,118 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# Samsara Project Constitution
 
-## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+## Project Overview
+- Goal: Game Development (Samsara Project)
+- Engine: Unity 6.2
+- **Structure Pattern:** Feature-based Modular Architecture (DDD + Clean Architecture applied)
+- **Root Folders:**
+    - **Game Logic:** 'Assets/_Game/' (Main Source Code & Assets)
+    - **System Resources:** 'Asstes/Resources/' (Only for 'LoadAll' targets like MasterData)
+    - **External Assets:** 'Assets/' or 'Assets/_External' (3rd party assets like Cainos)
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+## Core Principles (Non-Negotiable)
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### Zero Guessing (절대 추측 금지)
+- **STRICT PATH ADHERENCE:**
+    - Do NOT assume 'Assets/Scripts'
+    - All script logic MUST be inside 'Assets/_Game/'
+- **NO HALLUCINATION:** Never invent file paths, class names, or API versions.
+- **Verify Existence:** Before modifying a file, ensure it exists in the file tree.
+- **ASK FIRST:** If you are unsure about the existing project structure or where a file is located, you MUST use '/specify.clarify' to ask the user.
+- **NO ASSUMPTIONS:** Do not write code based on 'likely' scenarios. Verify facts first.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### Feature Architecture & Layer Separation & Asset Cohesion
+- 'Assets/_Game/App': Global configs, Context, Bootstrappers
+- 'Assets/_Game/Core': Shared utilities, Base classes, Domain interfaces
+- 'Assets/_Game/Features': Main game logic separated by feature (e.g., Inventory, Skills)
+- 'Assets/_Game/Scenes': Scene files and Scene Bootstrappers
+All features inside 'Assets/_Game/Features/[FeatureName]' follow this structure:
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+#### Data Layer ('.../Data')
+- **Role:** Data Definitions, Repositories, Mappers, API Calls.
+- **Rule:**
+    - Repository implementations go here.
+    - **MasterData(SO):**
+        - Definitions (MasterData class) go here.
+    - **Asset Files:** Actual '.asset' files go to `Assets/Resources/MasterData/[FeatureName]` (for `Resources.LoadAll`).
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+#### Domain Layer ('.../Domain')
+- **Role:** Business Logic, UseCases, Models (Pure C#).
+- **Rule:**
+    - **NO UNITY DEPENDENCIES:** Avoid referencing 'UnityEngine.UI' or 'GameObject'.
+    - Contains: 'UseCases', 'Models', 'Interfaces'
+    - Pure C# Logic.
+
+#### Presentation Layer ('.../Presentation')
+- **Role:** Handle UI logic, View components, and **Feature-Specific Assets**.
+- **Rule:**
+    - 'MonoBehaviour' views go here.
+    - 'Presenters' connect Domain UseCase to Views.
+- **Folder Structure (Cohesion):**
+    - **C# Scripts (Root):**
+        - Place all logic scripts ('*Boostrapper.cs', '*Presenter.cs', '*View.cs')
+        - **Reason:** Easy access to core logic.
+    - **Assets (Subfolders):**
+        - 'Prefabs/': Feature-related prefabs (e.g. 'CommonPopupView.prefab')
+        - 'Art/': Feature-specific Sprites,Animations, Materials.
+        - 'Sounds/': Feature-specific AudioClips.
+- **Naming:**
+    - '*Bootstrapper': Entry point for the feature.
+    - '*Presenter': Connects Domain to View.
+    - '*View': Inherits 'MonoBehavior', handles UI elements.
+
+### Data / Logic Separation
+- **Prohibition:**
+    - Never hardcode game data (stats, IDs, text) inside Logic classes.
+    - Logic classes must reference Data classes to read values.
+
+
+
+## Unity UI Coding Standards (Strict)
+
+### Fail Fast (Defensive Coding Forbidden)
+- **Rule:** DO NOT use 'if(component != null)' for '[SerializeField]' UI elements.
+- **Reason:** Missing references must cause a 'NullReferenceException' immediately during runtime to be fixed. Hiding errors is a bug.
+- **Target:** All View scripts referencing Text, Image, Button, etc.
+
+### Automate with Reset()
+// TODO Transform 같은건 Reset()에서 자동지정 해주지 않는걸 원한다. 이상한 객체에 할당될 가능성이 높을것 같아서 수동조정하는게 필요하다고 아직은 생각.
+- **Rule:** Implement the 'Reset()' method in all View scripts.
+- **Action:** Automatically find and assign child components using 'GetComponentInChildren<T>()' or 'transform.Find()' within 'Reset()'.
+- **Goal:** Minimize manual drag-and-drop-errors in the Inspector.
+
+### Component Caching Strategy
+- **Rule:** Cache the specific UI component (e.g., 'Image') instead of 'RectTransform'.
+- **Reason:** You can access 'image.rectTransform' freely, but you cannot access 'image' from 'rectTransform' without 'GetComponent' (overhead)
+- **Example:** '[SerializeField] private Image _hpBar;' (Good) vs 'private RectTransform _hpBarRect' (Bad).
+
+### Resolution Independence
+- **Rule:** Trust the 'Canvas Scaler'
+- **Action:** Use fixed 'float' values for padding/size in code. Do not manually calculate screen ratios or pixel density.
+
+
+
+## General Coding Standards
+- **Nameing Conventions:**
+    - Public/Methods: 'PascalCase'
+    - Private fields: '_camelCase' (starts with underscore)
+    - Suffixes: '*View', '*Presenter', '*UseCase', '*Repository', '*SO'
+- **Serialization:** Use '[SerailizeField] private' for inspector variables. Do not use 'public' fields for internal state.
+- **Performance:** Avoid 'GetComponent', 'FindObjectOfType' in 'Update()' loops. Cache references in 'Awake()' or 'Start()'.
+
+
+
+## Workflow
+- **Asset Placement:**
+    - If an asset (Sprite/Prefab) is used ONLY by this feature, place it in 'Presentatino/Art' or 'Presentation/Prefabs'.
+    - If shared across features, move to 'Assets/_Game/Core/...'.
+- **Plan Verification:** Check if the plan respects the 'Assets/_Game/...' path and Asset Cohesion rules.
+- Always verify the plan with the user before implementation.
+
+
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
-
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
-
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+- **Version**: 0.1.0 | **Ratified**: 2026-02-09 | **Last Amended**: 2026-02-09
