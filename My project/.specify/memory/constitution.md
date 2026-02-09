@@ -8,7 +8,7 @@
 - **Structure Pattern:** Feature-based Modular Architecture (DDD + Clean Architecture applied)
 - **Root Folders:**
     - **Game Logic:** 'Assets/_Game/' (Main Source Code & Assets)
-    - **System Resources:** 'Asstes/Resources/' (Only for 'LoadAll' targets like MasterData)
+    - **System Resources:** 'Assets/Resources/' (Only for 'LoadAll' targets like MasterData)
     - **External Assets:** 'Assets/' or 'Assets/_External' (3rd party assets like Cainos)
 
 
@@ -21,7 +21,7 @@
     - All script logic MUST be inside 'Assets/_Game/'
 - **NO HALLUCINATION:** Never invent file paths, class names, or API versions.
 - **Verify Existence:** Before modifying a file, ensure it exists in the file tree.
-- **ASK FIRST:** If you are unsure about the existing project structure or where a file is located, you MUST use '/specify.clarify' to ask the user.
+- **ASK FIRST:** If you are unsure about the existing project structure or where a file is located, you MUST use '/speckit.clarify' to ask the user.
 - **NO ASSUMPTIONS:** Do not write code based on 'likely' scenarios. Verify facts first.
 
 ### Feature Architecture & Layer Separation & Asset Cohesion
@@ -79,10 +79,12 @@ All features inside 'Assets/_Game/Features/[FeatureName]' follow this structure:
 - **Target:** All View scripts referencing Text, Image, Button, etc.
 
 ### Automate with Reset()
-// TODO Transform 같은건 Reset()에서 자동지정 해주지 않는걸 원한다. 이상한 객체에 할당될 가능성이 높을것 같아서 수동조정하는게 필요하다고 아직은 생각.
-- **Rule:** Implement the 'Reset()' method in all View scripts.
+- **Rule:** Implement the 'Reset()' method in View scripts to auto-assign clear UI components (Image, TMP_Text, Button).
 - **Action:** Automatically find and assign child components using 'GetComponentInChildren<T>()' or 'transform.Find()' within 'Reset()'.
 - **Goal:** Minimize manual drag-and-drop-errors in the Inspector.
+- **EXCEPTION (Manual Only):**
+    - **DO NOT** auto-assign `Transform` or `RectTransform` in `Reset()`.
+    - **Reason:** Transforms are generic and ambiguous; auto-assignment often picks the wrong object. These must be assigned manually in the Inspector.
 
 ### Component Caching Strategy
 - **Rule:** Cache the specific UI component (e.g., 'Image') instead of 'RectTransform'.
@@ -96,18 +98,18 @@ All features inside 'Assets/_Game/Features/[FeatureName]' follow this structure:
 
 
 ## General Coding Standards
-- **Nameing Conventions:**
+- **Naming Conventions:**
     - Public/Methods: 'PascalCase'
     - Private fields: '_camelCase' (starts with underscore)
     - Suffixes: '*View', '*Presenter', '*UseCase', '*Repository', '*SO'
-- **Serialization:** Use '[SerailizeField] private' for inspector variables. Do not use 'public' fields for internal state.
+- **Serialization:** Use '[SerializeField] private' for inspector variables. Do not use 'public' fields for internal state.
 - **Performance:** Avoid 'GetComponent', 'FindObjectOfType' in 'Update()' loops. Cache references in 'Awake()' or 'Start()'.
 
 
 
 ## Workflow
 - **Asset Placement:**
-    - If an asset (Sprite/Prefab) is used ONLY by this feature, place it in 'Presentatino/Art' or 'Presentation/Prefabs'.
+    - If an asset (Sprite/Prefab) is used ONLY by this feature, place it in 'Presentation/Art' or 'Presentation/Prefabs'.
     - If shared across features, move to 'Assets/_Game/Core/...'.
 - **Plan Verification:** Check if the plan respects the 'Assets/_Game/...' path and Asset Cohesion rules.
 - Always verify the plan with the user before implementation.
@@ -115,4 +117,4 @@ All features inside 'Assets/_Game/Features/[FeatureName]' follow this structure:
 
 
 ## Governance
-- **Version**: 0.1.0 | **Ratified**: 2026-02-09 | **Last Amended**: 2026-02-09
+- **Version**: 0.1.0 | **Ratified**: 2026-00-00 | **Last Amended**: 2026-02-10
