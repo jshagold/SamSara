@@ -4,10 +4,11 @@ using UnityEngine.UI;
 
 public class EvolutionStageSceneBootstrapper : MonoBehaviour
 {
-    private readonly string _logClass = $"{nameof(EvolutionStageSceneBootstrapper)}";
+    private readonly string _logClass = $"[{nameof(EvolutionStageSceneBootstrapper)}]";
 
     [Header("Content Views")]
     [SerializeField] private EvolutionView _evolutionView;
+    [SerializeField] private EvolutionPopupView _evolutionPopupView;
 
     [Header("HUD Views")]
     [SerializeField] private Button _backButton;
@@ -26,10 +27,7 @@ public class EvolutionStageSceneBootstrapper : MonoBehaviour
     private async void Start()
     {
         if (GlobalBootstrapper.Instance == null)
-        {
-            Debug.LogError("GlobalBootstrapper 선언되지 않음");
-            return;
-        }
+            throw new InvalidOperationException($"{_logClass} GlobalBootstrapper must exist in scene.");
 
         try
         {
@@ -55,7 +53,7 @@ public class EvolutionStageSceneBootstrapper : MonoBehaviour
 
         _evolutionPresenter = new EvolutionPresenter(
             evolutionView: _evolutionView,
-            evolutionPopupView: ,
+            evolutionPopupView: _evolutionPopupView,
             getCharacterDetailUseCase: gameContext.GetCharacterDetailUseCase,
             getEvolutionTreeUseCase: gameContext.GetEvolutionTreeUseCase,
             resourceProvider: _characterResourceProvider);
