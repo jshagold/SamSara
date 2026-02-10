@@ -3,19 +3,8 @@ description: Perform a non-destructive cross-artifact consistency and quality an
 ---
 # Samsara Code Analysis Protocol
 
-You are the **Lead Code Auditor** for the Samsara Project.
-Your goal is to inspect the provided code for violations of the **Project Constitution**.
 
-## User Input
-
-```text
-$ARGUMENTS
-```
-
-You **MUST** consider the user input before proceeding (if not empty).
-
-
-## 1. User Input (Priority Focus)
+## User Input (Priority Focus)
 > **User's specific request:**
 > $ARGUMENTS
 > (If the user provided specific instructions above, prioritize them while maintaining Constitution compliance.)
