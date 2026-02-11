@@ -239,6 +239,10 @@ All features inside `Assets/_Game/Features/[FeatureName]` MUST follow this struc
 - **Critical Failures:**
     - Data loading failures (MasterData/RuntimeData) must treat as **Critical Exceptions**.
     - Use `try-catch` blocks in Initialization phases to log specific errors (`Debug.LogError`) before throwing.
+- **Safe Cleanup (OnDestory/Dispose):**
+    - **Rule:** Do NOT throw exceptions (e.g., `InvalidOperationException`) inside `OnDestroy()` or `Dispose()` if a dependency is null.
+    - **Action:** Use the Null-conditional operator (`?.`) for cleanup calls. (e.g., `_presenter?.Dispose();`).
+    - **Reason:** To prevent Exception Masking. If an object failed to initialize (causing the dependency to be null), throwing another error during cleanup hides the original, critical error. Cleanup logic must be "Fail Safe", not "Fail Fast".
 - **Naming Conventions:**
     - Public/Methods: `PascalCase`
     - Private fields: `_camelCase` (starts with underscore)
