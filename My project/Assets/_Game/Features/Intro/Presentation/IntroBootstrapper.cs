@@ -1,7 +1,10 @@
+using System;
 using UnityEngine;
 
 public class IntroBootstrapper : MonoBehaviour
 {
+    private readonly string _logClass = $"[{nameof(IntroBootstrapper)}]";
+
     [SerializeField] private IntroView _introView;
 
     private IntroPresenter _introPresenter;
@@ -9,10 +12,7 @@ public class IntroBootstrapper : MonoBehaviour
     private void Start()
     {
         if (GlobalBootstrapper.Instance == null)
-        {
-            Debug.LogError("GlobalBootstrapper 선언되지 않음");
-            return;
-        }
+            throw new InvalidOperationException($"{_logClass} GlobalBootstrapper must exist in scene.");
         var gameContext = GlobalBootstrapper.Instance.GameContext;
 
         _introPresenter = new IntroPresenter(

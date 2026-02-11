@@ -6,6 +6,9 @@ public class IntroPresenter : IDisposable
 {
     private readonly string _logClass = $"[{nameof(IntroPresenter)}]";
 
+    /// <summary>Minimum display time for logo (ms) before showing title.</summary>
+    private const int MinLogoDisplayMs = 2000;
+
     private readonly IntroView _introView;
     private readonly PopupManager _popupManager;
     private string _nextSceneName;
@@ -28,7 +31,7 @@ public class IntroPresenter : IDisposable
             {
                 // 2. 데이터 로딩 (최소 2초 보장)
                 var loadTask = GlobalBootstrapper.Instance.InitializationTask;
-                var waitTask = UniTask.Delay(2000); // 로고 재생 시간
+                var waitTask = UniTask.Delay(MinLogoDisplayMs);
 
                 await UniTask.WhenAll(loadTask, waitTask);
 
