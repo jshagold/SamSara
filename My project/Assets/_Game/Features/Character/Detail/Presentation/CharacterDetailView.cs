@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -93,9 +93,6 @@ public class CharacterDetailView : MonoBehaviour
 
     public void ResetScroll()
     {
-        if(_scrollRect != null)
-        {
-            _scrollRect.verticalNormalizedPosition = 1f;
-        }
+        _scrollRect.verticalNormalizedPosition = 1f;
     }
 }

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class CharacterDetailBootstrapper: MonoBehaviour
 {
@@ -18,7 +18,9 @@ public class CharacterDetailBootstrapper: MonoBehaviour
 
     public void Initialize(GameContext gameContext)
     {
-        // UseCases
+        if (_characterDetailView == null)
+            throw new System.InvalidOperationException($"{_logClass} _characterDetailView must be assigned in Inspector.");
+
         var getCharacterDetailUseCase = gameContext.GetCharacterDetailUseCase;
         var getSkillListUseCase = gameContext.GetSkillListUseCase;
         var getInventoryUseCase = gameContext.GetInventoryUseCase;
@@ -29,11 +31,13 @@ public class CharacterDetailBootstrapper: MonoBehaviour
         _skillResourceProvider = new SkillResourceProvider(skillMasterRepo: masterDataManager.SkillRepo);
         _itemResourceProvider = new ItemResourceProvider(masterRepo: masterDataManager.ItemRepo);
 
-        // Presenters
+        var statListPresenter = new StatListPresenter(statListView: _characterDetailView.StatListView);
+
         _characterDetailPresenter = new CharacterDetailPresenter(
             characterDetailView: _characterDetailView,
             getCharacterDetailUseCase: getCharacterDetailUseCase,
-            resourceProvider: _characterResourceProvider);
+            resourceProvider: _characterResourceProvider,
+            statListPresenter: statListPresenter);
         _characterDetailPresenter.Initialize();
 
         _skillListPresenter = new SkillListPresenter(
@@ -54,13 +58,19 @@ public class CharacterDetailBootstrapper: MonoBehaviour
 
     private void OnDestroy()
     {
-        _characterDetailPresenter?.Dispose();
+        if (_characterDetailPresenter == null)
+            throw new System.InvalidOperationException($"{_logClass} OnDestroy called without Initialize - _characterDetailPresenter is null.");
+        _characterDetailPresenter.Dispose();
         _characterDetailPresenter = null;
 
-        _skillListPresenter?.Dispose();
+        if (_skillListPresenter == null)
+            throw new System.InvalidOperationException($"{_logClass} OnDestroy called without Initialize - _skillListPresenter is null.");
+        _skillListPresenter.Dispose();
         _skillListPresenter = null;
 
-        _inventoryPresenter?.Dispose();
+        if (_inventoryPresenter == null)
+            throw new System.InvalidOperationException($"{_logClass} OnDestroy called without Initialize - _inventoryPresenter is null.");
+        _inventoryPresenter.Dispose();
         _inventoryPresenter = null;
 
         _characterResourceProvider = null;

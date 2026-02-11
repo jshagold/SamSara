@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 
 public static class EvolutionNodeMapper
@@ -6,7 +6,8 @@ public static class EvolutionNodeMapper
     // Data -> Domain
     public static EvolutionNodeInfo ToDomain(this EvolutionNodeData data)
     {
-        if(data == null) return null;
+        if (data == null)
+            throw new System.InvalidOperationException($"[{nameof(EvolutionNodeMapper)}] EvolutionNodeData must not be null.");
 
         // TODO Skill List 변경해야함 (MasterData -> Domain)
         return new EvolutionNodeInfo
@@ -25,7 +26,8 @@ public static class EvolutionNodeMapper
                 .ToList(),
 
             NextNodeIds = new List<int>(data.NextNodeIds),
-            Position = data.Position,
+            PositionX = data.Position.x,
+            PositionY = data.Position.y,
             State = EvolutionStateType.None,
         };
     }

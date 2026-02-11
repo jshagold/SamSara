@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
-using NUnit.Framework;
+using System.Collections.Generic;
 
 public class StatListPresenter
 {
     private readonly StatListView _statListView;
 
-    public StatListPresenter(StatListView statListView) 
+    public StatListPresenter(StatListView statListView)
     {
-        _statListView = statListView;
+        _statListView = statListView ?? throw new System.ArgumentNullException(nameof(statListView));
     }
 
     public void Refresh(List<StatDisplayInfo> statList)

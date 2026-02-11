@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,25 +6,37 @@ using UnityEngine;
 public class EvolutionNodeData
 {
     [Header("Node Info")]
-    public int Id; 
-    public string Name;
-    [TextArea] public string Desc;
-    public Sprite Portrait;
+    [SerializeField] private int _id;
+    [SerializeField] private string _name;
+    [SerializeField] [TextArea] private string _desc;
+    [SerializeField] private Sprite _portrait;
 
     [Header("Level Info")]
-    public int Level; // 진화 단계 레벨
+    [SerializeField] private int _level;
 
     [Header("Branching")]
-    public int ParentId;
-    public List<int> NextNodeIds = new List<int>();
+    [SerializeField] private int _parentId;
+    [SerializeField] private List<int> _nextNodeIds = new List<int>();
 
     [Header("Stats")]
-    public StatGroup StartStats = new StatGroup();
-    public StatGroup MaxStats = new StatGroup();
+    [SerializeField] private StatGroup _startStats = new StatGroup();
+    [SerializeField] private StatGroup _maxStats = new StatGroup();
 
     [Header("Skills")]
-    public List<SkillMasterData> SkillList = new List<SkillMasterData>();
+    [SerializeField] private List<SkillMasterData> _skillList = new List<SkillMasterData>();
 
     [Header("UI Layout")]
-    public Vector2 Position;    // 화면의 노드 배치 좌표
+    [SerializeField] private Vector2 _position;
+
+    public int Id => _id;
+    public string Name => _name;
+    public string Desc => _desc;
+    public Sprite Portrait => _portrait;
+    public int Level => _level;
+    public int ParentId => _parentId;
+    public List<int> NextNodeIds => _nextNodeIds;
+    public StatGroup StartStats => _startStats;
+    public StatGroup MaxStats => _maxStats;
+    public List<SkillMasterData> SkillList => _skillList;
+    public Vector2 Position => _position;
 }

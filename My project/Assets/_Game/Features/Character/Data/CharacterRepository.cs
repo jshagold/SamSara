@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -50,10 +50,7 @@ public class CharacterRepository : ICharacterRepository
         CheckDataIntegrity();
 
         if (stat == null)
-        {
-            Debug.LogWarning($"{_logClass} UpdateStat 실패 - Stat null");
-            return;
-        }
+            throw new InvalidOperationException($"{_logClass} ModifyStat - stat must not be null.");
 
         _cachedData.CurrentStats = stat.Clone();
 

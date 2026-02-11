@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 public class InventoryPresenter : IDisposable
@@ -13,13 +13,13 @@ public class InventoryPresenter : IDisposable
     private readonly IItemResourceProvider _itemResourceProvider;
 
     public InventoryPresenter(
-        InventoryView inventoryView, 
+        InventoryView inventoryView,
         GetInventoryUseCase getInventoryUseCase,
-        IItemResourceProvider itemResourceProvider) 
-    { 
-        _inventoryView = inventoryView;
-        _getInventoryUseCase = getInventoryUseCase;
-        _itemResourceProvider = itemResourceProvider;
+        IItemResourceProvider itemResourceProvider)
+    {
+        _inventoryView = inventoryView ?? throw new ArgumentNullException(nameof(inventoryView));
+        _getInventoryUseCase = getInventoryUseCase ?? throw new ArgumentNullException(nameof(getInventoryUseCase));
+        _itemResourceProvider = itemResourceProvider ?? throw new ArgumentNullException(nameof(itemResourceProvider));
     }
 
     public void Initialize()
@@ -52,9 +52,6 @@ public class InventoryPresenter : IDisposable
 
     public void Dispose()
     {
-        if(_getInventoryUseCase != null)
-        {
-            _getInventoryUseCase.OnInventoryChanged -= Refresh;
-        }
+        _getInventoryUseCase.OnInventoryChanged -= Refresh;
     }
 }

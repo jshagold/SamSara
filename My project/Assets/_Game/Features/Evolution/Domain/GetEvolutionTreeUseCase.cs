@@ -1,19 +1,19 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 public class GetEvolutionTreeUseCase
 {
-    private readonly string _logClass = $"{nameof(GetEvolutionTreeUseCase)}";
+    private readonly string _logClass = $"[{nameof(GetEvolutionTreeUseCase)}]";
 
     private readonly ICharacterRepository _characterRepo;
     private readonly ICharacterMasterRepository _masterRepo;
 
     public GetEvolutionTreeUseCase(
         ICharacterRepository characterRepository,
-        ICharacterMasterRepository characterMasterRepository) 
+        ICharacterMasterRepository characterMasterRepository)
     {
-        _characterRepo = characterRepository;
-        _masterRepo = characterMasterRepository;
+        _characterRepo = characterRepository ?? throw new ArgumentNullException(nameof(characterRepository));
+        _masterRepo = characterMasterRepository ?? throw new ArgumentNullException(nameof(characterMasterRepository));
     }
 
     public List<EvolutionNodeInfo> Execute()

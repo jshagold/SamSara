@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using System;
 
 public class StatDisplayInfo
 {
@@ -8,13 +8,14 @@ public class StatDisplayInfo
     public float StartValue;
     public float MaxValue;
 
+    /// <summary>Normalized progress from StartValue to MaxValue in [0, 1].</summary>
     public float Ratio
     {
         get
         {
-            if(MaxValue <= StartValue) return 0f;
+            if (MaxValue <= StartValue) return 0f;
 
-            float current = Mathf.Clamp(CurrentValue, StartValue, MaxValue);
+            float current = Math.Clamp(CurrentValue, StartValue, MaxValue);
             return (current - StartValue) / (MaxValue - StartValue);
         }
     }

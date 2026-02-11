@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 public class GetCharacterSummaryUseCase
 {
-    private readonly string _logClass = $"{nameof(GetCharacterSummaryUseCase)}";
+    private readonly string _logClass = $"[{nameof(GetCharacterSummaryUseCase)}]";
 
     private readonly ICharacterRepository _characterRepo;
     private readonly ICharacterMasterRepository _characterMasterRepo;
@@ -20,9 +20,9 @@ public class GetCharacterSummaryUseCase
         ICharacterMasterRepository characterMasterRepo,
         IDailyStateRepository dailyStateRepo)
     {
-        _characterRepo = characterRepo;
-        _characterMasterRepo = characterMasterRepo;
-        _dailyStateRepo = dailyStateRepo;
+        _characterRepo = characterRepo ?? throw new ArgumentNullException(nameof(characterRepo));
+        _characterMasterRepo = characterMasterRepo ?? throw new ArgumentNullException(nameof(characterMasterRepo));
+        _dailyStateRepo = dailyStateRepo ?? throw new ArgumentNullException(nameof(dailyStateRepo));
     }
 
     public List<MainSceneCharacterSummaryInfo> GetCharacterSummaryList()

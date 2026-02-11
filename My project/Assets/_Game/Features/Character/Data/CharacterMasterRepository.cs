@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -19,31 +20,24 @@ public class CharacterMasterRepository : ICharacterMasterRepository
 
     public CharacterMasterData GetData(int characterId)
     {
-        if(_characterDictionary.TryGetValue(characterId, out var data))
-        {
+        if (_characterDictionary.TryGetValue(characterId, out var data))
             return data;
-        }
 
-        Debug.LogWarning($"{_logClass} 존재하지 않는 characterId 요청: {characterId}");
-        return null;
+        throw new InvalidOperationException($"{_logClass} 존재하지 않는 characterId: {characterId}");
     }
 
     public void LoadAll()
     {
         var assets = Resources.LoadAll<CharacterMasterData>(RESOURCE_PATH);
         if (assets == null || assets.Length == 0)
-        {
-            Debug.LogWarning($"{_logClass} '{RESOURCE_PATH}' 경로에서 아이템 데이터를 찾을 수 없습니다.");
-            return;
-        }
+            throw new InvalidOperationException($"{_logClass} '{RESOURCE_PATH}'에서 데이터를 찾을 수 없습니다.");
 
         foreach (var asset in assets)
         {
+            if (asset == null)
+                throw new InvalidOperationException($"{_logClass} null asset in LoadAll.");
             if (_characterDictionary.ContainsKey(asset.Id))
-            {
-                Debug.LogError($"{_logClass} 중복된 CharacterId 발견: {asset.Id} ({asset.Name})");
-                continue;
-            }
+                throw new InvalidOperationException($"{_logClass} 중복된 CharacterId: {asset.Id} ({asset.Name})");
 
             _characterDictionary.Add(asset.Id, asset);
         }

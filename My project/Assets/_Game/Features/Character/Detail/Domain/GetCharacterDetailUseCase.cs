@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 public class GetCharacterDetailUseCase
 {
-    private readonly string _logClass = $"{nameof(GetCharacterDetailUseCase)}";
+    private readonly string _logClass = $"[{nameof(GetCharacterDetailUseCase)}]";
 
     private readonly ICharacterRepository _characterRepo;
     private readonly ICharacterMasterRepository _masterRepo;

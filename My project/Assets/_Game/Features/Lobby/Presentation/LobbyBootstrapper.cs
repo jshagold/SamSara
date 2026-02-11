@@ -1,7 +1,10 @@
+using System;
 using UnityEngine;
 
 public class LobbyBootstrapper : MonoBehaviour
 {
+    private readonly string _logClass = $"[{nameof(LobbyBootstrapper)}]";
+
     [SerializeField] private NavigationButtonView _maintenanceButtonView;
     [SerializeField] private NavigationButtonView _stageButtonView;
     [SerializeField] private NavigationButtonView _characterInfoButtonView;
@@ -23,6 +26,8 @@ public class LobbyBootstrapper : MonoBehaviour
 
     private void OnDestroy()
     {
-        _lobbyBtnPresenter?.Dispose();
+        if (_lobbyBtnPresenter == null)
+            throw new InvalidOperationException($"{_logClass} OnDestroy without Initialize - _lobbyBtnPresenter is null.");
+        _lobbyBtnPresenter.Dispose();
     }
 }

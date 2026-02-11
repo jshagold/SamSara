@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 public class MainSceneCharacterSummaryPresenter : IDisposable
@@ -10,8 +10,8 @@ public class MainSceneCharacterSummaryPresenter : IDisposable
         MainSceneCharacterListView characterListView,
         GetCharacterSummaryUseCase charSummaryUseCase)
     {
-        _characterListView = characterListView;
-        _characterSummaryUseCase = charSummaryUseCase;
+        _characterListView = characterListView ?? throw new ArgumentNullException(nameof(characterListView));
+        _characterSummaryUseCase = charSummaryUseCase ?? throw new ArgumentNullException(nameof(charSummaryUseCase));
     }
 
     public void Initialize()
@@ -32,9 +32,6 @@ public class MainSceneCharacterSummaryPresenter : IDisposable
 
     public void Dispose()
     {
-        if (_characterSummaryUseCase != null)
-        {
-            _characterSummaryUseCase.OnCharacterUpdated -= RefreshList;
-        }
+        _characterSummaryUseCase.OnCharacterUpdated -= RefreshList;
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class BackgroundBootstrapper : MonoBehaviour
@@ -18,6 +19,8 @@ public class BackgroundBootstrapper : MonoBehaviour
 
     private void OnDestroy()
     {
-        _backgroundPresenter?.Dispose();
+        if (_backgroundPresenter == null)
+            throw new InvalidOperationException($"{_logClass} OnDestroy without Initialize - _backgroundPresenter is null.");
+        _backgroundPresenter.Dispose();
     }
 }

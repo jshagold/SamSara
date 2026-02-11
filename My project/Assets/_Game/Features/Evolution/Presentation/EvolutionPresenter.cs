@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EvolutionPresenter : IDisposable
 {
-    private readonly string _logClass = $"{nameof(EvolutionPresenter)}";
+    private readonly string _logClass = $"[{nameof(EvolutionPresenter)}]";
 
     // Views
     private readonly EvolutionView _evolutionView;
@@ -27,11 +27,11 @@ public class EvolutionPresenter : IDisposable
         GetEvolutionTreeUseCase getEvolutionTreeUseCase,
         ICharacterResourceProvider resourceProvider)
     {
-        _evolutionView = evolutionView;
-        _evolutionPopupView = evolutionPopupView;
-        _getCharacterDetailUseCase = getCharacterDetailUseCase;
-        _getTreeUseCase = getEvolutionTreeUseCase;
-        _resourceProvider = resourceProvider;
+        _evolutionView = evolutionView ?? throw new ArgumentNullException(nameof(evolutionView));
+        _evolutionPopupView = evolutionPopupView ?? throw new ArgumentNullException(nameof(evolutionPopupView));
+        _getCharacterDetailUseCase = getCharacterDetailUseCase ?? throw new ArgumentNullException(nameof(getCharacterDetailUseCase));
+        _getTreeUseCase = getEvolutionTreeUseCase ?? throw new ArgumentNullException(nameof(getEvolutionTreeUseCase));
+        _resourceProvider = resourceProvider ?? throw new ArgumentNullException(nameof(resourceProvider));
     }
 
     public void Initialize()
@@ -68,18 +68,18 @@ public class EvolutionPresenter : IDisposable
             _nodeDataCache[nodeInfo.Id] = nodeInfo;
 
             // 전체 맵의 최대 크기 갱신
-            if(Mathf.Abs(nodeInfo.Position.x) > maxAbsX) maxAbsX = Mathf.Abs(nodeInfo.Position.x);
-            if(Mathf.Abs(nodeInfo.Position.y) > maxAbsY) maxAbsY = Mathf.Abs(nodeInfo.Position.y);
+            if (Mathf.Abs(nodeInfo.PositionX) > maxAbsX) maxAbsX = Mathf.Abs(nodeInfo.PositionX);
+            if (Mathf.Abs(nodeInfo.PositionY) > maxAbsY) maxAbsY = Mathf.Abs(nodeInfo.PositionY);
 
-            if(!levelYBounds.ContainsKey(nodeInfo.EvolutionLevel))
+            if (!levelYBounds.ContainsKey(nodeInfo.EvolutionLevel))
             {
-                levelYBounds[nodeInfo.EvolutionLevel] = new Vector2(nodeInfo.Position.y, nodeInfo.Position.y);
+                levelYBounds[nodeInfo.EvolutionLevel] = new Vector2(nodeInfo.PositionY, nodeInfo.PositionY);
             }
             else
             {
                 var bounds = levelYBounds[nodeInfo.EvolutionLevel];
-                bounds.x = Mathf.Min(bounds.x, nodeInfo.Position.y);    // Min Y
-                bounds.y = Mathf.Max(bounds.y, nodeInfo.Position.y);    // Max Y
+                bounds.x = Mathf.Min(bounds.x, nodeInfo.PositionY);
+                bounds.y = Mathf.Max(bounds.y, nodeInfo.PositionY);
                 levelYBounds[nodeInfo.EvolutionLevel] = bounds;
             }
         }
@@ -118,8 +118,8 @@ public class EvolutionPresenter : IDisposable
                     var lineView = _evolutionView.CreateLine();
 
                     lineView.DrawLine(
-                        startPos: parentNode.Position,
-                        endPos: childNode.Position,
+                        startPos: new Vector2(parentNode.PositionX, parentNode.PositionY),
+                        endPos: new Vector2(childNode.PositionX, childNode.PositionY),
                         thickness: _evolutionView.LineThickness,
                         color: _evolutionView.LineColor);
                 }
@@ -132,7 +132,7 @@ public class EvolutionPresenter : IDisposable
             var nodeView = _evolutionView.CreateNode();
 
             // 위치 설정 (Domain의 좌표 -> View의 좌표)
-            nodeView.SetPosition(nodeInfo.Position);
+            nodeView.SetPosition(new Vector2(nodeInfo.PositionX, nodeInfo.PositionY));
 
             Sprite icon = _resourceProvider.GetPortrait(characterId: characterInfo.Id, evolutionNodeId: nodeInfo.Id);
 
@@ -146,7 +146,7 @@ public class EvolutionPresenter : IDisposable
 
     private void OnClickNode(int nodeId)
     {
-        Debug.Log($"[EvolutionPresenter] Node Clicked: {nodeId}");
+        Debug.Log($"{_logClass} Node Clicked: {nodeId}");
         if (_nodeDataCache.ContainsKey(nodeId))
         {
             EvolutionNodeInfo nodeInfo = _nodeDataCache[nodeId];
@@ -230,7 +230,7 @@ public class EvolutionPresenter : IDisposable
 
     private void OnClickBack()
     {
-        Debug.Log("[EvolutionPresenter] Back Button Clicked");
+        Debug.Log($"{_logClass} Back Button Clicked");
         UnityEngine.SceneManagement.SceneManager.LoadScene("CharacterInfoScene");
     }
 

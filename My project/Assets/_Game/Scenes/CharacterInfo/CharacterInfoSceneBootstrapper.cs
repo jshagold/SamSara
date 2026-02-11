@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 public class CharacterInfoSceneBootstrapper : MonoBehaviour
 {
-    private readonly string _logClass = $"{nameof(CharacterInfoSceneBootstrapper)}";
+    private readonly string _logClass = $"[{nameof(CharacterInfoSceneBootstrapper)}]";
 
     [Header("UI Bootstrappers")]
     [SerializeField] private CharacterDetailBootstrapper _characterDetailBootstrapper;
@@ -19,10 +19,7 @@ public class CharacterInfoSceneBootstrapper : MonoBehaviour
     private async void Start()
     {
         if (GlobalBootstrapper.Instance == null)
-        {
-            Debug.LogError("GlobalBootstrapper 선언되지 않음");
-            return;
-        }
+            throw new InvalidOperationException($"{_logClass} GlobalBootstrapper must exist in scene.");
 
         try
         {
@@ -43,15 +40,13 @@ public class CharacterInfoSceneBootstrapper : MonoBehaviour
 
     private void Initialize(GameContext gameContext)
     {
-        if (_characterDetailBootstrapper != null)
-        {
-            _characterDetailBootstrapper.Initialize(gameContext);
-        }
-        else
-        {
-            Debug.LogError($"{_logClass} CharacterDetailBootstrapper가 연결되지 않았습니다.");
-        }
+        if (_characterDetailBootstrapper == null)
+            throw new InvalidOperationException($"{_logClass} _characterDetailBootstrapper must be assigned in Inspector.");
+        _characterDetailBootstrapper.Initialize(gameContext);
 
+        if (_optionButton == null || _menuPopup == null || _settingsPopup == null)
+            throw new InvalidOperationException($"{_logClass} _optionButton, _menuPopup, _settingsPopup must be assigned in Inspector.");
+        
         _mainOptionPresenter = new OptionPresenter(
             optionButtonView: _optionButton,
             menuPopupView: _menuPopup,
@@ -62,7 +57,8 @@ public class CharacterInfoSceneBootstrapper : MonoBehaviour
 
     private void OnDestroy()
     {
-        _mainOptionPresenter?.Dispose();
-        _mainOptionPresenter = null;
+        if (_mainOptionPresenter == null)
+            throw new InvalidOperationException($"{_logClass} OnDestroy without Initialize - _mainOptionPresenter is null.");
+        _mainOptionPresenter.Dispose();
     }
 }

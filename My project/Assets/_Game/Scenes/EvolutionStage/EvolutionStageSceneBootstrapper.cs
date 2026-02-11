@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -69,7 +69,12 @@ public class EvolutionStageSceneBootstrapper : MonoBehaviour
 
     private void OnDestroy()
     {
-        _evolutionPresenter?.Dispose();
-        _optionPresenter?.Dispose();
+        if (_evolutionPresenter == null)
+            throw new InvalidOperationException($"{_logClass} OnDestroy without Initialize - _evolutionPresenter is null.");
+        _evolutionPresenter.Dispose();
+
+        if (_optionPresenter == null)
+            throw new InvalidOperationException($"{_logClass} OnDestroy without Initialize - _optionPresenter is null.");
+        _optionPresenter.Dispose();
     }
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class CreateNewCharacterUseCase
 {
-    private readonly string _logClass = $"{nameof(CreateNewCharacterUseCase)}";
+    private readonly string _logClass = $"[{nameof(CreateNewCharacterUseCase)}]";
 
     private readonly ICharacterRepository _characterRepo;
     private readonly ICharacterMasterRepository _characterMasterRepo;

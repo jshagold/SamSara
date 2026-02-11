@@ -1,16 +1,21 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "CharacterMasterData", menuName = "Samsara/Character Master Data")]
 public class CharacterMasterData : ScriptableObject
 {
     [Header("Identity")]
-    public int Id;
-    public string Name;
-    [TextArea] public string Desc;
+    [SerializeField] private int _id;
+    [SerializeField] private string _name;
+    [SerializeField] [TextArea] private string _desc;
 
     [Header("Evolution Graph")]
-    public List<EvolutionNodeData> EvolutionNodes;
-    public int RootNodeId;
+    [SerializeField] private List<EvolutionNodeData> _evolutionNodes;
+    [SerializeField] private int _rootNodeId;
+
+    public int Id => _id;
+    public string Name => _name;
+    public string Desc => _desc;
+    public List<EvolutionNodeData> EvolutionNodes => _evolutionNodes;
+    public int RootNodeId => _rootNodeId;
 }

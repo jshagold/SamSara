@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CharacterDetailPresenter : IDisposable
 {
-    private readonly string _logClass = $"{nameof(CharacterDetailPresenter)}";
+    private readonly string _logClass = $"[{nameof(CharacterDetailPresenter)}]";
 
     // Views
     private readonly CharacterDetailView _characterDetailView;
@@ -15,29 +15,25 @@ public class CharacterDetailPresenter : IDisposable
     // Resource Provider
     private readonly ICharacterResourceProvider _resourceProvider;
 
-    // Sub Presenters
-    private StatListPresenter _statListPresenter;
+    private readonly StatListPresenter _statListPresenter;
 
     public CharacterDetailPresenter(
         CharacterDetailView characterDetailView,
         GetCharacterDetailUseCase getCharacterDetailUseCase,
-        ICharacterResourceProvider resourceProvider) 
+        ICharacterResourceProvider resourceProvider,
+        StatListPresenter statListPresenter)
     {
-        _characterDetailView = characterDetailView;
-        _getCharacterDetailUC = getCharacterDetailUseCase;
-        _resourceProvider = resourceProvider;
+        _characterDetailView = characterDetailView ?? throw new ArgumentNullException(nameof(characterDetailView));
+        _getCharacterDetailUC = getCharacterDetailUseCase ?? throw new ArgumentNullException(nameof(getCharacterDetailUseCase));
+        _resourceProvider = resourceProvider ?? throw new ArgumentNullException(nameof(resourceProvider));
+        _statListPresenter = statListPresenter ?? throw new ArgumentNullException(nameof(statListPresenter));
     }
 
     public void Initialize()
     {
-        // 이벤트 binding
         _characterDetailView.OnClickBackButton(ToMainScene);
         _characterDetailView.OnClickEvoSceneButton(ToEvolutionScene);
 
-        // Sub Presenters
-        _statListPresenter = new StatListPresenter(statListView: _characterDetailView.StatListView);
-
-        // Logic Event
         _getCharacterDetailUC.OnCharacterUpdated += Refresh;
 
         Refresh();
@@ -75,9 +71,6 @@ public class CharacterDetailPresenter : IDisposable
 
     public void Dispose()
     {
-        if(_getCharacterDetailUC != null)
-        {
-            _getCharacterDetailUC.OnCharacterUpdated -= Refresh;
-        }
+        _getCharacterDetailUC.OnCharacterUpdated -= Refresh;
     }
 }
