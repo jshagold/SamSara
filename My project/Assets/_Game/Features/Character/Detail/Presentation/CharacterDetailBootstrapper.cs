@@ -58,21 +58,13 @@ public class CharacterDetailBootstrapper: MonoBehaviour
 
     private void OnDestroy()
     {
-        if (_characterDetailPresenter == null)
-            throw new System.InvalidOperationException($"{_logClass} OnDestroy called without Initialize - _characterDetailPresenter is null.");
-        _characterDetailPresenter.Dispose();
+        _characterDetailPresenter?.Dispose();
+        _skillListPresenter?.Dispose();
+        _inventoryPresenter?.Dispose();
+
         _characterDetailPresenter = null;
-
-        if (_skillListPresenter == null)
-            throw new System.InvalidOperationException($"{_logClass} OnDestroy called without Initialize - _skillListPresenter is null.");
-        _skillListPresenter.Dispose();
         _skillListPresenter = null;
-
-        if (_inventoryPresenter == null)
-            throw new System.InvalidOperationException($"{_logClass} OnDestroy called without Initialize - _inventoryPresenter is null.");
-        _inventoryPresenter.Dispose();
         _inventoryPresenter = null;
-
         _characterResourceProvider = null;
         _skillResourceProvider = null;
         _itemResourceProvider = null;

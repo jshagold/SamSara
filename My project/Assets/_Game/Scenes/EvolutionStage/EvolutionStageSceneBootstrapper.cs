@@ -69,12 +69,7 @@ public class EvolutionStageSceneBootstrapper : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (_evolutionPresenter == null)
-            throw new InvalidOperationException($"{_logClass} OnDestroy without Initialize - _evolutionPresenter is null.");
-        _evolutionPresenter.Dispose();
-
-        if (_optionPresenter == null)
-            throw new InvalidOperationException($"{_logClass} OnDestroy without Initialize - _optionPresenter is null.");
-        _optionPresenter.Dispose();
+        _evolutionPresenter?.Dispose();
+        _optionPresenter?.Dispose();
     }
 }

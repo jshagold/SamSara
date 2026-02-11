@@ -24,8 +24,6 @@ public class IntroBootstrapper : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (_introPresenter == null)
-            throw new InvalidOperationException($"{_logClass} OnDestroy without Initialize - _introPresenter is null.");
-        _introPresenter.Dispose();
+        _introPresenter?.Dispose();
     }
 }

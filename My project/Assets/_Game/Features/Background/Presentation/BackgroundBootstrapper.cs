@@ -19,8 +19,6 @@ public class BackgroundBootstrapper : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (_backgroundPresenter == null)
-            throw new InvalidOperationException($"{_logClass} OnDestroy without Initialize - _backgroundPresenter is null.");
-        _backgroundPresenter.Dispose();
+        _backgroundPresenter?.Dispose();
     }
 }

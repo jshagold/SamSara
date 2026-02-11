@@ -16,13 +16,9 @@ public class MainBackgroundView : MonoBehaviour
     {
         var data = _backgrounds?.Find(x => x.Type == type);
 
-        if (data != null && data.Sprite != null)
-        {
-            _backgroundImage.sprite = data.Sprite;
-        }
-        else
-        {
-            Debug.LogWarning($"{_logClass} Background not found: {type}");
-        }
+        if (data == null)
+            throw new System.InvalidOperationException($"{_logClass} Background not found: {type}");
+
+        _backgroundImage.sprite = data.Sprite;
     }
 }

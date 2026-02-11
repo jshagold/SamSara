@@ -42,19 +42,12 @@ public class HUDBootstrapper : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (_hudPresenter == null)
-            throw new System.InvalidOperationException($"{_logClass} OnDestroy without Initialize - _hudPresenter is null.");
-        _hudPresenter.Dispose();
+        _hudPresenter?.Dispose();
+        _mainOptionPresenter?.Dispose();
+        _characterSummaryPresenter?.Dispose();
+
         _hudPresenter = null;
-
-        if (_mainOptionPresenter == null)
-            throw new System.InvalidOperationException($"{_logClass} OnDestroy without Initialize - _mainOptionPresenter is null.");
-        _mainOptionPresenter.Dispose();
         _mainOptionPresenter = null;
-
-        if (_characterSummaryPresenter == null)
-            throw new System.InvalidOperationException($"{_logClass} OnDestroy without Initialize - _characterSummaryPresenter is null.");
-        _characterSummaryPresenter.Dispose();
         _characterSummaryPresenter = null;
 
         Debug.Log($"{_logClass} Destroyed, Presenters Disposed");

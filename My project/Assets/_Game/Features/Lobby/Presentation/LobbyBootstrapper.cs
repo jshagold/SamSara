@@ -26,8 +26,6 @@ public class LobbyBootstrapper : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (_lobbyBtnPresenter == null)
-            throw new InvalidOperationException($"{_logClass} OnDestroy without Initialize - _lobbyBtnPresenter is null.");
-        _lobbyBtnPresenter.Dispose();
+        _lobbyBtnPresenter?.Dispose();
     }
 }

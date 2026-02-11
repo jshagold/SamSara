@@ -57,8 +57,6 @@ public class CharacterInfoSceneBootstrapper : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (_mainOptionPresenter == null)
-            throw new InvalidOperationException($"{_logClass} OnDestroy without Initialize - _mainOptionPresenter is null.");
-        _mainOptionPresenter.Dispose();
+        _mainOptionPresenter?.Dispose();
     }
 }
