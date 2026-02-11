@@ -1,4 +1,4 @@
-﻿using TMPro;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -7,17 +7,16 @@ using System;
 
 public class NavigationButtonView : MonoBehaviour
 {
-    [SerializeField] private Button btn;
-    [SerializeField] private Image iconImg;
-    [SerializeField] private TextMeshProUGUI label;
+    [SerializeField] private Button _button;
+    [SerializeField] private Image _iconImage;
+    [SerializeField] private TextMeshProUGUI _label;
 
     public void SetOnClickAction(Action action)
     {
-        btn.onClick.RemoveAllListeners();
-        btn.onClick.AddListener(() => action.Invoke());
+        _button.onClick.RemoveAllListeners();
+        _button.onClick.AddListener(() => action.Invoke());
     }
 
-    // --- 화면 갱신용 함수들 ---
     public void Hide()
     {
         gameObject.SetActive(false);
@@ -31,7 +30,7 @@ public class NavigationButtonView : MonoBehaviour
     public void SetVisual(Sprite sprite, string text)
     {
         gameObject.SetActive(true);
-        iconImg.sprite = sprite;
-        label.text = text;
+        _iconImage.sprite = sprite;
+        _label.text = text;
     }
 }

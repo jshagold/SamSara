@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class HUDBootstrapper : MonoBehaviour
 {
+    private readonly string _logClass = $"[{nameof(HUDBootstrapper)}]";
+
     [SerializeField] private HUDView _hudView;
-    
+
     private HUDPresenter _hudPresenter;
     private OptionPresenter _mainOptionPresenter;
     private MainSceneCharacterSummaryPresenter _characterSummaryPresenter;
@@ -35,7 +37,7 @@ public class HUDBootstrapper : MonoBehaviour
         _characterSummaryPresenter.Initialize();
 
 
-        Debug.Log("HUD 및 옵션 조립 완료");
+        Debug.Log($"{_logClass} HUD 및 옵션 조립 완료");
     }
 
     private void OnDestroy()
@@ -44,6 +46,6 @@ public class HUDBootstrapper : MonoBehaviour
         _mainOptionPresenter?.Dispose();
         _characterSummaryPresenter?.Dispose();
 
-        Debug.Log("[HUD] Bootstrapper Destroyed, Presenters Disposed");
+        Debug.Log($"{_logClass} Destroyed, Presenters Disposed");
     }
 }

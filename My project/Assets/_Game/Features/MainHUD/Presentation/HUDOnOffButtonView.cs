@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -22,7 +22,7 @@ public class HUDOnOffButtonView : MonoBehaviour
 
     private void OnDestroy()
     {
-        if(_button != null) _button.onClick.RemoveAllListeners();
+        _button.onClick.RemoveAllListeners();
     }
 
     public void SetState(bool isHudOpen)

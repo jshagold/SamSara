@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -20,8 +20,8 @@ public class SettingsPopupView : MonoBehaviour
 
     private void OnDestroy()
     {
-        if(_closeButton != null) _closeButton.onClick.RemoveAllListeners();
-        if(_soundToggle != null) _soundToggle.onValueChanged.RemoveAllListeners();
+        _closeButton.onClick.RemoveAllListeners();
+        _soundToggle.onValueChanged.RemoveAllListeners();
     }
 
     // 현재 소리상태 반영해서 Popup열기

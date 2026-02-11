@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,16 +30,15 @@ public class OptionMenuPopupView : MonoBehaviour
             if(_dimmedBackground == null && objName.Contains("dimmed")) _dimmedBackground = button;
         }
 
-        if(_settingButton != null && _settingText == null) _settingText = _settingButton.GetComponentInChildren<TextMeshProUGUI>();
-        if (_accountButton != null && _accountButton == null) _accountText = _accountButton.GetComponentInChildren<TextMeshProUGUI>();        
-        
+        if (_settingButton != null && _settingText == null) _settingText = _settingButton.GetComponentInChildren<TextMeshProUGUI>();
+        if (_accountButton != null && _accountText == null) _accountText = _accountButton.GetComponentInChildren<TextMeshProUGUI>();
     }
 
     private void OnDestroy()
     {
-        // 1. 유니티 버튼 리스너 정리
-        if (_settingButton != null) _settingButton.onClick.RemoveAllListeners();
-        if (_dimmedBackground != null) _dimmedBackground.onClick.RemoveAllListeners();
+        _settingButton.onClick.RemoveAllListeners();
+        _accountButton.onClick.RemoveAllListeners();
+        _dimmedBackground.onClick.RemoveAllListeners();
     }
 
     public void ShowPopup() => gameObject.SetActive(true);
@@ -53,17 +52,13 @@ public class OptionMenuPopupView : MonoBehaviour
         _accountButton.onClick.RemoveAllListeners();
         _accountButton.onClick.AddListener(() => onAccountClicked.Invoke());
 
-        // 팝업 밖 영역 누르면 메뉴 닫기 기능 연결
-        if(_dimmedBackground != null)
-        {
-            _dimmedBackground.onClick.RemoveAllListeners();
-            _dimmedBackground.onClick.AddListener(() => onBackgroundClicked.Invoke());
-        }
+        _dimmedBackground.onClick.RemoveAllListeners();
+        _dimmedBackground.onClick.AddListener(() => onBackgroundClicked.Invoke());
     }
 
     public void UpdateTexts(string settingText, string accountText)
     {
-        if(_settingText != null) _settingText.text = settingText;
-        if(_accountText != null) _accountText.text = accountText;
+        _settingText.text = settingText;
+        _accountText.text = accountText;
     }
 }

@@ -4,17 +4,17 @@ using UnityEngine.UI;
 
 public class MainBackgroundView : MonoBehaviour
 {
+    private readonly string _logClass = $"[{nameof(MainBackgroundView)}]";
+
     [Header("Target Image")]
     [SerializeField] private Image _backgroundImage;
 
     [Header("Resources")]
     [SerializeField] private List<BackgroundData> _backgrounds;
 
-    // 외부(Presenter)에서 "야, 밤 배경으로 바꿔" 라고 호출하는 메서드
     public void SetBackground(BackgroundType type)
     {
-        // 리스트에서 해당 타입에 맞는 Sprite를 찾음
-        var data = _backgrounds.Find(x => x.Type == type);
+        var data = _backgrounds?.Find(x => x.Type == type);
 
         if (data != null && data.Sprite != null)
         {
@@ -22,7 +22,7 @@ public class MainBackgroundView : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"[BackgroundView] 해당 타입의 이미지가 없습니다: {type}");
+            Debug.LogWarning($"{_logClass} Background not found: {type}");
         }
     }
 }

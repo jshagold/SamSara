@@ -1,12 +1,12 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
 
 public class HUDPresenter : IDisposable
 {
-    private readonly HUDView _view;
+    private readonly string _logClass = $"[{nameof(HUDPresenter)}]";
 
-    // 로직
+    private readonly HUDView _view;
     private readonly GetMoneyUseCase _moneyUseCase;
     private readonly DailyStateUseCase _dailyStateUseCase;
 
@@ -41,7 +41,7 @@ public class HUDPresenter : IDisposable
         int date = _dailyStateUseCase.GetCurrentDay();
 
         _view.UpdateDate(date: date);
-        _view.UpdateCurreny(amount: money);
+        _view.UpdateCurrency(amount: money);
     }
     
     public async void ToggleHUD()
@@ -70,9 +70,7 @@ public class HUDPresenter : IDisposable
 
     private void HandleOptionClick()
     {
-        Debug.Log("[HUD] 옵션 버튼 클릭됨 -> 팝업을 띄우거나 씬 이동");
-        
-        // TODO 토글 테스트
+        Debug.Log($"{_logClass} 옵션 버튼 클릭 -> 토글");
         ToggleHUD();
     }
 
@@ -80,14 +78,7 @@ public class HUDPresenter : IDisposable
     // Boostrapper의 OnDestroy에서 호출됨
     public void Dispose()
     {
-        if(_moneyUseCase != null)
-        {
-            _moneyUseCase.OnInventoryChanged -= RefreshUI;
-        }
-        
-        if(_dailyStateUseCase != null)
-        {
-            _dailyStateUseCase.OnCharacterUpdated -= RefreshUI;
-        }
+        _moneyUseCase.OnInventoryChanged -= RefreshUI;
+        _dailyStateUseCase.OnCharacterUpdated -= RefreshUI;
     }
 }

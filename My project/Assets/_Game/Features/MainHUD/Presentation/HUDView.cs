@@ -1,12 +1,14 @@
-﻿using Cysharp.Threading.Tasks;
-using DG.Tweening;
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class HUDView : MonoBehaviour
 {
+    private readonly string _logClass = $"[{nameof(HUDView)}]";
+    
     [Header("Move Panel Components (움직이는 패널)")]
     [SerializeField] private RectTransform _abovePanelRect; // 위로 움직일 묶음
     [SerializeField] private CanvasGroup _abovePanelCanvasGroup;
@@ -22,9 +24,9 @@ public class HUDView : MonoBehaviour
     [SerializeField] private OptionButtonView _optionButton;
 
     [Header("Animation Settings")]
-    [SerializeField] private float animDuration = 0.5f; // 속도
+    [SerializeField] private float _animDuration = 0.5f;
     [Tooltip("1.0 = 패널 크기(가로, 세로)만큼 이동, 1.1 = 10% 여유 버퍼")]
-    [SerializeField][Range(1.0f, 1.5f)] private float hideOffsetRatio = 1.1f;
+    [SerializeField][Range(1.0f, 1.5f)] private float _hideOffsetRatio = 1.1f;
 
     [Header("Character List View")]
     [SerializeField] private MainSceneCharacterListView _characterListView;
@@ -44,27 +46,24 @@ public class HUDView : MonoBehaviour
 
     private void Awake()
     {
-        // 초기 위치와 숨겨질 위치 적용
+        if (_abovePanelRect == null)
+            throw new InvalidOperationException($"{_logClass} _abovePanelRect must be assigned in Inspector.");
+        if (_leftPanelRect == null)
+            throw new InvalidOperationException($"{_logClass} _leftPanelRect must be assigned in Inspector.");
 
-        if(_abovePanelRect != null)
-        {
-            float abovePanelHeight = _abovePanelRect.rect.height;
-            _abovePanelVisiblePos = _abovePanelRect.anchoredPosition;
-            _abovePanelHiddenPos = new Vector2(
-                _abovePanelVisiblePos.x, 
-                _abovePanelVisiblePos.y + (abovePanelHeight * hideOffsetRatio)
-            );
-        }
+        float abovePanelHeight = _abovePanelRect.rect.height;
+        _abovePanelVisiblePos = _abovePanelRect.anchoredPosition;
+        _abovePanelHiddenPos = new Vector2(
+            _abovePanelVisiblePos.x,
+            _abovePanelVisiblePos.y + (abovePanelHeight * _hideOffsetRatio)
+        );
 
-        if(_leftPanelRect != null)
-        {
-            float leftPanelWidth = _leftPanelRect.rect.width;
-            _leftPanelVisiblePos = _leftPanelRect.anchoredPosition;
-            _leftPanelHiddenPos = new Vector2(
-                _leftPanelVisiblePos.x - (leftPanelWidth * hideOffsetRatio),
-                _leftPanelVisiblePos.y
-            );
-        }
+        float leftPanelWidth = _leftPanelRect.rect.width;
+        _leftPanelVisiblePos = _leftPanelRect.anchoredPosition;
+        _leftPanelHiddenPos = new Vector2(
+            _leftPanelVisiblePos.x - (leftPanelWidth * _hideOffsetRatio),
+            _leftPanelVisiblePos.y
+        );
     }
 
     private void Reset()
@@ -75,21 +74,21 @@ public class HUDView : MonoBehaviour
         if (_optionButton == null) _optionButton = GetComponentInChildren<OptionButtonView>();
         if (_characterListView == null) _characterListView = GetComponentInChildren<MainSceneCharacterListView>();
 
-        Debug.Log($"[TopHUDView] 에디터 자동 연결 완료 (Panel 연결 확인해야함): {name}");
+        Debug.Log($"{_logClass} Reset 완료 (Panel 연결 확인): {name}");
     }
 
     public void SetOnClickHUDOnOffBtnAction(Action action)
     {
-        if(_hudOnOffButton != null) _hudOnOffButton.SetOnClicked(action);
+        _hudOnOffButton.SetOnClicked(action);
     }
 
     public void SetOnClickOptionBtnAction(Action action)
     {
-        if(_optionButton != null) _optionButton.SetOnClickAction(action);
+        _optionButton.SetOnClickAction(action);
     }
 
     // --- 데이터 갱신 ---
-    public void UpdateCurreny(int amount) =>_currencyView.SetMoneyText(amount);
+    public void UpdateCurrency(int amount) => _currencyView.SetMoneyText(amount);
     public void UpdateDate(int date) => _dateDisplay.SetDateText(date);
 
     // --- 애니메이션 코드 (HUD 효과) ---
@@ -106,7 +105,7 @@ public class HUDView : MonoBehaviour
         {
             if (_abovePanelCanvasGroup) _abovePanelCanvasGroup.interactable = false;
 
-            taskAbove = _abovePanelRect.DOAnchorPos(_abovePanelHiddenPos, animDuration)
+            taskAbove = _abovePanelRect.DOAnchorPos(_abovePanelHiddenPos, _animDuration)
                 .SetEase(Ease.InBack)
                 .ToUniTask(cancellationToken: token);
         }
@@ -115,7 +114,7 @@ public class HUDView : MonoBehaviour
         {
             if (_leftPanelCanvasGroup) _leftPanelCanvasGroup.interactable = false;
 
-            taskLeft = _leftPanelRect.DOAnchorPos(_leftPanelHiddenPos, animDuration)
+            taskLeft = _leftPanelRect.DOAnchorPos(_leftPanelHiddenPos, _animDuration)
                 .SetEase(Ease.InBack)
                 .ToUniTask(cancellationToken: token);
         }
@@ -137,7 +136,7 @@ public class HUDView : MonoBehaviour
         if (_abovePanelRect != null)
         {
             _abovePanelRect.gameObject.SetActive(true);
-            taskAbove = _abovePanelRect.DOAnchorPos(_abovePanelVisiblePos, animDuration)
+            taskAbove = _abovePanelRect.DOAnchorPos(_abovePanelVisiblePos, _animDuration)
                 .SetEase(Ease.OutBack)
                 .ToUniTask(cancellationToken: token);
         }
@@ -145,7 +144,7 @@ public class HUDView : MonoBehaviour
         if (_leftPanelRect != null)
         {
             _leftPanelRect.gameObject.SetActive(true);
-            taskLeft = _leftPanelRect.DOAnchorPos(_leftPanelVisiblePos, animDuration)
+            taskLeft = _leftPanelRect.DOAnchorPos(_leftPanelVisiblePos, _animDuration)
                 .SetEase(Ease.OutBack)
                 .ToUniTask(cancellationToken: token);
         }

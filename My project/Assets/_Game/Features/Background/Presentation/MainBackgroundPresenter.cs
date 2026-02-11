@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 public class MainBackgroundPresenter : IDisposable
 {
+    private readonly string _logClass = $"[{nameof(MainBackgroundPresenter)}]";
     private readonly MainBackgroundView _view;
 
     public MainBackgroundPresenter(MainBackgroundView view)
@@ -12,13 +13,12 @@ public class MainBackgroundPresenter : IDisposable
 
     public void Initialize()
     {
-        // 초기 상태는 '낮'으로 설정
         ChangeToDay();
     }
 
     public void ChangeToDay()
     {
-        Debug.Log("배경 변경: 낮");
+        Debug.Log($"{_logClass} 배경: 낮");
         _view.SetBackground(BackgroundType.Day);
     }
 

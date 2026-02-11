@@ -1,7 +1,6 @@
-﻿using NUnit.Framework;
-using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 [CreateAssetMenu(fileName = "LobbyButtonThemeConfig", menuName = "Configs/LobbyButtonTheme")]
 public class LobbyButtonThemeConfig : ScriptableObject
@@ -15,10 +14,10 @@ public class LobbyButtonThemeConfig : ScriptableObject
         public string localizationKey;
     }
 
-    [SerializeField] private List<LobbyButtonThemeData> themes;
+    [SerializeField] private List<LobbyButtonThemeData> _themes;
 
     public LobbyButtonThemeData GetData(LobbyButtonType type)
     {
-        return themes.FirstOrDefault(t => t.type == type);
+        return _themes?.FirstOrDefault(t => t.type == type);
     }
 }
