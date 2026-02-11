@@ -1,25 +1,25 @@
-﻿using Cysharp.Threading.Tasks;
+using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Pool;
 
 public class PopupManager : MonoBehaviour
 {
-    public static PopupManager Instance {  get; private set; }
+    private readonly string _logClass = $"[{nameof(PopupManager)}]";
 
     [Header("Settings")]
-    [SerializeField] private CommonPopupView _popupPrefab;  // 프리팹 원본
-    [SerializeField] private Transform _canvasRoot;  // 팝업이 생성될 부모
-
+    [SerializeField] private CommonPopupView _popupPrefab;
+    [SerializeField] private Transform _canvasRoot;
 
     private IObjectPool<CommonPopupView> _pool;
 
     private void Awake()
     {
-        if(Instance != null) { Destroy(gameObject); return; }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
+        if (_popupPrefab == null)
+            throw new InvalidOperationException($"{_logClass} _popupPrefab must be assigned in Inspector.");
+        if (_canvasRoot == null)
+            throw new InvalidOperationException($"{_logClass} _canvasRoot must be assigned in Inspector.");
 
-        // 풀 초기화 (규칙 설정)
         _pool = new ObjectPool<CommonPopupView>(
             createFunc: CreatePopup,            // 없으면 어떻게 만들래?
             actionOnGet: OnGetPopup,            // 빌려줄 때 뭐 해줄까?

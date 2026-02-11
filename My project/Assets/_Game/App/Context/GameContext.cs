@@ -1,7 +1,11 @@
-﻿using Cysharp.Threading.Tasks;
+using System;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 public class GameContext
 {
+    private readonly string _logClass = $"[{nameof(GameContext)}]";
+
     // [Repositories]
     public IInventoryRepository InventoryRepo { get; }
     public ICharacterRepository CharacterRepo { get; }
@@ -11,7 +15,7 @@ public class GameContext
     public GetMoneyUseCase GetMoneyUseCase { get; }
     public DailyStateUseCase DailyStateUseCase { get; }
     public GetCharacterSummaryUseCase GetCharacterSummaryUseCase { get; }
-    public GetCharacterDetailUseCase GetCharacterDetailUseCase {  get; }
+    public GetCharacterDetailUseCase GetCharacterDetailUseCase { get; }
     public GetSkillListUseCase GetSkillListUseCase { get; }
     public GetInventoryUseCase GetInventoryUseCase { get; }
     public GetEvolutionTreeUseCase GetEvolutionTreeUseCase { get; }
@@ -19,13 +23,18 @@ public class GameContext
     // [MasterDataManager]
     public MasterDataManager MasterDataManager { get; }
 
+    // [App Systems] (Constitution §6: access via GameContext, not Singleton)
+    public PopupManager PopupManager { get; }
+
     public GameContext(
-        IInventoryRepository inventoryRepo, 
+        IInventoryRepository inventoryRepo,
         ICharacterRepository characterRepo,
         IDailyStateRepository dailyStateRepo,
-        MasterDataManager masterDataManager)
+        MasterDataManager masterDataManager,
+        PopupManager popupManager)
     {
-        MasterDataManager = masterDataManager;
+        MasterDataManager = masterDataManager ?? throw new ArgumentNullException(nameof(masterDataManager));
+        PopupManager = popupManager ?? throw new ArgumentNullException(nameof(popupManager));
 
         InventoryRepo = inventoryRepo;
         CharacterRepo = characterRepo;
@@ -57,10 +66,18 @@ public class GameContext
 
     public async UniTask LoadAllDataAsync()
     {
-        var taskInventory = InventoryRepo.LoadDataAsync();
-        var taskCharacter = CharacterRepo.LoadDataAsync();
-        var taskDailyState = DailyStateRepo.LoadDataAsync();
+        try
+        {
+            var taskInventory = InventoryRepo.LoadDataAsync();
+            var taskCharacter = CharacterRepo.LoadDataAsync();
+            var taskDailyState = DailyStateRepo.LoadDataAsync();
 
-        await UniTask.WhenAll(taskInventory, taskCharacter, taskDailyState);
+            await UniTask.WhenAll(taskInventory, taskCharacter, taskDailyState);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"{_logClass} LoadAllDataAsync failed: {e}");
+            throw;
+        }
     }
 }

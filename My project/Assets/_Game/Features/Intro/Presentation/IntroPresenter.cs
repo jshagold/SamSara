@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine.SceneManagement;
 
@@ -6,12 +6,14 @@ public class IntroPresenter : IDisposable
 {
     private readonly string _logClass = $"[{nameof(IntroPresenter)}]";
 
-    private IntroView _introView;
+    private readonly IntroView _introView;
+    private readonly PopupManager _popupManager;
     private string _nextSceneName;
 
-    public IntroPresenter(IntroView introView)
+    public IntroPresenter(IntroView introView, PopupManager popupManager)
     {
         _introView = introView;
+        _popupManager = popupManager;
     }
 
     public async void Initialize()
@@ -36,7 +38,7 @@ public class IntroPresenter : IDisposable
             {
                 UnityEngine.Debug.Log($"{_logClass} 데이터 로딩 실패 : {e.Message}");
 
-                bool isRetry = await PopupManager.Instance.ShowCommonPopup(
+                bool isRetry = await _popupManager.ShowCommonPopup(
                     title: LocalizationUtils.GetString("common_error_title"),
                     desc: LocalizationUtils.GetString("common_error_network_case1"),
                     firstText: LocalizationUtils.GetString("common_error_retry"),

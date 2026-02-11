@@ -12,7 +12,7 @@ You are **NOT** checking documentation consistency. You are checking **Code Qual
 
 ## 1. The Supreme Law (Mandatory Reference)
 Before reviewing, you MUST strictly reference the rules defined in:
-@.specify/constitution.md
+@.specify/memory/constitution.md
 
 ## 2. Audit Checklist (Strict Enforcement)
 Review the code against these specific Samsara standards:

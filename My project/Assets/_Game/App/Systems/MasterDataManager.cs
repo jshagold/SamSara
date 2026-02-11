@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 public class MasterDataManager
@@ -7,17 +7,29 @@ public class MasterDataManager
 
     private bool _isInitialized = false;    // 초기화 여부
 
-    // Repository
-    public IItemMasterRepository ItemRepo { get; private set; }
-    public IQtePatternMasterRepository QtePatternRepo { get; private set; }
-    public ISkillMasterRepository SkillRepo { get; private set; }
-    public ICharacterMasterRepository CharacterRepo { get; private set; }
+    // Repositories (injected by Bootstrapper; Constitution §2 – only Bootstrapper uses new)
+    public IItemMasterRepository ItemRepo { get; }
+    public IQtePatternMasterRepository QtePatternRepo { get; }
+    public ISkillMasterRepository SkillRepo { get; }
+    public ICharacterMasterRepository CharacterRepo { get; }
+
+    public MasterDataManager(
+        IItemMasterRepository itemRepo,
+        IQtePatternMasterRepository qtePatternRepo,
+        ISkillMasterRepository skillRepo,
+        ICharacterMasterRepository characterRepo)
+    {
+        ItemRepo = itemRepo ?? throw new ArgumentNullException(nameof(itemRepo));
+        QtePatternRepo = qtePatternRepo ?? throw new ArgumentNullException(nameof(qtePatternRepo));
+        SkillRepo = skillRepo ?? throw new ArgumentNullException(nameof(skillRepo));
+        CharacterRepo = characterRepo ?? throw new ArgumentNullException(nameof(characterRepo));
+    }
 
     public void Initialize()
     {
-        if(_isInitialized)
+        if (_isInitialized)
         {
-            Debug.LogWarning($"{_logClass} alreadey initialized");
+            Debug.LogWarning($"{_logClass} already initialized");
             return;
         }
 
@@ -25,8 +37,6 @@ public class MasterDataManager
 
         try
         {
-            CreateRepositories();
-
             LoadAllData();
 
             _isInitialized = true;
@@ -37,14 +47,6 @@ public class MasterDataManager
             Debug.LogError($"{_logClass} [CRITICAL] 로드 실패. 게임을 진행할 수 없습니다. Error: {e.Message}");
             throw;
         }
-    }
-
-    private void CreateRepositories()
-    {
-        ItemRepo = new ItemMasterRepository();
-        QtePatternRepo = new QtePatternMasterRepository();
-        SkillRepo = new SkillMasterRepository();
-        CharacterRepo = new CharacterMasterRepository();
     }
 
     private void LoadAllData()

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class IntroBootstrapper : MonoBehaviour
 {
@@ -15,7 +15,9 @@ public class IntroBootstrapper : MonoBehaviour
         }
         var gameContext = GlobalBootstrapper.Instance.GameContext;
 
-        _introPresenter = new IntroPresenter(introView: _introView);
+        _introPresenter = new IntroPresenter(
+            introView: _introView,
+            popupManager: gameContext.PopupManager);
 
         _introPresenter.Initialize();
     }

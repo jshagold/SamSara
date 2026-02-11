@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
 
@@ -54,7 +54,8 @@ public class AutoSaveManager : MonoBehaviour
             // 병렬 저장 (하나라도 터지면 즉시 예외 전파)
             await UniTask.WhenAll(
                 _gameContext.DailyStateRepo.SaveDataAsync(),
-                _gameContext.InventoryRepo.SaveDataAsync()
+                _gameContext.InventoryRepo.SaveDataAsync(),
+                _gameContext.CharacterRepo.SaveDataAsync()
             );
             
             // 저장 성공시 플래그 초기화
@@ -84,14 +85,14 @@ public class AutoSaveManager : MonoBehaviour
             {
                 if (_isDirty)
                 {
-                    Debug.Log(">>> [AutoSaveLoop] 주기적 저장 시도...");
+                    Debug.Log($"{_logClass} 주기적 저장 시도...");
                     await SaveAllAsync();
                 }
             }
             catch (Exception e)
             {
                 // 여기선 throw 하지 않고 로그만 남김 (게임은 계속되어야 하니까)
-                Debug.LogError($"[AutoSaveLoop] 이번 주기 저장 실패 (3분 뒤 재시도): {e.Message}");
+                Debug.LogError($"{_logClass} 이번 주기 저장 실패 (다음 주기 재시도): {e.Message}");
             }
         }
     }
@@ -140,13 +141,14 @@ public class AutoSaveManager : MonoBehaviour
             // 여기서는 async/await를 쓰지 않고 즉시 파일에 씁니다.
             _gameContext.DailyStateRepo.SaveDataSync();
             _gameContext.InventoryRepo.SaveDataSync();
+            _gameContext.CharacterRepo.SaveDataSync();
 
             _isDirty = false;
-            Debug.Log(">>> [Emergency Save] 긴급 저장 완료");
+            Debug.Log($"{_logClass} 긴급 저장 완료");
         }
         catch (Exception e)
         {
-            Debug.LogError($"⛔ [Emergency Save] 긴급 저장 실패! (데이터 유실 가능성): {e.Message}");
+            Debug.LogError($"{_logClass} 긴급 저장 실패 (데이터 유실 가능성): {e.Message}");
         }
     }
 }
