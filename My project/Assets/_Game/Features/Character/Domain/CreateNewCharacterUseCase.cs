@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 public class CreateNewCharacterUseCase
@@ -18,6 +18,9 @@ public class CreateNewCharacterUseCase
         _characterMasterRepo = characterMasterRepo;
         _newGameConfig = newGameConfig;
     }
+
+    /// <summary>True when no character save exists and new game data should be created.</summary>
+    public bool IsNewGameRequired() => !_characterRepo.HasSaveData();
 
     public void Execute()
     {

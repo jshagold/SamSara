@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 public class CreateNewDailyStateUseCase
 {
@@ -12,6 +12,9 @@ public class CreateNewDailyStateUseCase
         _newGameConfig = newGameConfig;
         _dailyStateRepo = dailyStateRepo;
     }
+
+    /// <summary>True when no daily state save exists and new game data should be created.</summary>
+    public bool IsNewGameRequired() => !_dailyStateRepo.HasSaveData();
 
     public void Execute()
     {

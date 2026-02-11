@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class CreateNewInventoryUseCase
 {
@@ -14,6 +14,9 @@ public class CreateNewInventoryUseCase
         _inventoryRepo = inventoryRepo;
         _newGameConfig = newGameConfig;
     }
+
+    /// <summary>True when no inventory save exists and new game data should be created.</summary>
+    public bool IsNewGameRequired() => !_inventoryRepo.HasSaveData();
 
     public void Execute()
     {

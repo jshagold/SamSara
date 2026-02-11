@@ -89,9 +89,21 @@ public class GlobalBootstrapper : MonoBehaviour
             await LocalizationSettings.InitializationOperation;
             await LocalizationSettings.StringDatabase.GetTableAsync(LocalizationUtils.TextTableName);
 
-            var initUserDataUC = new InitializeUserDataUseCase(
-                gameContext: GameContext,
+            // Only Bootstrapper instantiates UseCases (Constitution §2)
+            var createNewCharacter = new CreateNewCharacterUseCase(
+                characterRepo: GameContext.CharacterRepo,
+                characterMasterRepo: GameContext.MasterDataManager.CharacterRepo,
                 newGameConfig: _newGameConfig);
+            var createNewInventory = new CreateNewInventoryUseCase(
+                inventoryRepo: GameContext.InventoryRepo,
+                newGameConfig: _newGameConfig);
+            var createNewDailyState = new CreateNewDailyStateUseCase(
+                newGameConfig: _newGameConfig,
+                dailyStateRepo: GameContext.DailyStateRepo);
+            var initUserDataUC = new InitializeUserDataUseCase(
+                createNewCharacter: createNewCharacter,
+                createNewInventory: createNewInventory,
+                createNewDailyState: createNewDailyState);
             initUserDataUC.Execute();
 
             await GameContext.LoadAllDataAsync();

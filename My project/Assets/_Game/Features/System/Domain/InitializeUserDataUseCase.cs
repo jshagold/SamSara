@@ -1,51 +1,41 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class InitializeUserDataUseCase
 {
     private readonly string _logClass = $"[{nameof(InitializeUserDataUseCase)}]";
 
-    private readonly GameContext _gameContext;
-    private readonly NewGameConfig _newGameConfig;
+    private readonly CreateNewCharacterUseCase _createNewCharacter;
+    private readonly CreateNewInventoryUseCase _createNewInventory;
+    private readonly CreateNewDailyStateUseCase _createNewDailyState;
 
     public InitializeUserDataUseCase(
-        GameContext gameContext,
-        NewGameConfig newGameConfig)
+        CreateNewCharacterUseCase createNewCharacter,
+        CreateNewInventoryUseCase createNewInventory,
+        CreateNewDailyStateUseCase createNewDailyState)
     {
-        _gameContext = gameContext;
-        _newGameConfig = newGameConfig;
+        _createNewCharacter = createNewCharacter ?? throw new System.ArgumentNullException(nameof(createNewCharacter));
+        _createNewInventory = createNewInventory ?? throw new System.ArgumentNullException(nameof(createNewInventory));
+        _createNewDailyState = createNewDailyState ?? throw new System.ArgumentNullException(nameof(createNewDailyState));
     }
 
     public void Execute()
     {
-        if (!_gameContext.CharacterRepo.HasSaveData())
+        if (_createNewCharacter.IsNewGameRequired())
         {
             Debug.Log($"{_logClass} 캐릭터 세이브 데이터 없음 -> 신규 데이터 생성");
-
-            new CreateNewCharacterUseCase(
-                characterRepo: _gameContext.CharacterRepo,
-                characterMasterRepo: _gameContext.MasterDataManager.CharacterRepo,
-                newGameConfig: _newGameConfig
-            ).Execute();
+            _createNewCharacter.Execute();
         }
 
-        if(!_gameContext.InventoryRepo.HasSaveData())
+        if (_createNewInventory.IsNewGameRequired())
         {
             Debug.Log($"{_logClass} 인벤토리 세이브 데이터 없음 -> 신규 데이터 생성");
-
-            new CreateNewInventoryUseCase(
-                inventoryRepo: _gameContext.InventoryRepo,
-                newGameConfig: _newGameConfig
-            ).Execute();
+            _createNewInventory.Execute();
         }
 
-        if (!_gameContext.DailyStateRepo.HasSaveData())
+        if (_createNewDailyState.IsNewGameRequired())
         {
             Debug.Log($"{_logClass} Daily 세이브 데이터 없음 -> 신규 데이터 생성");
-
-            new CreateNewDailyStateUseCase(
-                newGameConfig: _newGameConfig,
-                dailyStateRepo: _gameContext.DailyStateRepo
-            ).Execute();
+            _createNewDailyState.Execute();
         }
     }
 }
