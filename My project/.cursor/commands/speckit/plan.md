@@ -25,10 +25,11 @@ This command generates technical implementation plans based on an existing featu
 1. **Context Loading**: 
    - Identify the target `specify.md`. Target directory is the folder containing it.
 
-2. **Phase 0: Complexity Analysis & File Structure Decision**:
-   - Analyze the `specify.md` to determine the architectural scope.
-   - **If SIMPLE** (e.g., singular utility, localized feature): Consolidate all design into a single `plan.md`.
-   - **If COMPLEX**: Split the design into multiple contextual files alongside `plan.md`. Dynamically name these files based on what the architecture actually requires (e.g., `state-machine.md`, `save-schema.md`, `network-sync.md`).
+2. **Phase 0: Structure Proposal (Consultation)**:
+   - Analyze the `specify.md`.
+   - **Default Action**: Attempt to fit all design components (Data, Interfaces, Logic) into a single `plan.md`.
+   - **Zero-Guessing Rule**: If the feature seems too large for a single file, you **MUST ASK** the developer before creating extra files: *"This feature has significant architectural scope. Should I keep everything in one `plan.md` or split it into contextual files (e.g., `data-model.md`)?"*
+   - Do NOT generate multiple files without explicit confirmation if the structure is ambiguous.
 
 3. **Phase 1: Architecture & Planning**:
    Execute the planning workflow and generate the decided files. Ensure the following architectural components are covered across the generated files:
