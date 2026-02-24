@@ -57,7 +57,7 @@ Interceptor (FR-01: LogType.Error/Exception only + Ring Buffer) → Classify WAR
 | **Stability flag state** | Single boolean (or read-only property): save allowed vs blocked. Set to blocked on CRITICAL (or NETWORK escalation); never reset until process exit (FR-07). | — |
 | **NetworkRetryCommand** | Cached command/action for retry (FR-06). | `Func<UniTask>` or command object; captures exact failed operation |
 
-**Placement**: `Assets/_Game/Core/ErrorHandling/` for types (ErrorSeverity, ErrorReport, StateSnapshot, LogRingBufferEntry, NetworkRetryCommand); StabilityFlag **implementation** in `Assets/_Game/App/Systems/ErrorHandling/`.
+**Placement**: `Assets/_Game/Core/ErrorHandling/` for types (ErrorSeverity, ErrorReport, StateSnapshot, LogRingBufferEntry, NetworkRetryCommand) and interfaces (IStabilityFlag, IErrorReportSink, **IPopupService**, **ITitleNavigationService**); StabilityFlag **implementation** in `Assets/_Game/App/Systems/ErrorHandling/`; **TitleNavigationService** (implements ITitleNavigationService) in `Assets/_Game/App/Systems/ErrorHandling/`.
 
 ---
 
@@ -67,13 +67,15 @@ Interceptor (FR-01: LogType.Error/Exception only + Ring Buffer) → Classify WAR
 |----------|---------|-----------|
 | **IStabilityFlag** | Save-block contract (FR-07). Consumed by **AutoSaveManager** before any save. | `bool IsSaveAllowed { get; }` |
 | **IErrorReportSink** | Error report transmission/buffer (FR-08). Interceptor calls; Transmission implements. | `void Report(ErrorReport report)` |
-| **PopupManager** | Existing popup system for error modal (UR-06). Verified: `ShowCommonPopup(string title, string desc, string firstText, string secondText)` returns `UniTask<bool>`. | Use existing method; `firstText` = "Reconnect" or empty; `secondText` = "To Title"; return value indicates user choice. |
+| **IPopupService** | Popup UI contract for error recovery (UR-06). **Domain must not depend on concrete PopupManager.** | `UniTask<bool> ShowCommonPopup(string title, string desc, string firstText, string secondText)` — return = user chose first button (e.g. Reconnect). Implemented by **PopupManager** (existing). |
+| **ITitleNavigationService** | Title-screen navigation contract. **Domain must not call SceneManager directly.** | `void NavigateToTitle()` — loads title scene. Implemented in App (e.g. `TitleNavigationService` calling `SceneManager.LoadScene("IntroScene")`). |
+| **PopupManager** | Existing MonoBehaviour; implements **IPopupService** for error modal. | Same signature as IPopupService; Bootstrapper passes as IPopupService to ErrorRecoveryFlow. |
 
 **Events**:  
 - Optional: `Action<ErrorReport> OnErrorReported` if single handler pattern preferred over `IErrorReportSink`.  
-- Recovery flow events: Internal to ErrorRecoveryFlow; no global events needed if PopupManager await pattern is used.
+- Recovery flow events: Internal to ErrorRecoveryFlow; no global events needed if IPopupService await pattern is used.
 
-All dependencies injected via constructor; Bootstrapper wires.
+All dependencies injected via constructor (or `Initialize(...)` for MonoBehaviour consumers); Bootstrapper wires.
 
 ---
 
@@ -81,7 +83,7 @@ All dependencies injected via constructor; Bootstrapper wires.
 
 **Handlers (Unity/C#)**  
 
-- **GlobalErrorInterceptor** (MonoBehaviour or static hook):
+- **GlobalErrorInterceptor** (MonoBehaviour; App/Systems lifecycle hook only — no UI logic; M1):
   - Register `Application.logMessageReceived` (filter: `LogType.Error` and `LogType.Exception` only for error handling flows).
   - Register `AppDomain.UnhandledException`.
   - Maintain lightweight, non-allocating Ring Buffer for `LogType.Log` and `LogType.Warning` (context only; never triggers state changes).
@@ -101,9 +103,9 @@ All dependencies injected via constructor; Bootstrapper wires.
 
 - **ErrorSnapshotCapture** (Pure C#):
   - Builds `StateSnapshot`:
-    - Execution context: `Scene.name`, `Time.frameCount`, `SystemInfo.deviceModel`, `SystemInfo.operatingSystem`, optional memory.
+    - Execution context: `Scene.name`, `Time.frameCount`, `SystemInfo.deviceModel`, `SystemInfo.operatingSystem`, optional memory. *Permitted:* UnityEngine (Scene, Time, SystemInfo) as read-only diagnostic APIs only; no state mutation, no UI (M4).
     - Data summary: Call `GameContext.GetDataSummaryJson()` (FR-04 clarification).
-    - Ring Buffer payload: Copy current Ring Buffer entries (read-only snapshot).
+    - Ring Buffer payload: Copy current Ring Buffer entries via `LogRingBuffer.GetSnapshot()` (returns `LogRingBufferEntry[]`) into `StateSnapshot.RingBufferPayload` (M2).
   - Must not cause frame drops; use async/ThreadPool if JSON serialization is heavy.
 
 - **StabilityFlag** (Pure C#):
@@ -112,12 +114,13 @@ All dependencies injected via constructor; Bootstrapper wires.
   - Never set back to `true` in the same process (FR-07).
 
 - **ErrorRecoveryFlow** (Pure C#):
+  - **Dependencies (constructor only; no GameContext, no UnityEngine)**: `IStabilityFlag`, `IErrorReportSink`, `IPopupService`, `ITitleNavigationService`.
   - **One-shot guard** for CRITICAL (FR-05): static/session flag `_criticalHandled`; skip handler if already true.
-  - **Network retry counter**: Track consecutive retries; at 4th failure, escalate to CRITICAL (FR-09).
+  - **Network retry counter** (L2): Start at 0 on first NETWORK failure; increment after each failed retry; escalate to CRITICAL when counter reaches 3 (i.e. 3 retries attempted = 4th total failure) (FR-09).
   - **Command caching** (FR-06): When NETWORK error occurs, capture failed operation as `NetworkRetryCommand` (e.g., `Func<UniTask>`). On Retry click, re-invoke only this cached command (1:1 retry, isolated).
   - Decides which UI to show: Reconnect+Title (network, count < 4) vs Title only (escalated/critical).
-  - Integrates with PopupManager: Call `ShowCommonPopup` with appropriate button labels; await result; update counter or trigger escalation.
-  - **Return to Title**: On "To Title" action, call `SceneManager.LoadScene("IntroScene")` to return to title screen.
+  - Integrates with **IPopupService**: Call `ShowCommonPopup` with appropriate button labels; await result; update counter or trigger escalation.
+  - **Return to Title**: On "To Title" action, call **ITitleNavigationService.NavigateToTitle()** (implementation in App calls `SceneManager.LoadScene("IntroScene")`).
 
 - **ErrorReportTransmission** (Pure C#):
   - Implements `IErrorReportSink`.
@@ -130,25 +133,27 @@ All dependencies injected via constructor; Bootstrapper wires.
   - Fixed-size array (e.g., 100 entries) with index wrapping.
   - On `LogType.Log` or `LogType.Warning`: Append entry (overwrite oldest if full).
   - Non-allocating: Reuse entry objects or use structs.
-  - Expose `LogRingBufferEntry[] GetSnapshot()` for StateSnapshot (read-only copy).
+  - Expose `LogRingBufferEntry[] GetSnapshot()` for StateSnapshot (copy into new array for DTO compatibility; M2).
 
-- **ErrorPopupPresenter** + **ErrorPopupView**:
-  - Presenter subscribes to recovery flow state changes.
-  - View: Full-screen modal with dimmer (UR-01), title/message (UR-02), debug info (UR-03), context-aware buttons (UR-04), loading state (UR-05).
-  - Use existing **PopupManager.ShowCommonPopup** for show/hide and animations (UR-06).
+- **ErrorPopupPresenter** + **ErrorPopupView** (M5):
+  - **Popup ownership**: Error popup is shown by **PopupManager** (IPopupService). **ErrorPopupView** provides the modal *content* (title, message, debug info, buttons). PopupManager hosts this content with standard entry/exit animations (UR-06). Recovery flow calls `popupService.ShowCommonPopup(...)`; the implementation displays ErrorPopupView or equivalent.
+  - Presenter subscribes to recovery flow state changes; while retry is in-flight, disables buttons and shows loading state (UR-05).
+  - View: Full-screen modal content with dimmer (UR-01), title/message (UR-02), debug info (UR-03), context-aware buttons (UR-04), loading state and `SetButtonsInteractable(bool)` (UR-05).
 
 **Unity lifecycle**  
 
 - **GlobalBootstrapper** (`Assets/_Game/App/Bootstrapper/GlobalBootstrapper.cs`):
   - In `Awake` (early, before other systems):
     1. Create `StabilityFlag` (implements `IStabilityFlag`).
-    2. Create `GlobalErrorInterceptor`; register log callback and unhandled exception handler.
-    3. Inject `IStabilityFlag` into **AutoSaveManager** (constructor or setter).
-    4. Wire interceptor → classifier → snapshot → recovery flow → transmission → UI.
+    2. Create `TitleNavigationService` (implements `ITitleNavigationService`; calls `SceneManager.LoadScene("IntroScene")`).
+    3. Create `GlobalErrorInterceptor`; register log callback and unhandled exception handler.
+    4. Call **AutoSaveManager.Initialize(IStabilityFlag)** — **method injection** (MonoBehaviour cannot use constructor injection). Pass `stabilityFlag`; AutoSaveManager stores and uses it before every save.
+    5. Wire interceptor → classifier → snapshot → recovery flow → transmission → UI. Inject into ErrorRecoveryFlow: `IStabilityFlag`, `IErrorReportSink`, `IPopupService` (PopupManager), `ITitleNavigationService` (TitleNavigationService). **Do not pass GameContext into ErrorRecoveryFlow.**
 
 - **AutoSaveManager** (`Assets/_Game/App/Systems/AutoSaveManager.cs`):
+  - **Initialize(IStabilityFlag flag)**: Store reference (e.g. `_stabilityFlag`). Must be called from GlobalBootstrapper before first save cycle.
   - Before any save (periodic `SaveAllAsync()` or `OnApplicationPause/Quit` → `SaveAllSync()`):
-    - **MUST** check `IStabilityFlag.IsSaveAllowed`.
+    - **MUST** check `_stabilityFlag.IsSaveAllowed`.
     - If `false`: Skip save entirely; do not set dirty flag; do not call repository save methods.
     - If `true`: Proceed with normal save flow.
 
@@ -157,7 +162,7 @@ All dependencies injected via constructor; Bootstrapper wires.
   - **Data mutation blocking**: Features that mutate Data (combat, inventory, character stats) must check `IStabilityFlag.IsSaveAllowed` before executing mutations (Option 1: explicit checks). If flag is `false`, skip the mutation operation entirely. This ensures no corrupted data is created in memory.
   - Unity lifecycle (Update, FixedUpdate) continues; only business logic mutations are blocked.
 
-- **Error popup**: Shown via PopupManager; same entry/exit animations as other popups (UR-06).
+- **Error popup**: Shown via PopupManager (IPopupService); ErrorPopupView is the content; same entry/exit animations as other popups (UR-06). On retry in-flight, buttons disabled and loading state shown (UR-05). **Startup:** Wrap `RetryBufferedReportsAsync()` in try/catch or `.ContinueWith(e => Debug.LogWarning(...))` before `.Forget()` so buffered-report retry failures are logged (L1).
 
 **Source layout**  
 
@@ -174,14 +179,17 @@ Assets/_Game/
 │       ├── ErrorRecoveryFlow.cs               # One-shot, retry count, escalation, command cache (FR-05, FR-06, FR-09)
 │       ├── ErrorReportTransmission.cs         # Send + buffer + retry (FR-08)
 │       ├── GlobalErrorInterceptor.cs          # Log callback + unhandled exception + Ring Buffer (FR-01)
-│       └── LogRingBuffer.cs                   # Non-allocating Ring Buffer for context
+│       ├── LogRingBuffer.cs                   # Non-allocating Ring Buffer for context
+│       └── TitleNavigationService.cs          # Implements ITitleNavigationService; SceneManager.LoadScene("IntroScene")
 ├── Core/ErrorHandling/
 │   ├── ErrorSeverity.cs                       # enum WARNING, NETWORK, CRITICAL
 │   ├── ErrorReport.cs                         # DTO: report payload
 │   ├── StateSnapshot.cs                       # DTO: execution context + data summary + Ring Buffer
 │   ├── LogRingBufferEntry.cs                  # Ring Buffer entry (struct or class)
 │   ├── NetworkRetryCommand.cs                 # Command pattern for retry (Func<UniTask> wrapper)
-│   └── IStabilityFlag.cs                      # Contract: bool IsSaveAllowed { get; }
+│   ├── IStabilityFlag.cs                      # Contract: bool IsSaveAllowed { get; }
+│   ├── IPopupService.cs                       # Contract: UniTask<bool> ShowCommonPopup(...)
+│   └── ITitleNavigationService.cs             # Contract: void NavigateToTitle()
 └── Features/ErrorHandling/Presentation/
     ├── ErrorPopupView.cs                      # Full-screen modal (UR-01–UR-05)
     ├── ErrorPopupPresenter.cs                 # Binds recovery flow to view
@@ -199,7 +207,7 @@ Assets/_Game/
 | FR-03 | Emergency stop: (1) Stability Flag block, (2) Business logic mutation block, (3) Unity lifecycle continues |
 | FR-04 | ErrorSnapshotCapture: GameContext.GetDataSummaryJson() + Ring Buffer payload |
 | FR-05 | ErrorRecoveryFlow: One-shot guard (_criticalHandled flag) |
-| FR-06 | ErrorRecoveryFlow + PopupManager: Command-pattern retry (NetworkRetryCommand); Reconnect+Title vs Title only |
+| FR-06 | ErrorRecoveryFlow + IPopupService: Command-pattern retry (NetworkRetryCommand); Reconnect+Title vs Title only; ITitleNavigationService for title return |
 | FR-07 | IStabilityFlag + AutoSaveManager: Check before save; never reset until process exit |
 | FR-08 | ErrorReportTransmission: Send → on fail encrypt+buffer → retry on next launch → delete cache |
 | FR-09 | ErrorRecoveryFlow: Retry counter; at 4th failure → escalate to CRITICAL |
@@ -220,7 +228,7 @@ Assets/_Game/
 2. **Review** this architecture before coding.
 3. **Implementation decisions**:
    - ✅ **Business logic blocking**: Option 1 (explicit checks) — Features check `IStabilityFlag.IsSaveAllowed` before data mutations.
-   - ✅ **Return to Title**: Scene name is `"IntroScene"` — Use `SceneManager.LoadScene("IntroScene")` for title return.
+   - ✅ **Return to Title**: Scene name is `"IntroScene"` — **ITitleNavigationService** implementation (TitleNavigationService) calls `SceneManager.LoadScene("IntroScene")`; ErrorRecoveryFlow has no direct UnityEngine dependency.
    - **Ring Buffer**: Use fixed-size array with modulo indexing; avoid allocations.
    - **Remote endpoint**: Implement transmission as stub/no-op until endpoint is defined.
 4. Run **speckit.tasks** to break into tasks, or proceed to implementation.
