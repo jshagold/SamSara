@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
 using UnityEngine;
 
 public class GameContext
@@ -62,6 +63,27 @@ public class GameContext
         GetEvolutionTreeUseCase = new GetEvolutionTreeUseCase(
             characterRepository: characterRepo,
             characterMasterRepository: masterDataManager.CharacterRepo);
+    }
+
+    /// <summary>
+    /// Serializes summaries of all held repositories to JSON for error diagnostics (FR-04).
+    /// </summary>
+    public string GetDataSummaryJson()
+    {
+        try
+        {
+            var summary = new
+            {
+                inventory = InventoryRepo.HasSaveData() ? InventoryRepo.GetInventory() : null,
+                character = CharacterRepo.HasSaveData() ? CharacterRepo.GetCharacterData() : null,
+                dailyStateCurrentDay = DailyStateRepo.GetCurrentDay()
+            };
+            return JsonConvert.SerializeObject(summary);
+        }
+        catch (Exception e)
+        {
+            return $"{{\"error\":\"GetDataSummaryJson failed: {e.Message}\"}}";
+        }
     }
 
     public async UniTask LoadAllDataAsync()
