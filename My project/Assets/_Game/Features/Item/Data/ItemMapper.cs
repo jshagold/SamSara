@@ -1,5 +1,3 @@
-﻿using UnityEditor.Localization.Plugins.XLIFF.V12;
-
 public static class ItemMapper
 {
     // MasterData -> Domain
