@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Core.ErrorHandling;
 using System;
 using UnityEngine;
 
@@ -7,6 +8,7 @@ public class AutoSaveManager : MonoBehaviour
     private readonly string _logClass = $"[{nameof(AutoSaveManager)}]";
 
     private GameContext _gameContext;
+    private IStabilityFlag _stabilityFlag;
 
     // 안전장치 플래그
     private bool _isInitialized = false;
@@ -30,6 +32,12 @@ public class AutoSaveManager : MonoBehaviour
         Debug.Log($"{_logClass} 가동 시작");
     }
 
+    /// <summary>Method injection for IStabilityFlag (FR-07). Call from GlobalBootstrapper after Initialize(GameContext).</summary>
+    public void Initialize(IStabilityFlag flag)
+    {
+        _stabilityFlag = flag;
+    }
+
     // Repository나 Presenter에서 데이터가 변경되었을 때 호출해줘야 함
     public void MakeDirty()
     {
@@ -44,6 +52,7 @@ public class AutoSaveManager : MonoBehaviour
     public async UniTask SaveAllAsync()
     {
         if (!_isInitialized) throw new InvalidOperationException("초기화 안 됨!");
+        if (_stabilityFlag != null && !_stabilityFlag.IsSaveAllowed) return;
 
         // 바뀐 게 없으면 파일 I/O를 아예 안 함
         if (!_isDirty) return;
@@ -108,7 +117,7 @@ public class AutoSaveManager : MonoBehaviour
         // pauseStatus == true : 앱이 백그라운드로 들어감 (게임 멈춤)
         // pauseStatus == false : 앱이 다시 켜짐 (게임 재개)
 
-        if (pauseStatus && _isInitialized && _isDirty)
+        if (pauseStatus && _isInitialized && _isDirty && (_stabilityFlag == null || _stabilityFlag.IsSaveAllowed))
         {
             // 1. 로컬 저장: 무조건 성공해야 하므로 동기(Sync) 방식으로 수행
             SaveAllSync();
@@ -123,7 +132,7 @@ public class AutoSaveManager : MonoBehaviour
     // [PC/Editor] 앱 종료 시
     private void OnApplicationQuit()
     {
-        if (_isInitialized)
+        if (_isInitialized && (_stabilityFlag == null || _stabilityFlag.IsSaveAllowed))
         {
             // 동기식으로 저장하거나 최대한 빨리 저장해야 함
             SaveAllSync();
@@ -136,6 +145,7 @@ public class AutoSaveManager : MonoBehaviour
     // Repository에 SaveDataSync() 메서드가 필요함 (이전 대화 참고)
     private void SaveAllSync()
     {
+        if (_stabilityFlag != null && !_stabilityFlag.IsSaveAllowed) return;
         try
         {
             // 여기서는 async/await를 쓰지 않고 즉시 파일에 씁니다.

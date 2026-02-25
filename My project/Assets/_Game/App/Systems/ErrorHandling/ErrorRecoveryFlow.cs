@@ -18,6 +18,11 @@ namespace App.Systems.ErrorHandling
         private bool _criticalHandled;
         private int _networkRetryCount;
 
+        /// <summary>Raised when a network retry is about to start (UR-05: presenter disables buttons).</summary>
+        public event Action RetryStarted;
+        /// <summary>Raised when the retry has completed (UR-05: presenter restores interactability).</summary>
+        public event Action RetryCompleted;
+
         public ErrorRecoveryFlow(
             IStabilityFlag stabilityFlag,
             IErrorReportSink reportSink,
@@ -59,7 +64,15 @@ namespace App.Systems.ErrorHandling
 
             if (choseReconnect && retryCommand != null)
             {
-                await retryCommand.Invoke();
+                RetryStarted?.Invoke();
+                try
+                {
+                    await retryCommand.Invoke();
+                }
+                finally
+                {
+                    RetryCompleted?.Invoke();
+                }
                 _networkRetryCount++;
                 if (_networkRetryCount >= 4)
                 {

@@ -1,9 +1,10 @@
 using System;
 using Cysharp.Threading.Tasks;
+using Core.ErrorHandling;
 using UnityEngine;
 using UnityEngine.Pool;
 
-public class PopupManager : MonoBehaviour
+public class PopupManager : MonoBehaviour, IPopupService
 {
     private readonly string _logClass = $"[{nameof(PopupManager)}]";
 

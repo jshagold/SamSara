@@ -1,3 +1,5 @@
+using App.Systems.ErrorHandling;
+using Core.ErrorHandling;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Localization.Settings;
@@ -64,6 +66,31 @@ public class GlobalBootstrapper : MonoBehaviour
         );
 
         _autoSaveManager.Initialize(GameContext);
+
+        // Error Handling (FR-07): only place to use new for Domain/Data
+        var stabilityFlag = new StabilityFlag();
+        var titleNavigation = new TitleNavigationService();
+        var logRingBuffer = new LogRingBuffer();
+        var errorClassifier = new ErrorClassifier();
+        var errorSnapshotCapture = new ErrorSnapshotCapture(GameContext, logRingBuffer);
+        var errorReportTransmission = new ErrorReportTransmission();
+        var errorRecoveryFlow = new ErrorRecoveryFlow(
+            stabilityFlag,
+            errorReportTransmission,
+            _popupManager,
+            titleNavigation);
+        var globalErrorInterceptor = gameObject.AddComponent<GlobalErrorInterceptor>();
+        globalErrorInterceptor.Initialize(
+            logRingBuffer,
+            errorClassifier,
+            errorSnapshotCapture,
+            errorRecoveryFlow,
+            errorReportTransmission);
+
+        _autoSaveManager.Initialize(stabilityFlag);
+
+        RetryBufferedReportsAsync(errorReportTransmission).Forget();
+
         GameContext.InventoryRepo.OnInventoryChanged += () => _autoSaveManager.MakeDirty();
         GameContext.DailyStateRepo.OnDailyStateChanged += () => _autoSaveManager.MakeDirty();
         GameContext.CharacterRepo.OnCharacterUpdated += () => _autoSaveManager.MakeDirty();
@@ -73,6 +100,18 @@ public class GlobalBootstrapper : MonoBehaviour
         RetryInitialization();
 
         Debug.Log($"{_logClass} Initialized");
+    }
+
+    private static async UniTaskVoid RetryBufferedReportsAsync(ErrorReportTransmission transmission)
+    {
+        try
+        {
+            await transmission.RetryBufferedReportsAsync();
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning($"[GlobalBootstrapper] RetryBufferedReports failed: {e.Message}");
+        }
     }
 
     // 데이터 불러오기 재시도
