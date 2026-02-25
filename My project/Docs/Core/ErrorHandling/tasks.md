@@ -75,9 +75,9 @@
 
 > Add explicit `IStabilityFlag` checks to all features that mutate Data. This is the "Business Logic Block" for FR-03 (Option 1: explicit checks). Apply to each feature that modifies Repository state.
 
-- [ ] T024 [Domain] Add `IStabilityFlag` guard to combat logic (any UseCase/system that modifies character stats or health: check `IStabilityFlag.IsSaveAllowed` before mutation; if `false` return/skip immediately). **경로 입력 필요** — 대상 파일: `Assets/_Game/Features/` 내 해당 UseCase/시스템 `.cs` *(spec FR-03)*
-- [ ] T025 [Domain] Add `IStabilityFlag` guard to inventory mutation logic (any UseCase/system that calls `InventoryRepo.AddItem`, `ConsumeItem` etc.: check flag before mutation). **경로 입력 필요** — 대상 파일: `Assets/_Game/Features/` 내 해당 UseCase/시스템 `.cs` *(spec FR-03)*
-- [ ] T026 [Domain] Add `IStabilityFlag` guard to character progression logic (any UseCase/system that modifies CharacterRepository or evolution state: check flag before mutation). **경로 입력 필요** — 대상 파일: `Assets/_Game/Features/` 내 해당 UseCase/시스템 `.cs` *(spec FR-03)*
+- [x] T024 [Domain] Add `IStabilityFlag` guard to combat logic (any UseCase/system that modifies character stats or health: check `IStabilityFlag.IsSaveAllowed` before mutation; if `false` return/skip immediately). **경로 입력 필요** — 대상 파일: `Assets/_Game/Features/` 내 해당 UseCase/시스템 `.cs` *(spec FR-03)*
+- [x] T025 [Domain] Add `IStabilityFlag` guard to inventory mutation logic (any UseCase/system that calls `InventoryRepo.AddItem`, `ConsumeItem` etc.: check flag before mutation). **경로 입력 필요** — 대상 파일: `Assets/_Game/Features/` 내 해당 UseCase/시스템 `.cs` *(spec FR-03)*
+- [x] T026 [Domain] Add `IStabilityFlag` guard to character progression logic (any UseCase/system that modifies CharacterRepository or evolution state: check flag before mutation). **경로 입력 필요** — 대상 파일: `Assets/_Game/Features/` 내 해당 UseCase/시스템 `.cs` *(spec FR-03)*
 
 ---
 
@@ -119,5 +119,5 @@ T024–T026  (Feature guards — 경로 입력 필요; depends on T006 IStabilit
 | 2: Domain | T010–T016 | 7 | 0 |
 | 3: Presentation (+ T017 Domain) | T017–T020 | 4 | 0 |
 | 4: Bootstrapper | T021–T023 | 3 | 0 |
-| 5: Integration | T024–T026 | 0 | 3 *(경로 입력 필요)* |
-| **Total** | **26** | **23** | **3** |
+| 5: Integration | T024–T026 | 3 | 0 |
+| **Total** | **26** | **26** | **0** |

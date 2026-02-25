@@ -1,3 +1,4 @@
+using Core.ErrorHandling;
 using UnityEngine;
 
 public class CreateNewInventoryUseCase
@@ -6,13 +7,16 @@ public class CreateNewInventoryUseCase
 
     private readonly IInventoryRepository _inventoryRepo;
     private readonly NewGameConfig _newGameConfig;
+    private readonly IStabilityFlag _stabilityFlag;
 
     public CreateNewInventoryUseCase(
         IInventoryRepository inventoryRepo,
-        NewGameConfig newGameConfig)
+        NewGameConfig newGameConfig,
+        IStabilityFlag stabilityFlag = null)
     {
         _inventoryRepo = inventoryRepo;
         _newGameConfig = newGameConfig;
+        _stabilityFlag = stabilityFlag;
     }
 
     /// <summary>True when no inventory save exists and new game data should be created.</summary>
@@ -20,6 +24,8 @@ public class CreateNewInventoryUseCase
 
     public void Execute()
     {
+        if (_stabilityFlag != null && !_stabilityFlag.IsSaveAllowed) return;
+
         var newSaveData = new InventorySaveData();
 
         if (_newGameConfig.InitialMoney > 0)

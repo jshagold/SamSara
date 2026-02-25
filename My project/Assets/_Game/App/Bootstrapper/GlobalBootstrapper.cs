@@ -12,6 +12,8 @@ public class GlobalBootstrapper : MonoBehaviour
     [SerializeField] private NewGameConfig _newGameConfig;
     [SerializeField] private PopupManager _popupManager;
 
+    private IStabilityFlag _stabilityFlag;
+
     // SingleTon 패턴
     public static GlobalBootstrapper Instance { get; private set; }
     public GameContext GameContext { get; private set; }
@@ -68,14 +70,14 @@ public class GlobalBootstrapper : MonoBehaviour
         _autoSaveManager.Initialize(GameContext);
 
         // Error Handling (FR-07): only place to use new for Domain/Data
-        var stabilityFlag = new StabilityFlag();
+        _stabilityFlag = new StabilityFlag();
         var titleNavigation = new TitleNavigationService();
         var logRingBuffer = new LogRingBuffer();
         var errorClassifier = new ErrorClassifier();
         var errorSnapshotCapture = new ErrorSnapshotCapture(GameContext, logRingBuffer);
         var errorReportTransmission = new ErrorReportTransmission();
         var errorRecoveryFlow = new ErrorRecoveryFlow(
-            stabilityFlag,
+            _stabilityFlag,
             errorReportTransmission,
             _popupManager,
             titleNavigation);
@@ -87,7 +89,7 @@ public class GlobalBootstrapper : MonoBehaviour
             errorRecoveryFlow,
             errorReportTransmission);
 
-        _autoSaveManager.Initialize(stabilityFlag);
+        _autoSaveManager.Initialize(_stabilityFlag);
 
         RetryBufferedReportsAsync(errorReportTransmission).Forget();
 
@@ -128,17 +130,20 @@ public class GlobalBootstrapper : MonoBehaviour
             await LocalizationSettings.InitializationOperation;
             await LocalizationSettings.StringDatabase.GetTableAsync(LocalizationUtils.TextTableName);
 
-            // Only Bootstrapper instantiates UseCases (Constitution §2)
+            // Only Bootstrapper instantiates UseCases (Constitution §2); FR-03 stability guard
             var createNewCharacter = new CreateNewCharacterUseCase(
                 characterRepo: GameContext.CharacterRepo,
                 characterMasterRepo: GameContext.MasterDataManager.CharacterRepo,
-                newGameConfig: _newGameConfig);
+                newGameConfig: _newGameConfig,
+                stabilityFlag: _stabilityFlag);
             var createNewInventory = new CreateNewInventoryUseCase(
                 inventoryRepo: GameContext.InventoryRepo,
-                newGameConfig: _newGameConfig);
+                newGameConfig: _newGameConfig,
+                stabilityFlag: _stabilityFlag);
             var createNewDailyState = new CreateNewDailyStateUseCase(
                 newGameConfig: _newGameConfig,
-                dailyStateRepo: GameContext.DailyStateRepo);
+                dailyStateRepo: GameContext.DailyStateRepo,
+                stabilityFlag: _stabilityFlag);
             var initUserDataUC = new InitializeUserDataUseCase(
                 createNewCharacter: createNewCharacter,
                 createNewInventory: createNewInventory,
