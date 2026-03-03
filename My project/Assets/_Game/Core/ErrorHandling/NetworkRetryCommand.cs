@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System;
 
 namespace Core.ErrorHandling
 {
@@ -7,9 +8,9 @@ namespace Core.ErrorHandling
     /// </summary>
     public class NetworkRetryCommand
     {
-        private readonly System.Func<UniTask> _retryAction;
+        private readonly Func<UniTask> _retryAction;
 
-        public NetworkRetryCommand(System.Func<UniTask> retryAction)
+        public NetworkRetryCommand(Func<UniTask> retryAction)
         {
             _retryAction = retryAction;
         }

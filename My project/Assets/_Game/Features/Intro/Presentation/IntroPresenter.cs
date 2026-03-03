@@ -1,5 +1,7 @@
 using System;
+using Core.System;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class IntroPresenter : IDisposable
@@ -11,12 +13,14 @@ public class IntroPresenter : IDisposable
 
     private readonly IntroView _introView;
     private readonly PopupManager _popupManager;
+    private readonly IAppLifecycleService _appLifecycle;
     private string _nextSceneName;
 
-    public IntroPresenter(IntroView introView, PopupManager popupManager)
+    public IntroPresenter(IntroView introView, PopupManager popupManager, IAppLifecycleService appLifecycle)
     {
-        _introView = introView;
-        _popupManager = popupManager;
+        _introView = introView ?? throw new ArgumentNullException(nameof(introView));
+        _popupManager = popupManager ?? throw new ArgumentNullException(nameof(popupManager));
+        _appLifecycle = appLifecycle ?? throw new ArgumentNullException(nameof(appLifecycle));
     }
 
     public async void Initialize()
@@ -57,12 +61,7 @@ public class IntroPresenter : IDisposable
                 }
                 else
                 {
-                    // secondButton을 눌렀으면 -> 게임 끄고 함수 종료
-                    #if UNITY_EDITOR
-                        UnityEditor.EditorApplication.isPlaying = false;
-                    #else
-                        Application.Quit();
-                    #endif
+                    _appLifecycle.Quit();
                     return;
                 }
             }

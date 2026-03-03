@@ -14,10 +14,12 @@ public class IntroBootstrapper : MonoBehaviour
         if (GlobalBootstrapper.Instance == null)
             throw new InvalidOperationException($"{_logClass} GlobalBootstrapper must exist in scene.");
         var gameContext = GlobalBootstrapper.Instance.GameContext;
+        var appLifecycle = GlobalBootstrapper.Instance.AppLifecycleService;
 
         _introPresenter = new IntroPresenter(
             introView: _introView,
-            popupManager: gameContext.PopupManager);
+            popupManager: gameContext.PopupManager,
+            appLifecycle: appLifecycle);
 
         _introPresenter.Initialize();
     }

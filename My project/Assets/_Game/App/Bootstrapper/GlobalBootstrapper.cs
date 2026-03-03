@@ -1,5 +1,7 @@
-using App.Systems.ErrorHandling;
+using App.Systems.Lifecycle;
+using Core.System;
 using Core.ErrorHandling;
+using App.Systems.ErrorHandling;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Localization.Settings;
@@ -17,6 +19,7 @@ public class GlobalBootstrapper : MonoBehaviour
     // SingleTon 패턴
     public static GlobalBootstrapper Instance { get; private set; }
     public GameContext GameContext { get; private set; }
+    public IAppLifecycleService AppLifecycleService { get; private set; }
 
     // 다른 씬들이 초기화 완료를 기다릴 수 있게 하는 Task
     public UniTask InitializationTask { get; private set; }
@@ -57,6 +60,8 @@ public class GlobalBootstrapper : MonoBehaviour
             throw new System.InvalidOperationException($"{_logClass} _newGameConfig must be assigned in Inspector.");
         if (_popupManager == null)
             throw new System.InvalidOperationException($"{_logClass} _popupManager must be assigned in Inspector.");
+
+        AppLifecycleService = new AppLifecycleService();
 
         // GameContext 조립
         GameContext = new GameContext(
