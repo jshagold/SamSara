@@ -1,9 +1,9 @@
 ---
-description: Create or update the feature specification from a natural language feature description directly into the Docs hierarchy.
+description: Create or update the feature specification from a natural language feature description directly into the Docs hierarchy. Customized for the Samsara Unity mobile game project.
 handoffs: 
   - label: Build Technical Plan
     agent: speckit.plan
-    prompt: Create a plan for the spec. I am building with...
+    prompt: Create a plan for the spec. I am building with Unity 6.2, C#, UniTask, Newtonsoft.Json, DOTween, TMP. Architecture is Feature-based Modular (DDD + Clean Architecture). See constitution.md for full rules.
   - label: Clarify Spec Requirements
     agent: speckit.clarify
     prompt: Clarify specification requirements
@@ -18,205 +18,357 @@ $ARGUMENTS
 
 You **MUST** consider the user input before proceeding (if not empty).
 
+## Project Context (Always Apply)
+
+This specification is for **Samsara** — a Unity 6.2 mobile roguelike turn-based RPG.
+Before writing any spec, internalize these constraints:
+
+- **Engine:** Unity 6.2 / C#
+- **Platform:** Mobile (Android / iOS)
+- **Architecture:** Feature-based Modular (DDD + Clean Architecture)
+- **Async:** UniTask only (no Coroutines, no standard Task)
+- **Serialization:** Newtonsoft.Json
+- **UI:** TMP (TextMeshPro), Unity UI
+- **Animation/Tween:** DOTween
+- **Root path:** `Assets/_Game/` — never assume `Assets/Scripts`
+- **Full rules:** See `constitution.md` (always treat it as the source of truth)
+
+---
+
 ## Outline
 
 The text the user typed after `/speckit.specify` in the triggering message **is** the feature description. Assume you always have it available in this conversation even if `$ARGUMENTS` appears literally below. Do not ask the user to repeat it unless they provided an empty command.
 
 Given that feature description, do this:
 
-1. **Categorize the Feature**:
-   - Analyze the feature description to determine the category.
-   - If it's a foundational system (Error Handling, Save System, Network, etc.), the category is `Core`.
-   - If it's a specific game mechanic or content (Combat, Inventory, UI, etc.), the category is `Features`.
+### 1. Categorize the Feature
 
-2. **Determine Folder Name (PascalCase)**:
-   - Extract the core feature name from the description.
-   - Convert it strictly to PascalCase (e.g., "ErrorHandling", "CombatSystem", "UserAuth").
-   - **Do not use numbers, prefixes, or dashes.**
+Analyze the feature description and assign one of these categories:
 
-3. **Set Target Paths**:
-   - `FEATURE_DIR` = `Docs/[Category]/[FeatureName]/`
-   - `SPEC_FILE` = `FEATURE_DIR/specify.md`
+| Category | When to use | Example features |
+|----------|-------------|-----------------|
+| `Core` | Pure interfaces, base classes, and shared utilities. No Unity or external library dependencies. No game-content dependency. | `ISceneNavigator`, `IPopupManager`, `SceneKey`, shared domain base classes |
+| `App` | Concrete implementations of `Core` interfaces. Top-level wiring: bootstrappers, GameContext, external library wrappers. Depends on Unity and third-party libs. | `GlobalBootstrapper`, `GameContext`, `SceneNavigator` (impl), `AutoSaveManager`, external SDK wrappers |
+| `Features` | Self-contained game mechanic or content module. Depends on `Core` interfaces but never on other `Features` directly. | `Battle`, `CharacterEvo`, `Maintenance`, `Stage`, `ActionEvent` |
 
-4. Follow this execution flow:
+### 2. Determine Folder Name (PascalCase)
 
-    1. Parse user description from Input
-       If empty: ERROR "No feature description provided"
-    2. Extract key concepts from description
-       Identify: actors, actions, data, constraints
-    3. For unclear aspects:
-       - Make informed guesses based on context and industry standards
-       - Only mark with [NEEDS CLARIFICATION: specific question] if:
-         - The choice significantly impacts feature scope or user experience
-         - Multiple reasonable interpretations exist with different implications
-         - No reasonable default exists
-       - **LIMIT: Maximum 3 [NEEDS CLARIFICATION] markers total**
-       - Prioritize clarifications by impact: scope > security/privacy > user experience > technical details
-    4. Fill User Scenarios & Testing section
-       If no clear user flow: ERROR "Cannot determine user scenarios"
-    5. Generate Functional Requirements
-       Each requirement must be testable
-       Use reasonable defaults for unspecified details (document assumptions in Assumptions section)
-    6. Define Success Criteria
-       Create measurable, technology-agnostic outcomes
-       Include both quantitative metrics (time, performance, volume) and qualitative measures (user satisfaction, task completion)
-       Each criterion must be verifiable without implementation details
-    7. Identify Key Entities (if data involved)
-    8. Return: SUCCESS (spec ready for writing)
+- Extract the core feature name from the description.
+- Convert strictly to PascalCase (e.g., `SaveSystem`, `BattleSystem`, `CharacterEvo`).
+- **Do not use numbers, prefixes, or dashes.**
 
-5. Write the specification to `SPEC_FILE` using the template structure, replacing placeholders with concrete details derived from the feature description while preserving section order and headings. **Do not run any external scripts.**
+### 3. Set Target Paths
 
-6. **Specification Quality Validation**: After writing the initial spec, validate it against quality criteria:
+- `FEATURE_DIR` = `Docs/[Category]/[FeatureName]/`
+- `SPEC_FILE` = `FEATURE_DIR/specify.md`
 
-   a. **Create Spec Quality Checklist**: Generate a checklist file at `FEATURE_DIR/checklists/requirements.md` using the checklist template structure with these validation items:
+### 4. Execution Flow
 
-      ```markdown
-      # Specification Quality Checklist: [FEATURE NAME]
-      
-      **Purpose**: Validate specification completeness and quality before proceeding to planning
-      **Created**: [DATE]
-      **Feature**: [Link to spec.md]
-      
-      ## Content Quality
-      
-      - [ ] No implementation details (languages, frameworks, APIs)
-      - [ ] Focused on user value and business needs
-      - [ ] Written for non-technical stakeholders
-      - [ ] All mandatory sections completed
-      
-      ## Requirement Completeness
-      
-      - [ ] No [NEEDS CLARIFICATION] markers remain
-      - [ ] Requirements are testable and unambiguous
-      - [ ] Success criteria are measurable
-      - [ ] Success criteria are technology-agnostic (no implementation details)
-      - [ ] All acceptance scenarios are defined
-      - [ ] Edge cases are identified
-      - [ ] Scope is clearly bounded
-      - [ ] Dependencies and assumptions identified
-      
-      ## Feature Readiness
-      
-      - [ ] All functional requirements have clear acceptance criteria
-      - [ ] User scenarios cover primary flows
-      - [ ] Feature meets measurable outcomes defined in Success Criteria
-      - [ ] No implementation details leak into specification
-      
-      ## Samsara Project Constraints
-      - [ ] Strict Data/Logic separation is explicitly maintained
-      - [ ] Zero speculative causes or inferred data are included
-      ```
+1. Parse user description from Input.
+   If empty → ERROR "No feature description provided"
 
-   b. **Run Validation Check**: Review the spec against each checklist item:
-      - For each item, determine if it passes or fails
-      - Document specific issues found (quote relevant spec sections)
+2. Extract key concepts:
+   - **Actors**: Who interacts with this feature? (Player, System, NPC, etc.)
+   - **Actions**: What can they do?
+   - **Data**: What data is created, read, updated, or deleted?
+     - Is this **RunData** (resets on reincarnation / 윤회) or **AccountData** (permanent across runs)?
+   - **Constraints**: What rules apply? (Constitution rules, GDD decisions)
 
-   c. **Handle Validation Results**:
+3. For unclear aspects:
+   - Make informed guesses based on `constitution.md`, GDD documents, and Unity best practices.
+   - Only mark `[NEEDS CLARIFICATION: specific question]` if:
+     - The choice significantly impacts feature scope or player experience
+     - Multiple reasonable interpretations exist with meaningfully different implications
+     - No reasonable default exists in `constitution.md` or the GDD
+   - **LIMIT: Maximum 3 [NEEDS CLARIFICATION] markers total**
+   - Priority order: game scope > data lifetime (RunData vs AccountData) > player experience > technical details
 
-      - **If all items pass**: Mark checklist complete and proceed to step 7
+4. Fill Player / System Scenarios section.
+   If no clear flow can be determined → ERROR "Cannot determine user scenarios"
 
-      - **If items fail (excluding [NEEDS CLARIFICATION])**:
-        1. List the failing items and specific issues
-        2. Update the spec to address each issue
-        3. Re-run validation until all items pass (max 3 iterations)
-        4. If still failing after 3 iterations, document remaining issues in checklist notes and warn user
+5. Generate Functional Requirements.
+   - Each requirement must be testable.
+   - Every requirement must be traceable to a `constitution.md` rule or a GDD decision.
 
-      - **If [NEEDS CLARIFICATION] markers remain**:
-        1. Extract all [NEEDS CLARIFICATION: ...] markers from the spec
-        2. **LIMIT CHECK**: If more than 3 markers exist, keep only the 3 most critical (by scope/security/UX impact) and make informed guesses for the rest
-        3. For each clarification needed (max 3), present options to user in this format:
+6. Define Success Criteria.
+   - Measurable, implementation-agnostic outcomes.
+   - Use game-relevant metrics (frame rate, response feel, player action count, data integrity).
+   - Each criterion must be verifiable without knowing implementation details.
 
-           ```markdown
-           ## Question [N]: [Topic]
-           
-           **Context**: [Quote relevant spec section]
-           
-           **What we need to know**: [Specific question from NEEDS CLARIFICATION marker]
-           
-           **Suggested Answers**:
-           
-           | Option | Answer | Implications |
-           |--------|--------|--------------|
-           | A      | [First suggested answer] | [What this means for the feature] |
-           | B      | [Second suggested answer] | [What this means for the feature] |
-           | C      | [Third suggested answer] | [What this means for the feature] |
-           | Custom | Provide your own answer | [Explain how to provide custom input] |
-           
-           **Your choice**: _[Wait for user response]_
-           ```
+7. Identify Key Entities (if data is involved).
+   - Explicitly label each entity as `RunData` or `AccountData`.
+   - Flag any entity that spans both lifetimes as `[NEEDS CLARIFICATION]`.
 
-        4. **CRITICAL - Table Formatting**: Ensure markdown tables are properly formatted:
-           - Use consistent spacing with pipes aligned
-           - Each cell should have spaces around content: `| Content |` not `|Content|`
-           - Header separator must have at least 3 dashes: `|--------|`
-           - Test that the table renders correctly in markdown preview
-        5. Number questions sequentially (Q1, Q2, Q3 - max 3 total)
-        6. Present all questions together before waiting for responses
-        7. Wait for user to respond with their choices for all questions
-        8. Update the spec by replacing each [NEEDS CLARIFICATION] marker with the user's selected or provided answer
-        9. Re-run validation after all clarifications are resolved
+8. Return: SUCCESS (spec ready for writing)
 
-   d. **Update Checklist**: After each validation iteration, update the checklist file with current pass/fail status
+### 5. Write the Specification
 
-7. Report completion with the `FEATURE_DIR` path, checklist results, and readiness for the next phase (`/speckit.clarify` or `/speckit.plan`).
+Write to `SPEC_FILE` using the template structure below. Replace all placeholders with concrete details derived from the feature description. Preserve section order and headings. **Do not run any external scripts.**
+
+---
+
+## Spec Template
+
+```markdown
+# Feature Specification: [Feature Name]
+
+**Category**: Core | Features
+**Folder**: `Docs/[Category]/[FeatureName]/`
+**Status**: Draft
+**Last Updated**: [DATE]
+**GDD Reference**: [GDD document name or section — e.g., GDD_BattleSystem_v1.0]
+
+---
+
+## 1. Overview
+
+### Purpose
+[1-2 sentences. Why does this feature exist? What value does it provide to the player or system?]
+
+### Scope
+
+**In Scope:**
+- [What is included]
+
+**Out of Scope (excluded from 1st development phase):**
+- [What is explicitly excluded — include reason]
+
+---
+
+## 2. Actors & Interactions
+
+| Actor | Role | Interaction |
+|-------|------|-------------|
+| [Player / System / NPC] | [Role description] | [What they do] |
+
+---
+
+## 3. Data Model
+
+### Data Lifetime
+> Every entity MUST be explicitly labeled as RunData or AccountData.
+> RunData resets on every reincarnation (윤회). AccountData persists permanently across runs.
+
+| Entity | Lifetime | Description |
+|--------|----------|-------------|
+| [EntityName] | `RunData` \| `AccountData` | [Description] |
+
+### Entity Definitions
+
+#### [EntityName]
+```
+[FieldName]: [Type] — [Description] (RunData | AccountData)
+```
+
+---
+
+## 4. Functional Requirements
+
+> Each requirement maps to a constitution.md rule or GDD decision.
+
+### FR-[N]: [Requirement Title]
+- **Description**: [What must happen]
+- **Acceptance Criteria**:
+  - [ ] [Testable condition 1]
+  - [ ] [Testable condition 2]
+- **Constitution Rule**: [Relevant section — e.g., §4 Cached Repository, §6 Data Lifetime]
+- **GDD Reference**: [Relevant GDD document name]
+
+---
+
+## 5. Player / System Scenarios
+
+### Happy Path
+1. [Step-by-step description of the normal flow]
+
+### Edge Cases
+- **[Case Name]**: [Description and expected behavior]
+
+### Error Cases
+- **[Error Name]**: [Trigger condition and how it is handled]
+
+---
+
+## 6. Success Criteria
+
+> Technology-agnostic. Measurable. Game-context focused.
+
+| # | Criterion | Measurement |
+|---|-----------|-------------|
+| SC-1 | [Outcome to achieve] | [How to verify] |
+
+---
+
+## 7. Constitution Compliance
+
+> Verifies the feature design does not violate constitution.md.
+> Remove rows that do not apply to this feature.
+
+| Rule | Compliant? | Notes |
+|------|-----------|-------|
+| §2 Zero Guessing — paths use `Assets/_Game/` | ✅ / ⚠️ / ❌ | |
+| §2 Data/Logic Separation — no hardcoded game data | ✅ / ⚠️ / ❌ | |
+| §2 Pure DI — Logic classes use Constructor Injection | ✅ / ⚠️ / ❌ | |
+| §3 Layer Structure — Data / Domain / Presentation separated | ✅ / ⚠️ / ❌ | |
+| §4 Cached Repository — data loaded once, cache modified | ✅ / ⚠️ / ❌ | |
+| §4 Dual-Mode Saving — both Async and Sync implemented | ✅ / ⚠️ / ❌ | |
+| §5 PopupManager — not called from Domain layer | ✅ / ⚠️ / ❌ | |
+| §6 Singleton restriction — only GlobalBootstrapper allowed | ✅ / ⚠️ / ❌ | |
+| §6 SceneNavigator — scene transitions via ISceneNavigator only | ✅ / ⚠️ / ❌ | |
+| §6 AccountData/RunData — not mixed in the same class | ✅ / ⚠️ / ❌ | |
+| §8 Fail Fast — no silent null returns | ✅ / ⚠️ / ❌ | |
+| §8 Safe Cleanup — no exceptions thrown in Dispose/OnDestroy | ✅ / ⚠️ / ❌ | |
+
+---
+
+## 8. Dependencies
+
+| Dependency | Type | Reason |
+|------------|------|--------|
+| [Feature or system name] | `Core` \| `Feature` \| `External Lib` | [Why it is needed] |
+
+---
+
+## 9. Assumptions
+
+> Decisions made without explicit confirmation. If wrong, the spec must be revised.
+
+- [Assumption 1]
+- [Assumption 2]
+
+---
+
+## 10. Open Questions
+
+> Must be resolved before implementation begins.
+
+- [ ] [Question or unresolved item]
+```
+
+---
+
+### 6. Specification Quality Validation
+
+After writing the initial spec, validate it. Create a checklist file at `FEATURE_DIR/checklists/requirements.md`:
+
+```markdown
+# Specification Quality Checklist: [FEATURE NAME]
+
+**Purpose**: Validate specification completeness before proceeding to planning
+**Created**: [DATE]
+**Feature**: [Link to specify.md]
+
+## Content Quality
+
+- [ ] No implementation details (no class names, Unity APIs, or specific library calls)
+- [ ] Focused on WHAT and WHY, not HOW
+- [ ] All mandatory sections completed (Sections 1-7 required; 8-10 when applicable)
+- [ ] GDD Reference points to an existing GDD document
+
+## Requirement Completeness
+
+- [ ] No [NEEDS CLARIFICATION] markers remain
+- [ ] Every requirement is testable and unambiguous
+- [ ] Every entity has an explicit RunData / AccountData label
+- [ ] Success criteria are measurable and game-context focused
+- [ ] Happy path, edge cases, and error cases are all defined
+- [ ] Scope is clearly bounded (both In Scope and Out of Scope stated)
+- [ ] Dependencies identified
+
+## Constitution Compliance
+
+- [ ] §2 Path rule: `Assets/_Game/` used, `Assets/Scripts` never assumed
+- [ ] §2 Data/Logic separation: no hardcoded game data in logic classes
+- [ ] §2 Pure DI: no `new` instantiation of Logic classes outside Bootstrapper
+- [ ] §3 Layer separation: Data / Domain / Presentation roles are clear
+- [ ] §4 Cached Repository: single load at startup principle reflected
+- [ ] §4 Dual-Mode Saving: both Async and Sync saving addressed (if feature saves data)
+- [ ] §5 PopupManager: no popup calls from Domain layer
+- [ ] §6 Singleton restriction: no Singleton other than GlobalBootstrapper
+- [ ] §6 SceneNavigator: all scene transitions go through ISceneNavigator
+- [ ] §6 AccountData/RunData: two lifetimes are clearly separated
+- [ ] §8 Fail Fast: no silent null returns, CheckDataIntegrity referenced where applicable
+- [ ] §8 Safe Cleanup: Dispose/OnDestroy safety handling addressed
+
+## Feature Readiness
+
+- [ ] Every Functional Requirement has Acceptance Criteria
+- [ ] Player/System scenarios cover the primary flow
+- [ ] Success criteria describe verifiable game outcomes
+- [ ] No blocking Open Questions remain (or all are explicitly listed)
+```
+
+**Validation handling:**
+
+- **All items pass** → Mark checklist complete and proceed to step 7.
+- **Items fail** → Update the spec to fix each issue. Re-validate (max 3 iterations). If still failing after 3 iterations, document remaining issues in checklist notes and warn the user.
+- **[NEEDS CLARIFICATION] markers remain** → Present questions to the user (max 3) using this format:
+
+```markdown
+## Question [N]: [Topic]
+
+**Context**: [Quote the relevant spec section]
+
+**What we need to know**: [The specific question from the NEEDS CLARIFICATION marker]
+
+**Suggested Answers**:
+
+| Option | Answer | Implications |
+|--------|--------|--------------|
+| A      | [First option] | [Impact on the feature] |
+| B      | [Second option] | [Impact on the feature] |
+| C      | [Third option] | [Impact on the feature] |
+| Custom | Provide your own answer | Write your answer freely |
+
+**Your choice**: _[Waiting for response]_
+```
+
+Number questions sequentially (Q1, Q2, Q3 — max 3 total). Present all questions together before waiting for responses. After the user responds, update the spec and re-run validation.
+
+---
+
+### 7. Completion Report
+
+Report completion with:
+- `FEATURE_DIR` path
+- Checklist pass/fail summary
+- Any remaining Open Questions
+- Readiness for next phase: `/speckit.plan`
+
+---
 
 ## General Guidelines
 
-- Focus on **WHAT** users need and **WHY**.
-- Avoid HOW to implement (no tech stack, APIs, code structure).
-- Written for business stakeholders, not developers.
-- DO NOT create any checklists that are embedded in the spec. That will be a separate command.
+- Focus on **WHAT** the feature does and **WHY** it exists in Samsara.
+- **Never specify HOW** to implement (no class names, Unity APIs, or library-specific calls).
+- Written to be unambiguous enough for Cursor and Gemini to implement correctly from the spec alone.
+- Do NOT embed checklists inside the spec itself — that is always a separate file.
 
-### Section Requirements
+### Reasonable Defaults for Samsara (Do NOT ask about these)
 
-- **Mandatory sections**: Must be completed for every feature
-- **Optional sections**: Include only when relevant to the feature
-- When a section doesn't apply, remove it entirely (don't leave as "N/A")
+| Topic | Default assumption |
+|-------|--------------------|
+| Async pattern | UniTask (not Coroutine, not standard Task) |
+| Save format | JSON via Newtonsoft.Json |
+| Save location | `Application.persistentDataPath` |
+| UI framework | Unity UI + TMP |
+| Animation | DOTween |
+| Error handling | Fail Fast (throw InvalidOperationException) + Fail Safe cleanup (null-conditional in Dispose) |
+| Scene transition | ISceneNavigator — except Main to Maintenance which is a camera move |
+| Popup interaction | Caller awaits UniTask result from PopupManager |
+| Data reset boundary | On reincarnation (윤회) |
+| RunData scope | Character stats, Gold, Karma (업보), current Day |
+| AccountData scope | Unlocked evolution nodes, Codex (도감), Gems (보석) |
 
-### For AI Generation
+### Success Criteria Guidelines for Samsara
 
-When creating this spec from a user prompt:
+**Good examples:**
+- "AccountData (unlocked evolution nodes) is fully preserved after reincarnation (윤회)"
+- "No frame drop is perceptible during scene transitions (60 fps maintained)"
+- "After a forced app close, the game restores exactly to the last saved state on relaunch"
+- "Battle outcome stat changes are reflected in RunData immediately and accurately"
 
-1. **Make informed guesses**: Use context, industry standards, and common patterns to fill gaps
-2. **Document assumptions**: Record reasonable defaults in the Assumptions section
-3. **Limit clarifications**: Maximum 3 [NEEDS CLARIFICATION] markers - use only for critical decisions that:
-   - Significantly impact feature scope or user experience
-   - Have multiple reasonable interpretations with different implications
-   - Lack any reasonable default
-4. **Prioritize clarifications**: scope > security/privacy > user experience > technical details
-5. **Think like a tester**: Every vague requirement should fail the "testable and unambiguous" checklist item
-6. **Common areas needing clarification** (only if no reasonable default exists):
-   - Feature scope and boundaries (include/exclude specific use cases)
-   - User types and permissions (if multiple conflicting interpretations possible)
-   - Security/compliance requirements (when legally/financially significant)
-
-**Examples of reasonable defaults** (don't ask about these):
-
-- Data retention: Industry-standard practices for the domain
-- Performance targets: Standard web/mobile app expectations unless specified
-- Error handling: User-friendly messages with appropriate fallbacks
-- Authentication method: Standard session-based or OAuth2 for web apps
-- Integration patterns: RESTful APIs unless specified otherwise
-
-### Success Criteria Guidelines
-
-Success criteria must be:
-
-1. **Measurable**: Include specific metrics (time, percentage, count, rate)
-2. **Technology-agnostic**: No mention of frameworks, languages, databases, or tools
-3. **User-focused**: Describe outcomes from user/business perspective, not system internals
-4. **Verifiable**: Can be tested/validated without knowing implementation details
-
-**Good examples**:
-
-- "Users can complete checkout in under 3 minutes"
-- "System supports 10,000 concurrent users"
-- "95% of searches return results in under 1 second"
-- "Task completion rate improves by 40%"
-
-**Bad examples** (implementation-focused):
-
-- "API response time is under 200ms" (too technical, use "Users see results instantly")
-- "Database can handle 1000 TPS" (implementation detail, use user-facing metric)
-- "React components render efficiently" (framework-specific)
-- "Redis cache hit rate above 80%" (technology-specific)
+**Bad examples (avoid):**
+- "The Repository queries in O(1)" — implementation detail
+- "UniTask completes without exception" — technical specification
+- "The JSON file serializes correctly" — implementation detail
