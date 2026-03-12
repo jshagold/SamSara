@@ -236,3 +236,7 @@ Must execute in this exact order. Wrap entire method in try-catch.
 - **DO NOT** create files outside `Assets/_Game/`.
 - **DO NOT** use `Manager.Instance` patterns anywhere.
 - **DO NOT** make `GameContext` a MonoBehaviour.
+- **DO NOT** reference or copy patterns from `Assets/_Game/Dev/`.
+- If you make any judgment calls not covered by this Spec,
+  record them in `.claude/specs/app-bootstrap/decisions.md`
+  (the file is pre-created and empty)
