@@ -1,5 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
+using Samsara.App;
+using Samsara.Core.Navigation;
 using UnityEngine;
 
 /// <summary>
