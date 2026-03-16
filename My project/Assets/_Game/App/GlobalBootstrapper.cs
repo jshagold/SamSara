@@ -71,8 +71,7 @@ public class GlobalBootstrapper : MonoBehaviour
             Debug.Log($"{_logClass} 초기화 시작 (시도 {_retryCount + 1})");
 
             // Step 1 — MasterData 로드 (ThreadPool에서 I/O 처리)
-            var masterData = await UniTask.RunOnThreadPool(
-                () => Resources.LoadAll<ScriptableObject>("MasterData"));
+            var masterData = Resources.LoadAll<ScriptableObject>("MasterData");
 
             Debug.Log($"{_logClass} Step 1 완료 — MasterData {masterData.Length}개 로드");
 
