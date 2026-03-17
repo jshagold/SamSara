@@ -1,6 +1,6 @@
 # Samsara Project Constitution
 
-**Version:** 1.2.0 | **Ratification Date:** 2026-02-10 | **Last Amended:** 2026-03-10
+**Version:** 1.2.1 | **Ratification Date:** 2026-02-10 | **Last Amended:** 2026-03-17
 **Status:** ✅ Active (Read-only — spec writing in progress)
 
 > This document is the **Architecture Bible** of the Samsara Project.
@@ -26,6 +26,7 @@
 | `Assets/_Game/Features/` | Independent game modules (each Feature is self-contained) |
 | `Assets/_Game/Scenes/` | Scene files and SceneBootstrappers |
 | `Assets/_Game/Dev/` | Development sandbox — relaxed rules for prototyping |
+| `Assets/_Game/Art/` | Shared visual assets (fonts, textures, sprites not tied to a specific Feature) |
 | `Assets/Resources/MasterData/` | ScriptableObject .asset files ONLY |
 
 ### Dev/ Graduation Checklist
@@ -91,13 +92,11 @@ Before moving any code from `Dev/` to `Features/`, ALL of the following must be 
 
 Each Feature follows Clean Architecture layers:
 
-```
-Assets/_Game/Features/[FeatureName]/
-├── Data/           # Repository implementations, SaveData
-├── Domain/         # UseCase, Model, Interface definitions
-├── Presentation/   # Bootstrapper, Presenter, View
-└── MasterData/     # ScriptableObject definitions (*SO.cs)
-```
+    Assets/_Game/Features/[FeatureName]/
+    ├── Data/           # Repository implementations, SaveData
+    ├── Domain/         # UseCase, Model, Interface definitions
+    ├── Presentation/   # Bootstrapper, Presenter, View
+    └── MasterData/     # ScriptableObject definitions (*SO.cs)
 
 ### Layer Rules
 
@@ -200,9 +199,7 @@ MasterData: Must be initialized **Asynchronously** before GameContext setup.
 
 Every class MUST include:
 
-```csharp
-private readonly string _logClass = $"[{nameof(ClassName)}]";
-```
+    private readonly string _logClass = $"[{nameof(ClassName)}]";
 
 ### Inspector Variables
 
