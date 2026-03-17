@@ -1,8 +1,11 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Samsara.App;
+using Samsara.App.Popup;
 using Samsara.Core.Navigation;
+using Samsara.Core.Popup;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// 프로젝트 유일의 Singleton. Bootstrap Scene에서 시작하며 DontDestroyOnLoad로 유지된다.
@@ -29,6 +32,7 @@ public class GlobalBootstrapper : MonoBehaviour
     private int _retryCount = 0;
 
     [SerializeField] private FallbackErrorCanvas _fallbackCanvas;
+    [SerializeField] private CommonPopupView     _popupViewPrefab;
 
     // ──────────────────────────────────────────────
     // Public API
@@ -79,12 +83,26 @@ public class GlobalBootstrapper : MonoBehaviour
 
             // Step 2 — Core 시스템 생성
             _sceneNavigator = new SceneNavigator();
-            _popupManager   = new PopupManager();
+
+            // PopupCanvas 생성 (sortingOrder 100, ScreenSpaceOverlay)
+            var popupCanvasGO = new GameObject("PopupCanvas",
+                typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            popupCanvasGO.transform.SetParent(transform);
+
+            var canvas = popupCanvasGO.GetComponent<Canvas>();
+            canvas.renderMode    = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder  = 100;
+
+            var scaler = popupCanvasGO.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode       = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1080, 1920);
+
+            _popupManager = new PopupManager(popupCanvasGO.transform, _popupViewPrefab);
 
             Debug.Log($"{_logClass} Step 2 완료 — Core 시스템 생성");
 
             // Step 3 — GameContext 생성 및 DI 조립
-            _gameContext = new GameContext(masterData);
+            _gameContext = new GameContext(masterData, _popupManager);
 
             Debug.Log($"{_logClass} Step 3 완료 — GameContext 조립");
 

@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using Samsara.Core.Popup;
 using UnityEngine;
 
 /// <summary>
@@ -27,8 +28,9 @@ public class GameContext
     private readonly MiniGameUseCase   _miniGameUseCase;
 
     // ──────────────────────────────────────────────
-    // Public Accessors — UseCase만 공개
+    // Public Accessors — UseCase 및 Core 시스템
     // ──────────────────────────────────────────────
+    public IPopupManager    PopupManager      { get; }
     public CharacterUseCase CharacterUseCase  => _characterUseCase;
     public EvolutionUseCase EvolutionUseCase  => _evolutionUseCase;
     public StageUseCase     StageUseCase      => _stageUseCase;
@@ -40,8 +42,10 @@ public class GameContext
     // Constructor — DI 조립. new 사용은 여기서만 허용.
     // ──────────────────────────────────────────────
     /// <param name="masterData">GlobalBootstrapper가 ThreadPool에서 로드한 MasterData 전체.</param>
-    public GameContext(ScriptableObject[] masterData)
+    /// <param name="popupManager">GlobalBootstrapper가 생성한 IPopupManager 인스턴스.</param>
+    public GameContext(ScriptableObject[] masterData, IPopupManager popupManager)
     {
+        PopupManager = popupManager;
         // Step 1 — Repository 생성
         _characterRepo    = new CharacterRepository();
         _stageRepo        = new StageRepository();

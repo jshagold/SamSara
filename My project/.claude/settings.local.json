@@ -8,7 +8,8 @@
       "Bash(done)",
       "Bash(for f in \"./Features/DailyState/Domain/DailyStateUseCase.cs\" \"./Features/DailyState/Domain/CreateNewDailyStateUseCase.cs\" \"./Features/Inventory/Domain/GetItemCountUseCase.cs\" \"./Features/Inventory/Domain/GetMoneyUseCase.cs\" \"./App/Systems/Lifecycle/AppLifecycleService.cs\")",
       "Bash(for f in ./Features/Character/Domain/CreateNewCharacterUseCase.cs ./Features/Inventory/Domain/CreateNewInventoryUseCase.cs ./Features/Inventory/Domain/GetInventoryUseCase.cs ./Features/Skills/Domain/GetSkillListUseCase.cs)",
-      "Bash(grep -v \"//\")"
+      "Bash(grep -v \"//\")",
+      "Bash(cd:*)"
     ]
   }
 }
