@@ -216,4 +216,4 @@
 - **DO NOT** create files outside `Assets/_Game/`.
 - **DO NOT** reference or copy patterns from `Assets/_Game/Dev/`.
 - If you make any judgment calls not covered by this Spec,
-  record them in `.claude/specs/stage-masterdata/decisions.md`
+  record them in `.claude/specs/masterdata/stage/decisions.md`
