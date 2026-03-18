@@ -10,7 +10,8 @@
       "Bash(for f in ./Features/Character/Domain/CreateNewCharacterUseCase.cs ./Features/Inventory/Domain/CreateNewInventoryUseCase.cs ./Features/Inventory/Domain/GetInventoryUseCase.cs ./Features/Skills/Domain/GetSkillListUseCase.cs)",
       "Bash(grep -v \"//\")",
       "Bash(cd:*)",
-      "mcp__claude_ai_Notion__notion-update-page"
+      "mcp__claude_ai_Notion__notion-update-page",
+      "mcp__claude_ai_Notion__notion-fetch"
     ]
   }
 }
