@@ -307,7 +307,7 @@
   - `Assets/_Game/Core/MasterData/SkillSO.cs`
   - `Assets/_Game/Core/MasterData/QTEPatternSO.cs`
 - **Implementation order:** TASK-01 → TASK-02 → TASK-03 → TASK-04 → TASK-05 → TASK-06 → TASK-07 → TASK-08
-- **DO NOT** create files outside `Assets/_Game/`.
+- **DO NOT** create files outside `Assets/_Game/`.dlqp
 - **DO NOT** reference or copy patterns from `Assets/_Game/Dev/`.
 - If you make any judgment calls not covered by this Spec,
   record them in `.claude/specs/features/masterdata/character/player/decisions.md`

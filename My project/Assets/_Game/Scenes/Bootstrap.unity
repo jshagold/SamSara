@@ -403,7 +403,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 999
@@ -603,8 +603,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 0}
-  m_sharedMaterial: {fileID: 0}
+  m_fontAsset: {fileID: 11400000, guid: 41b8286d1d3f8664d8181c1184a75056, type: 2}
+  m_sharedMaterial: {fileID: -273323812001102710, guid: 41b8286d1d3f8664d8181c1184a75056,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -739,14 +740,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: Button
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 0}
-  m_sharedMaterial: {fileID: 0}
+  m_fontAsset: {fileID: 11400000, guid: 41b8286d1d3f8664d8181c1184a75056, type: 2}
+  m_sharedMaterial: {fileID: -273323812001102710, guid: 41b8286d1d3f8664d8181c1184a75056,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4281479730
   m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -759,7 +761,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -965,14 +967,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: Button
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 0}
-  m_sharedMaterial: {fileID: 0}
+  m_fontAsset: {fileID: 11400000, guid: 41b8286d1d3f8664d8181c1184a75056, type: 2}
+  m_sharedMaterial: {fileID: -273323812001102710, guid: 41b8286d1d3f8664d8181c1184a75056,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4281479730
   m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -985,7 +988,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -1086,6 +1089,106 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1812212942
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1812212944}
+  - component: {fileID: 1812212943}
+  - component: {fileID: 1812212945}
+  - component: {fileID: 1812212946}
+  - component: {fileID: 1812212948}
+  - component: {fileID: 1812212947}
+  m_Layer: 0
+  m_Name: TestCharacterData
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1812212943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1812212942}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e57280a52d334240a3839833f37b9bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Samsara.Dev.V03_DefaultValueValidation
+  _testCharacterStats: {fileID: 11400000, guid: 0527ec4a310892646bbe1fa4ef58dec5,
+    type: 2}
+--- !u!4 &1812212944
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1812212942}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 264.53537, y: 247.94778, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1812212945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1812212942}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4c24db57c912384995063c59cfe9bc6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Samsara.Dev.V05_SaveRestoreValidation
+  _testStats: {fileID: 11400000, guid: b0b7dd43cf40d114eaae4c3ce99817bd, type: 2}
+--- !u!114 &1812212946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1812212942}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfc8269316c847b4ea7ab68eaf575ca5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Samsara.Dev.V06_DirtyFlagValidation
+--- !u!114 &1812212947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1812212942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18d3281f49501254e98fc60f7ab18d8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Samsara.Dev.V08_InitializeNewRunValidation
+  _testStats: {fileID: 11400000, guid: b0b7dd43cf40d114eaae4c3ce99817bd, type: 2}
+--- !u!114 &1812212948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1812212942}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0096e95e0cf59b044bae5170b27c35a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Samsara.Dev.V07_NoDuplicateValidation
 --- !u!1 &2138330715
 GameObject:
   m_ObjectHideFlags: 0
@@ -1216,3 +1319,4 @@ SceneRoots:
   - {fileID: 1658157469}
   - {fileID: 613702033}
   - {fileID: 389192226}
+  - {fileID: 1812212944}

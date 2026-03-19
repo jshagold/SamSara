@@ -15,7 +15,7 @@ MonoBehaviour:
   _enemyId: 0
   _enemyName: 
   _baseStats: {fileID: 11400000, guid: ac6bde5428c556340804db81fe947536, type: 2}
-  _skillIds: 00000000
+  _skillIds: 01000000
   _battleSpriteKeyHp100: 
   _battleSpriteKeyHp50: 
   _battleSpriteKeyHp0: 

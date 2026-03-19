@@ -16,8 +16,15 @@ MonoBehaviour:
   _eventName: 
   _eventType: 0
   _backgroundSpriteKey: 
-  _dialogues: []
+  _dialogues:
+  - _portraitSpriteKey: 
+    _dialogueText: 
   _result:
     _resultType: 0
     _value: 0
-  _choices: []
+  _choices:
+  - _choiceText: 
+    _result:
+      _resultType: 0
+      _value: 0
+    _nextEventId: 0

@@ -1,6 +1,8 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Samsara.Core.Popup;
+using Samsara.Features.Character.Data;
+using Samsara.Features.Character.Domain;
 using UnityEngine;
 
 /// <summary>
@@ -14,8 +16,10 @@ public class GameContext
     // ──────────────────────────────────────────────
     // Repositories (외부 노출 금지 — UseCase를 통해서만 접근)
     // ──────────────────────────────────────────────
-    private readonly CharacterRepository _characterRepo;
-    private readonly StageRepository     _stageRepo;
+    private readonly CharacterRepository        _characterRepo;
+    private readonly StageRepository            _stageRepo;
+    private readonly ICharacterRunRepository    _characterRunRepo;
+    private readonly ICharacterAccountRepository _characterAccountRepo;
 
     // ──────────────────────────────────────────────
     // UseCases (public 프로퍼티로만 노출)
@@ -30,7 +34,9 @@ public class GameContext
     // ──────────────────────────────────────────────
     // Public Accessors — UseCase 및 Core 시스템
     // ──────────────────────────────────────────────
-    public IPopupManager    PopupManager      { get; }
+    public IPopupManager              PopupManager         { get; }
+    public ICharacterRunRepository    CharacterRunRepo     => _characterRunRepo;
+    public ICharacterAccountRepository CharacterAccountRepo => _characterAccountRepo;
     public CharacterUseCase CharacterUseCase  => _characterUseCase;
     public EvolutionUseCase EvolutionUseCase  => _evolutionUseCase;
     public StageUseCase     StageUseCase      => _stageUseCase;
@@ -47,8 +53,11 @@ public class GameContext
     {
         PopupManager = popupManager;
         // Step 1 — Repository 생성
-        _characterRepo    = new CharacterRepository();
-        _stageRepo        = new StageRepository();
+        _characterRepo        = new CharacterRepository();
+        _stageRepo            = new StageRepository();
+        _characterRunRepo     = new CharacterRunRepository();
+        _characterAccountRepo = new CharacterAccountRepository();
+        Debug.Log($"{_logClass} [V-02] CharacterRunRepo={_characterRunRepo.GetType().Name} / CharacterAccountRepo={_characterAccountRepo.GetType().Name} 등록 확인.");
 
         // Step 2 — UseCase 생성 (Repository 주입)
         _characterUseCase = new CharacterUseCase(_characterRepo);
@@ -74,7 +83,9 @@ public class GameContext
         {
             await UniTask.WhenAll(
                 _characterRepo.LoadDataAsync(),
-                _stageRepo.LoadDataAsync()
+                _stageRepo.LoadDataAsync(),
+                _characterRunRepo.LoadDataAsync(),
+                _characterAccountRepo.LoadDataAsync()
             );
 
             Debug.Log($"{_logClass} 런타임 데이터 로드 완료.");
@@ -97,6 +108,8 @@ public class GameContext
     {
         _characterRepo.SaveDataSync();
         _stageRepo.SaveDataSync();
+        _characterRunRepo.SaveDataSync();
+        _characterAccountRepo.SaveDataSync();
 
         Debug.Log($"{_logClass} 긴급 동기 저장 완료.");
     }

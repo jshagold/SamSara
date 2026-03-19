@@ -82,4 +82,4 @@
 - **DO NOT** create files outside `Assets/_Game/`.
 - **DO NOT** reference or copy patterns from `Assets/_Game/Dev/`.
 - If you make any judgment calls not covered by this Spec,
-  record them in `.claude/specs/enemy-masterdata/decisions.md`
+  record them in `.claude/specs/features/masterdata/character/enemy/decisions.md`
