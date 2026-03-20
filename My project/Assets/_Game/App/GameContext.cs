@@ -3,6 +3,8 @@ using Cysharp.Threading.Tasks;
 using Samsara.Core.Popup;
 using Samsara.Features.Character.Data;
 using Samsara.Features.Character.Domain;
+using Samsara.Features.Stage.Data;
+using Samsara.Features.Stage.Domain;
 using UnityEngine;
 
 /// <summary>
@@ -16,9 +18,10 @@ public class GameContext
     // ──────────────────────────────────────────────
     // Repositories (외부 노출 금지 — UseCase를 통해서만 접근)
     // ──────────────────────────────────────────────
-    private readonly CharacterRepository        _characterRepo;
-    private readonly StageRepository            _stageRepo;
-    private readonly ICharacterRunRepository    _characterRunRepo;
+    private readonly CharacterRepository         _characterRepo;
+    private readonly IStageRepository            _stageRepo;
+    private readonly IStageMasterDataRepository  _stageMasterDataRepo;
+    private readonly ICharacterRunRepository     _characterRunRepo;
     private readonly ICharacterAccountRepository _characterAccountRepo;
 
     // ──────────────────────────────────────────────
@@ -34,9 +37,10 @@ public class GameContext
     // ──────────────────────────────────────────────
     // Public Accessors — UseCase 및 Core 시스템
     // ──────────────────────────────────────────────
-    public IPopupManager              PopupManager         { get; }
-    public ICharacterRunRepository    CharacterRunRepo     => _characterRunRepo;
+    public IPopupManager               PopupManager         { get; }
+    public ICharacterRunRepository     CharacterRunRepo     => _characterRunRepo;
     public ICharacterAccountRepository CharacterAccountRepo => _characterAccountRepo;
+    public IStageMasterDataRepository  StageMasterDataRepo  => _stageMasterDataRepo;
     public CharacterUseCase CharacterUseCase  => _characterUseCase;
     public EvolutionUseCase EvolutionUseCase  => _evolutionUseCase;
     public StageUseCase     StageUseCase      => _stageUseCase;
@@ -47,17 +51,19 @@ public class GameContext
     // ──────────────────────────────────────────────
     // Constructor — DI 조립. new 사용은 여기서만 허용.
     // ──────────────────────────────────────────────
-    /// <param name="masterData">GlobalBootstrapper가 ThreadPool에서 로드한 MasterData 전체.</param>
+    /// <param name="masterData">GlobalBootstrapper가 로드한 MasterData 전체.</param>
     /// <param name="popupManager">GlobalBootstrapper가 생성한 IPopupManager 인스턴스.</param>
     public GameContext(ScriptableObject[] masterData, IPopupManager popupManager)
     {
         PopupManager = popupManager;
+
         // Step 1 — Repository 생성
         _characterRepo        = new CharacterRepository();
         _stageRepo            = new StageRepository();
+        _stageMasterDataRepo  = new StageMasterDataRepository();
         _characterRunRepo     = new CharacterRunRepository();
         _characterAccountRepo = new CharacterAccountRepository();
-        Debug.Log($"{_logClass} [V-02] CharacterRunRepo={_characterRunRepo.GetType().Name} / CharacterAccountRepo={_characterAccountRepo.GetType().Name} 등록 확인.");
+        Debug.Log($"{_logClass} [V-02] StageRepo={_stageRepo.GetType().Name} / StageMasterDataRepo={_stageMasterDataRepo.GetType().Name} 등록 확인.");
 
         // Step 2 — UseCase 생성 (Repository 주입)
         _characterUseCase = new CharacterUseCase(_characterRepo);
@@ -74,16 +80,19 @@ public class GameContext
     // LoadAllDataAsync — 병렬 로드 (FR-02)
     // ──────────────────────────────────────────────
     /// <summary>
-    /// 모든 Repository의 런타임 데이터를 병렬로 로드한다.
+    /// MasterData 초기화 후 모든 Repository의 런타임 데이터를 병렬로 로드한다.
     /// 하나라도 실패하면 즉시 InvalidOperationException (Fail Fast).
     /// </summary>
     public async UniTask LoadAllDataAsync()
     {
         try
         {
+            // StageMasterDataRepository는 Resources API 사용으로 메인 스레드에서 동기 초기화
+            _stageMasterDataRepo.Initialize();
+
             await UniTask.WhenAll(
                 _characterRepo.LoadDataAsync(),
-                _stageRepo.LoadDataAsync(),
+                _stageRepo.LoadAsync(),
                 _characterRunRepo.LoadDataAsync(),
                 _characterAccountRepo.LoadDataAsync()
             );
@@ -107,7 +116,7 @@ public class GameContext
     public void SaveAllDataSync()
     {
         _characterRepo.SaveDataSync();
-        _stageRepo.SaveDataSync();
+        _stageRepo.SaveSync();
         _characterRunRepo.SaveDataSync();
         _characterAccountRepo.SaveDataSync();
 

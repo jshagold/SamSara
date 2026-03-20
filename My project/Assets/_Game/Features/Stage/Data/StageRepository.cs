@@ -1,21 +1,118 @@
+using System.Collections.Generic;
+using System.IO;
 using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
+using Samsara.Features.Stage.Domain;
 using UnityEngine;
 
-/// <summary>
-/// [STUB] 스테이지 저장 데이터 Repository. 구체 구현은 Stage Feature 스펙에서 진행.
-/// </summary>
-public class StageRepository
+namespace Samsara.Features.Stage.Data
 {
-    private readonly string _logClass = $"[{nameof(StageRepository)}]";
-
-    public async UniTask LoadDataAsync()
+    public class StageRepository : IStageRepository
     {
-        await UniTask.CompletedTask;
-        Debug.Log($"{_logClass} LoadDataAsync (stub)");
-    }
+        private readonly string _logClass = $"[{nameof(StageRepository)}]";
+        private readonly string _savePath = Application.persistentDataPath + "/stage_run_save.json";
 
-    public void SaveDataSync()
-    {
-        Debug.Log($"{_logClass} SaveDataSync (stub)");
+        private StageRunData _runData;
+        private bool _isDirty;
+
+        public StageRunData RunData => _runData;
+
+        // ──────────────────────────────────────────────
+        // Mutation — Save-on-Action
+        // ──────────────────────────────────────────────
+
+        public void InitializeRun(string startStageId)
+        {
+            _runData = new StageRunData
+            {
+                CurrentStageId     = startStageId,
+                CurrentNodeIndex   = 0,
+                GeneratedNodeIds   = new List<string>(),
+                CompletedNodeIndices = new List<int>()
+            };
+            _isDirty = true;
+            SaveAsync().Forget();
+        }
+
+        public void CompleteNode(int nodeIndex)
+        {
+            _runData.CompletedNodeIndices.Add(nodeIndex);
+            _runData.CurrentNodeIndex++;
+            _isDirty = true;
+            SaveAsync().Forget();
+        }
+
+        public void TransitionToStage(string stageId)
+        {
+            _runData.CurrentStageId = stageId;
+            _runData.CurrentNodeIndex = 0;
+            _runData.GeneratedNodeIds.Clear();
+            _runData.CompletedNodeIndices.Clear();
+            _isDirty = true;
+            SaveAsync().Forget();
+        }
+
+        public void SetGeneratedNodes(List<string> nodeIds)
+        {
+            _runData.GeneratedNodeIds = nodeIds;
+            _isDirty = true;
+            SaveAsync().Forget();
+        }
+
+        // ──────────────────────────────────────────────
+        // Load
+        // ──────────────────────────────────────────────
+
+        public async UniTask LoadAsync()
+        {
+            await UniTask.RunOnThreadPool(() =>
+            {
+                if (File.Exists(_savePath))
+                {
+                    var json = File.ReadAllText(_savePath);
+                    _runData = JsonConvert.DeserializeObject<StageRunData>(json);
+                }
+                else
+                {
+                    _runData = new StageRunData();
+                }
+            });
+
+            _isDirty = false;
+            Debug.Log($"{_logClass} LoadAsync 완료.");
+        }
+
+        // ──────────────────────────────────────────────
+        // Save — Async (일반 게임플레이)
+        // ──────────────────────────────────────────────
+
+        public async UniTask SaveAsync()
+        {
+            if (!_isDirty) return;
+
+            await UniTask.RunOnThreadPool(() =>
+            {
+                var json = JsonConvert.SerializeObject(_runData);
+                File.WriteAllText(_savePath, json);
+            });
+
+            _isDirty = false;
+            Debug.Log($"{_logClass} SaveAsync 완료.");
+        }
+
+        // ──────────────────────────────────────────────
+        // Save — Sync (OnApplicationPause / OnApplicationQuit 전용)
+        // ──────────────────────────────────────────────
+
+        public void SaveSync()
+        {
+            if (!_isDirty) return;
+
+            var json = JsonConvert.SerializeObject(_runData);
+            File.WriteAllText(_savePath, json);
+            _isDirty = false;
+
+            Debug.Log($"{_logClass} SaveSync 완료.");
+        }
     }
 }
