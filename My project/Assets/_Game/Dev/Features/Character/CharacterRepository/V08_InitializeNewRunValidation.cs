@@ -3,7 +3,7 @@ using Samsara.Features.Character.Data;
 using Samsara.Features.Character.MasterData;
 using UnityEngine;
 
-namespace Samsara.Dev
+namespace Samsara.Dev.Character
 {
     /// <summary>
     /// [V-08] InitializeNewRun()이 CharacterRunData를 올바른 초기값으로 설정하는지 검증.

@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using Samsara.Features.Character.Data;
 using UnityEngine;
 
-namespace Samsara.Dev
+namespace Samsara.Dev.Character
 {
     /// <summary>
     /// [V-06] Dirty Flag가 false일 때 SaveDataAsync()가 파일을 쓰지 않는지 검증.

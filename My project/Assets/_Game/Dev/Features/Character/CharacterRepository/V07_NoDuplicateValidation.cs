@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 using Samsara.Features.Character.Data;
 using UnityEngine;
 
-namespace Samsara.Dev
+namespace Samsara.Dev.Character
 {
     /// <summary>
     /// [V-07] UnlockEvolutionNode() / RegisterCodex() 중복 호출 시 리스트에 항목이 1개만 존재하는지 검증.

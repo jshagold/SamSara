@@ -4,7 +4,7 @@ using Samsara.Features.Character.Data;
 using Samsara.Features.Character.MasterData;
 using UnityEngine;
 
-namespace Samsara.Dev
+namespace Samsara.Dev.Character
 {
     /// <summary>
     /// [V-03] LoadDataAsync() — 저장 파일 없을 때 기본값 초기화 검증.

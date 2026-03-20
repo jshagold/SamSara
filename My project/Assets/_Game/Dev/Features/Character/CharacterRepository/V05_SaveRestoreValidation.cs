@@ -5,7 +5,7 @@ using Samsara.Features.Character.Data;
 using Samsara.Features.Character.MasterData;
 using UnityEngine;
 
-namespace Samsara.Dev
+namespace Samsara.Dev.Character
 {
     /// <summary>
     /// [V-05] SaveDataAsync() 후 다음 실행에서 값이 올바르게 복원되는지 검증.
