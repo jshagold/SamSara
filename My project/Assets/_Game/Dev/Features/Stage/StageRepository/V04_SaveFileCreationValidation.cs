@@ -38,10 +38,7 @@ namespace Samsara.Dev.Stage
                 // ── InitializeRun → 내부 SaveAsync().Forget() 경유 파일 생성 ─
                 var repo = new StageRepository();
                 repo.InitializeRun("v04_stage");
-
-                // InitializeRun이 SaveAsync().Forget()을 내부 호출.
-                // ThreadPool I/O 완료까지 대기.
-                await UniTask.Delay(500);
+                await repo.SaveAsync();
 
                 bool fileCreated = File.Exists(savePath);
                 LogCheck($"SaveAsync() 후: stage_run_save.json 생성됨", fileCreated,

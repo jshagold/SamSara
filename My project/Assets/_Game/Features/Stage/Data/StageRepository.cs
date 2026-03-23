@@ -31,7 +31,6 @@ namespace Samsara.Features.Stage.Data
                 CompletedNodeIndices = new List<int>()
             };
             _isDirty = true;
-            SaveAsync().Forget();
         }
 
         public void CompleteNode(int nodeIndex)
@@ -39,7 +38,6 @@ namespace Samsara.Features.Stage.Data
             _runData.CompletedNodeIndices.Add(nodeIndex);
             _runData.CurrentNodeIndex++;
             _isDirty = true;
-            SaveAsync().Forget();
         }
 
         public void TransitionToStage(string stageId)
@@ -49,14 +47,12 @@ namespace Samsara.Features.Stage.Data
             _runData.GeneratedNodeIds.Clear();
             _runData.CompletedNodeIndices.Clear();
             _isDirty = true;
-            SaveAsync().Forget();
         }
 
         public void SetGeneratedNodes(List<string> nodeIds)
         {
             _runData.GeneratedNodeIds = nodeIds;
             _isDirty = true;
-            SaveAsync().Forget();
         }
 
         // ──────────────────────────────────────────────

@@ -12,8 +12,6 @@ namespace Samsara.Dev.Stage
     /// Dev 전용. 프로덕션 빌드에 포함하지 말 것.
     /// 사용법: 빈 GameObject에 컴포넌트 추가 후 Play Mode 진입.
     ///
-    /// NOTE: 인메모리 상태 검증이므로 AsyncSave 완료 대기 없이 즉시 확인 가능.
-    ///       finally에서 잔류 파일 정리 시에만 Delay 사용.
     /// </summary>
     public class V07_TransitionToStageValidation : MonoBehaviour
     {
@@ -86,8 +84,6 @@ namespace Samsara.Dev.Stage
             }
             finally
             {
-                // 내부 SaveAsync().Forget() 완료 후 잔류 파일 정리
-                await UniTask.Delay(500);
                 if (File.Exists(savePath)) File.Delete(savePath);
                 if (fileExisted) File.Move(backupPath, savePath);
                 Debug.Log($"{_logClass} === V-07 검증 종료. ===");

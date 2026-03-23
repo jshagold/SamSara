@@ -68,9 +68,9 @@ namespace Samsara.Dev.Stage
                 Debug.Log($"{_logClass} --- [Case 3] Positive Control: Dirty=true → 파일 생성 ---");
 
                 var repoPositive = new StageRepository();
-                await repoPositive.LoadAsync();          // _isDirty=false
-                repoPositive.InitializeRun("v06_ctrl");  // _isDirty=true, Forget 내부 실행
-                await UniTask.Delay(500);                // Forget 완료 대기
+                await repoPositive.LoadAsync();         // _isDirty=false
+                repoPositive.InitializeRun("v06_ctrl"); // _isDirty=true
+                await repoPositive.SaveAsync();
 
                 bool case3Pass = File.Exists(savePath);
                 LogCheck("Dirty=true: stage_run_save.json 생성됨 (Positive Control)", case3Pass);

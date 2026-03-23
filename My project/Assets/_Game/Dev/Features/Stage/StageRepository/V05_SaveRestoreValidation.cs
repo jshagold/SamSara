@@ -11,8 +11,6 @@ namespace Samsara.Dev.Stage
     /// Dev 전용. 프로덕션 빌드에 포함하지 말 것.
     /// 사용법: 빈 GameObject에 컴포넌트 추가 후 Play Mode 진입.
     ///
-    /// NOTE: mutation 메서드들이 SaveAsync().Forget()을 내부 호출하므로
-    ///       순차 Delay를 삽입해 각 저장이 완료된 이후 다음 mutation을 실행한다.
     /// </summary>
     public class V05_SaveRestoreValidation : MonoBehaviour
     {
@@ -48,13 +46,9 @@ namespace Samsara.Dev.Stage
                 var writerRepo = new StageRepository();
 
                 writerRepo.InitializeRun(TestStageId);
-                await UniTask.Delay(300);   // Forget 완료 대기
-
                 writerRepo.SetGeneratedNodes(new List<string> { TestNodeA, TestNodeB, TestNodeC });
-                await UniTask.Delay(300);
-
                 writerRepo.CompleteNode(0); // CompletedNodeIndices=[0], CurrentNodeIndex=1
-                await UniTask.Delay(300);
+                await writerRepo.SaveAsync();
 
                 Debug.Log($"{_logClass} Phase 1 완료: 테스트 값 저장됨.");
 
