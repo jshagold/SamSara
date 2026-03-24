@@ -9,5 +9,7 @@ namespace Samsara.Features.Character.Data
         public string EvolutionNodeId;
         public int Day;
         public int Gold;
+        public int ActionPoints;
+        public int MaxActionPoints;
     }
 }

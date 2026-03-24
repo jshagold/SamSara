@@ -283,7 +283,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 613702031}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 585a22c1371966e4980ee2f8b4144345, type: 3}
   m_Name: 
@@ -423,6 +423,128 @@ MonoBehaviour:
   _messageText: {fileID: 1387344285}
   _retryButton: {fileID: 2138330717}
   _quitButton: {fileID: 1307652670}
+--- !u!1 &1240573590
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1240573598}
+  - component: {fileID: 1240573597}
+  - component: {fileID: 1240573596}
+  - component: {fileID: 1240573595}
+  - component: {fileID: 1240573594}
+  - component: {fileID: 1240573593}
+  - component: {fileID: 1240573592}
+  - component: {fileID: 1240573591}
+  m_Layer: 0
+  m_Name: Test_StageRepository
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1240573591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240573590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef9af223fab4e5741a8f2503e8323b6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Samsara.Dev.Stage.V09_MasterDataCacheValidation
+--- !u!114 &1240573592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240573590}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaae207d0bc5d154eb69f983ee1f3fcd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Samsara.Dev.Stage.V08_GetStageByIdExceptionValidation
+--- !u!114 &1240573593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240573590}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6332391a8bb312c4b8200d0077e63f06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Samsara.Dev.Stage.V07_TransitionToStageValidation
+--- !u!114 &1240573594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240573590}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72f5ce617cf83984496079490e882674, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Samsara.Dev.Stage.V06_DirtyFlagValidation
+--- !u!114 &1240573595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240573590}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b568fd5340af804cb60c26115e76233, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Samsara.Dev.Stage.V05_SaveRestoreValidation
+--- !u!114 &1240573596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240573590}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e71b4630980c52c489444645273a97d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Samsara.Dev.Stage.V04_SaveFileCreationValidation
+--- !u!114 &1240573597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240573590}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06099d8b1c0ed4b4d848080e2e81f8b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Samsara.Dev.Stage.V03_DefaultValueValidation
+--- !u!4 &1240573598
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240573590}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 264.53537, y: 247.94778, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1307652668
 GameObject:
   m_ObjectHideFlags: 0
@@ -1069,7 +1191,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1658157467}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0b7895e3108b3e24f89bf1d01f1cccdb, type: 3}
   m_Name: 
@@ -1171,7 +1293,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1812212942}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 18d3281f49501254e98fc60f7ab18d8e, type: 3}
   m_Name: 
@@ -1352,3 +1474,4 @@ SceneRoots:
   - {fileID: 1658157469}
   - {fileID: 613702033}
   - {fileID: 1812212944}
+  - {fileID: 1240573598}

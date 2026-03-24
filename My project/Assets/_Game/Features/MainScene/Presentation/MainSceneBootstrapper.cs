@@ -1,0 +1,36 @@
+using Cysharp.Threading.Tasks;
+using Samsara.Features.MainScene.Domain;
+using UnityEngine;
+
+namespace Samsara.Features.MainScene.Presentation
+{
+    public class MainSceneBootstrapper : MonoBehaviour
+    {
+        private readonly string _logClass = $"[{nameof(MainSceneBootstrapper)}]";
+
+        [SerializeField] private MainView _mainView;
+
+        private MainPresenter _mainPresenter;
+
+        private void Awake()
+        {
+            InitializeAsync().Forget();
+        }
+
+        private async UniTaskVoid InitializeAsync()
+        {
+            await GlobalBootstrapper.Instance.InitializationTask;
+
+            var gameContext = GlobalBootstrapper.Instance.GameContext;
+            var characterRunRepo = gameContext.CharacterRunRepo;
+            var sceneNavigator = GlobalBootstrapper.Instance.SceneNavigator;
+
+            var mainUseCase = new MainUseCase(characterRunRepo);
+
+            _mainPresenter = new MainPresenter(mainUseCase, _mainView, sceneNavigator);
+            _mainPresenter.Initialize();
+
+            Debug.Log($"{_logClass} MainScene 초기화 완료.");
+        }
+    }
+}

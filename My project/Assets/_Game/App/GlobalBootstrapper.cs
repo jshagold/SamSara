@@ -48,6 +48,11 @@ public class GlobalBootstrapper : MonoBehaviour
     /// </summary>
     public GameContext GameContext => _gameContext;
 
+    /// <summary>
+    /// ISceneNavigator. InitializationTask 완료 이후에만 접근할 것.
+    /// </summary>
+    public ISceneNavigator SceneNavigator => _sceneNavigator;
+
     // ──────────────────────────────────────────────
     // Singleton Guard (FR-01)
     // ──────────────────────────────────────────────
