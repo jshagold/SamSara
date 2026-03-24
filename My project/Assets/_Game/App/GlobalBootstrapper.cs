@@ -120,6 +120,9 @@ public class GlobalBootstrapper : MonoBehaviour
             _initTcs.TrySetResult();
 
             Debug.Log($"{_logClass} 초기화 완료.");
+
+            // Step 6 — Main 씬으로 전환
+            await _sceneNavigator.NavigateToAsync(SceneKey.Main);
         }
         catch (Exception e)
         {
