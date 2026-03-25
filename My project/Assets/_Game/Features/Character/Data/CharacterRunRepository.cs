@@ -39,6 +39,7 @@ namespace Samsara.Features.Character.Data
             _runData = new CharacterRunData
             {
                 Hp = baseStats.Hp,
+                MaxHp = baseStats.Hp,
                 Strength = baseStats.Strength,
                 Toughness = baseStats.Toughness,
                 Speed = baseStats.Speed,

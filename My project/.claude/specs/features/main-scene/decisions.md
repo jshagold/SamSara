@@ -9,7 +9,7 @@
 ## D-02: CharacterRunData.MaxHp 부재
 
 - **상황:** MainViewModel에 MaxHp가 필요하지만 CharacterRunData에 MaxHp 필드가 없음.
-- **결정:** 현재는 Hp 값을 MaxHp로도 사용. CharacterRunData에 MaxHp 필드 추가 시 교체 필요.
+- **결정:** MaxHp는 캐릭터 스탯의 Hp 스탯 수치를 초기값으로 하되, 이벤트/정비 등을 통해 가변되는 수치. 현재 Hp는 전투/이벤트로 증감하는 실시간 수치(0 ~ MaxHp 범위). 두 값 모두 CharacterRunData에 별도 필드로 관리 필요.
 
 ## D-03: IsMerchantActive 항상 false (OQ-02)
 

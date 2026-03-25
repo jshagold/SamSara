@@ -3,6 +3,7 @@ namespace Samsara.Features.Character.Data
     public class CharacterRunData
     {
         public int Hp;
+        public int MaxHp;
         public int Strength;
         public int Toughness;
         public int Speed;

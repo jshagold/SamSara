@@ -34,7 +34,7 @@ namespace Samsara.Features.MainScene.Domain
                 Day = runData.Day,
                 Gold = runData.Gold,
                 CurrentHp = runData.Hp,
-                MaxHp = runData.Hp, // TODO: MaxHp 필드가 RunData에 추가되면 교체
+                MaxHp = runData.MaxHp,
                 ActionPoints = runData.ActionPoints,
                 MaxActionPoints = runData.MaxActionPoints,
                 CurrentEvolutionNodeId = runData.EvolutionNodeId,

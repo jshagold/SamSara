@@ -18,6 +18,7 @@ namespace Samsara.Features.MainScene.Presentation
         [SerializeField] private HudView _hudView;
 
         // Main Views
+        [SerializeField] private BackgroundView _backgroundView;
         [SerializeField] private CharacterSpriteView _characterSpriteView;
         [SerializeField] private StageButtonView _stageButtonView;
         [SerializeField] private MaintenanceButtonView _maintenanceButtonView;

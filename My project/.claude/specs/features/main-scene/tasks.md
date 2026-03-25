@@ -33,15 +33,16 @@ Based on the class structure defined in Plan, this document defines the order an
 | 6 | OptionButtonView.cs | Assets/_Game/Features/MainScene/Presentation/Hud/ | Create |
 | 7 | CharacterStatusView.cs | Assets/_Game/Features/MainScene/Presentation/Hud/ | Create |
 | 8 | HudView.cs | Assets/_Game/Features/MainScene/Presentation/Hud/ | Create |
-| 9 | CharacterSpriteView.cs | Assets/_Game/Features/MainScene/Presentation/Main/ | Create |
-| 10 | StageButtonView.cs | Assets/_Game/Features/MainScene/Presentation/Main/ | Create |
-| 11 | MaintenanceButtonView.cs | Assets/_Game/Features/MainScene/Presentation/Main/ | Create |
-| 12 | CharacterInfoButtonView.cs | Assets/_Game/Features/MainScene/Presentation/Main/ | Create |
-| 13 | MerchantButtonView.cs | Assets/_Game/Features/MainScene/Presentation/Main/ | Create |
-| 14 | MainView.cs | Assets/_Game/Features/MainScene/Presentation/ | Create |
-| 15 | MainPresenter.cs | Assets/_Game/Features/MainScene/Presentation/ | Create |
-| 16 | MainSceneBootstrapper.cs | Assets/_Game/Features/MainScene/Presentation/ | Create |
-| 17 | decisions.md | .claude/specs/features/main-scene/ | Create (empty) |
+| 9 | BackgroundView.cs | Assets/_Game/Features/MainScene/Presentation/Main/ | Create |
+| 10 | CharacterSpriteView.cs | Assets/_Game/Features/MainScene/Presentation/Main/ | Create |
+| 11 | StageButtonView.cs | Assets/_Game/Features/MainScene/Presentation/Main/ | Create |
+| 12 | MaintenanceButtonView.cs | Assets/_Game/Features/MainScene/Presentation/Main/ | Create |
+| 13 | CharacterInfoButtonView.cs | Assets/_Game/Features/MainScene/Presentation/Main/ | Create |
+| 14 | MerchantButtonView.cs | Assets/_Game/Features/MainScene/Presentation/Main/ | Create |
+| 15 | MainView.cs | Assets/_Game/Features/MainScene/Presentation/ | Create |
+| 16 | MainPresenter.cs | Assets/_Game/Features/MainScene/Presentation/ | Create |
+| 17 | MainSceneBootstrapper.cs | Assets/_Game/Features/MainScene/Presentation/ | Create |
+| 18 | decisions.md | .claude/specs/features/main-scene/ | Create (empty) |
 
 ---
 
@@ -49,9 +50,10 @@ Based on the class structure defined in Plan, this document defines the order an
 
 ### Task 1 — Modify CharacterRunData.cs
 
-Add the following two fields to CharacterRunData:
+Add the following three fields to CharacterRunData:
 - actionPoints (int) — current remaining action points
 - maxActionPoints (int) — maximum action points
+- maxHp (int) — maximum HP
 
 Follow the existing field pattern: JsonProperty, private backing field, public getter.
 
@@ -79,7 +81,15 @@ Each View inherits MonoBehaviour. Inspector-linked fields declared as [Serialize
 
 ---
 
-### Task 9~13 — Create Main area View files
+### Task 9 — Create BackgroundView.cs
+
+- Inherits MonoBehaviour. Inspector-linked fields declared as [SerializeField] private.
+- Displays background image via Image component.
+- Placed at the lowest layer in Canvas. No methods required. Background Sprite connected directly via Inspector.
+
+---
+
+### Task 10~14 — Create Main area View files
 
 Each View inherits MonoBehaviour. Inspector-linked fields declared as [SerializeField] private.
 
@@ -89,7 +99,7 @@ Each View inherits MonoBehaviour. Inspector-linked fields declared as [Serialize
 
 ---
 
-### Task 14 — Create MainView.cs
+### Task 15 — Create MainView.cs
 
 - Holds references to all child Views as [SerializeField] private.
 - Implements public methods called by Presenter (delegates to each child View method).
@@ -97,7 +107,7 @@ Each View inherits MonoBehaviour. Inspector-linked fields declared as [Serialize
 
 ---
 
-### Task 15 — Create MainPresenter.cs
+### Task 16 — Create MainPresenter.cs
 
 - Receives MainUseCase, MainView, ISceneNavigator via constructor injection.
 - Initialize() method:
@@ -109,7 +119,7 @@ Each View inherits MonoBehaviour. Inspector-linked fields declared as [Serialize
 
 ---
 
-### Task 16 — Create MainSceneBootstrapper.cs
+### Task 17 — Create MainSceneBootstrapper.cs
 
 - MonoBehaviour. Executes in Awake().
 - Retrieves ICharacterRunRepository from GameContext.
@@ -120,7 +130,7 @@ Each View inherits MonoBehaviour. Inspector-linked fields declared as [Serialize
 
 ---
 
-### Task 17 — Create decisions.md
+### Task 18 — Create decisions.md
 
 Create empty file at .claude/specs/features/main-scene/decisions.md.
 
@@ -131,12 +141,13 @@ Create empty file at .claude/specs/features/main-scene/decisions.md.
 | # | Item | How to Check |
 |---|---|---|
 | V-01 | No compile errors in Unity console | Check console |
-| V-02 | actionPoints and maxActionPoints fields added to CharacterRunData | Check file |
+| V-02 | actionPoints, maxActionPoints, maxHp fields added to CharacterRunData | Check file |
 | V-03 | No console errors after placing MainSceneBootstrapper in scene and pressing Play | Editor check |
 | V-04 | HUD elements slide out/in when HUD on/off button is tapped | Editor Play check |
 | V-05 | HUD on/off button remains fixed on screen when HUD is off | Editor Play check |
 | V-06 | Scene transitions to target scene after character animation plays on navigation button tap | Editor Play check |
 | V-07 | MerchantButtonView is inactive by default | Editor check |
+| V-08 | Background image is displayed at the lowest layer in Canvas during Play | Editor Play check |
 
 ---
 

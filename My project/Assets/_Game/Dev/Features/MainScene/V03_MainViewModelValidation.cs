@@ -45,6 +45,7 @@ namespace Samsara.Dev.MainScene
             bool dayPass   = vm.Day == runRepo.RunData.Day;
             bool goldPass  = vm.Gold == runRepo.RunData.Gold;
             bool hpPass    = vm.CurrentHp == runRepo.RunData.Hp;
+            bool maxHpPass = vm.MaxHp == runRepo.RunData.MaxHp;
             bool apPass    = vm.ActionPoints == runRepo.RunData.ActionPoints;
             bool maxApPass = vm.MaxActionPoints == runRepo.RunData.MaxActionPoints;
             bool nodePass  = vm.CurrentEvolutionNodeId == runRepo.RunData.EvolutionNodeId;
@@ -57,6 +58,8 @@ namespace Samsara.Dev.MainScene
                 goldPass, vm.Gold.ToString());
             LogCheck($"CurrentHp == {vm.CurrentHp} (expected: {runRepo.RunData.Hp})",
                 hpPass, vm.CurrentHp.ToString());
+            LogCheck($"MaxHp == {vm.MaxHp} (expected: {runRepo.RunData.MaxHp})",
+                maxHpPass, vm.MaxHp.ToString());
             LogCheck($"ActionPoints == {vm.ActionPoints} (expected: {runRepo.RunData.ActionPoints})",
                 apPass, vm.ActionPoints.ToString());
             LogCheck($"MaxActionPoints == {vm.MaxActionPoints} (expected: {runRepo.RunData.MaxActionPoints})",
@@ -66,7 +69,7 @@ namespace Samsara.Dev.MainScene
             LogCheck("IsMerchantActive == false (OQ-02 미해결, v1 기본값)",
                 merchantPass, vm.IsMerchantActive.ToString());
 
-            bool allPass = dayPass && goldPass && hpPass && apPass
+            bool allPass = dayPass && goldPass && hpPass && maxHpPass && apPass
                         && maxApPass && nodePass && merchantPass;
 
             Debug.Log($"{_logClass} -------------------------------------------");
