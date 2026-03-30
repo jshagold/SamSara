@@ -34,6 +34,9 @@ namespace Samsara.Features.Character.Data
             });
         }
 
+        /// <summary>Dev 전용. 외부에서 dirty 플래그를 강제로 설정한다.</summary>
+        public void MarkDirty() => _isDirty = true;
+
         public void InitializeNewRun(string startingEvolutionNodeId, CharacterStatsSO baseStats)
         {
             _runData = new CharacterRunData
@@ -42,7 +45,7 @@ namespace Samsara.Features.Character.Data
                 MaxHp = baseStats.Hp,
                 Strength = baseStats.Strength,
                 Toughness = baseStats.Toughness,
-                Speed = baseStats.Speed,
+                Agility = baseStats.Agility,
                 EvolutionNodeId = startingEvolutionNodeId,
                 Day = 1,
                 Gold = 0

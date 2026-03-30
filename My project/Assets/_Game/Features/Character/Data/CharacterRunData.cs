@@ -6,7 +6,7 @@ namespace Samsara.Features.Character.Data
         public int MaxHp;
         public int Strength;
         public int Toughness;
-        public int Speed;
+        public int Agility;
         public string EvolutionNodeId;
         public int Day;
         public int Gold;

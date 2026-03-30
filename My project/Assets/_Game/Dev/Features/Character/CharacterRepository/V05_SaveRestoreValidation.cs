@@ -101,8 +101,8 @@ namespace Samsara.Dev.Character
                                                                   runNotNull ? $"실제={runData.Strength}"    : "null");
                 LogCheck($"Toughness == {_testStats.Toughness}", runNotNull && runData.Toughness  == _testStats.Toughness,
                                                                   runNotNull ? $"실제={runData.Toughness}"   : "null");
-                LogCheck($"Speed == {_testStats.Speed}",         runNotNull && runData.Speed      == _testStats.Speed,
-                                                                  runNotNull ? $"실제={runData.Speed}"       : "null");
+                LogCheck($"Agility == {_testStats.Agility}",       runNotNull && runData.Agility      == _testStats.Agility,
+                                                                  runNotNull ? $"실제={runData.Agility}"       : "null");
                 LogCheck($"EvolutionNodeId == \"{TestStartNodeId}\"",
                                                                   runNotNull && runData.EvolutionNodeId == TestStartNodeId,
                                                                   runNotNull ? $"실제=\"{runData.EvolutionNodeId}\"" : "null");
@@ -115,7 +115,7 @@ namespace Samsara.Dev.Character
                     && runData.Hp              == _testStats.Hp
                     && runData.Strength        == _testStats.Strength
                     && runData.Toughness       == _testStats.Toughness
-                    && runData.Speed           == _testStats.Speed
+                    && runData.Agility           == _testStats.Agility
                     && runData.EvolutionNodeId == TestStartNodeId
                     && runData.Day             == 1
                     && runData.Gold            == 0;

@@ -45,7 +45,7 @@ namespace Samsara.Dev.Character
             bool hpPass    = d.Hp              == _testStats.Hp;
             bool strPass   = d.Strength        == _testStats.Strength;
             bool toughPass = d.Toughness       == _testStats.Toughness;
-            bool speedPass = d.Speed           == _testStats.Speed;
+            bool speedPass = d.Agility           == _testStats.Agility;
             bool nodePass  = d.EvolutionNodeId == TestNodeId;
             bool dayPass   = d.Day             == 1;
             bool goldPass  = d.Gold            == 0;
@@ -54,7 +54,7 @@ namespace Samsara.Dev.Character
             LogCheck($"Hp == {_testStats.Hp}",                                          hpPass,    d.Hp.ToString());
             LogCheck($"Strength == {_testStats.Strength}",                              strPass,   d.Strength.ToString());
             LogCheck($"Toughness == {_testStats.Toughness}",                           toughPass, d.Toughness.ToString());
-            LogCheck($"Speed == {_testStats.Speed}",                                    speedPass, d.Speed.ToString());
+            LogCheck($"Agility == {_testStats.Agility}",                                  speedPass, d.Agility.ToString());
             LogCheck($"EvolutionNodeId == \"{TestNodeId}\"",                           nodePass,  $"\"{d.EvolutionNodeId}\"");
             LogCheck("Day == 1 (항상 1로 시작)",                                        dayPass,   d.Day.ToString());
             LogCheck("Gold == 0 (항상 0으로 시작)",                                     goldPass,  d.Gold.ToString());

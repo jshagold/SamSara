@@ -10,11 +10,11 @@ namespace Samsara.Features.Character.MasterData
         [SerializeField] private int _hp;
         [SerializeField] private int _strength;
         [SerializeField] private int _toughness;
-        [SerializeField] private int _speed;
+        [SerializeField] private int _agility;
 
         public int Hp => _hp;
         public int Strength => _strength;
         public int Toughness => _toughness;
-        public int Speed => _speed;
+        public int Agility => _agility;
     }
 }
