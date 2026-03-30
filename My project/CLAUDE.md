@@ -1,6 +1,6 @@
 # CLAUDE.md — Samsara Project
 
-**Version:** 1.2.0 | **Date:** 2026-03-17
+**Version:** 1.3.0 | **Date:** 2026-03-30
 
 This file is automatically read by Claude Code on startup.
 Read this before any Spec files. Apply all rules here to every file you create.
@@ -119,6 +119,37 @@ Add to every class:
 
 ---
 
+## Decisions Tags (Required)
+
+When recording judgments in `decisions.md`, you MUST use one of these tags:
+
+| Tag | Meaning | What happens next |
+|---|---|---|
+| `[DECISION]` | Code-level judgment call | Uploaded to Notion Decisions page |
+| `[BACKLOG]` | Temporary implementation, needs real impl later | Moved to Notion Backlog page |
+| `[SPEC-GAP]` | Spec was missing a needed definition | Hak reviews, may trigger Specify version-up |
+
+Format each entry like:
+
+    D-01 [DECISION] Used coroutine instead of DOTween for gauge animation
+    D-02 [BACKLOG] Skill detail popup not implemented — showing name only
+    D-03 [SPEC-GAP] Inventory section integration method not defined in Specify
+
+Every entry MUST have exactly one tag. Do not mix tags or omit them.
+
+---
+
+## Patch Files
+
+When Hak provides a Patch file (`.claude/specs/[feature-name]/patch-NNN.md`):
+- Read the Patch file as your primary guide (instead of tasks.md)
+- Modify ONLY the files specified in the Patch
+- Do NOT create new files unless the Patch explicitly instructs it
+- Record any additional judgments in `decisions.md` with appropriate tags
+- Follow the Claude Code Implementation Guide section in the Patch
+
+---
+
 ## Project Status (Notion)
 
 Project-wide editor state, scene configurations, global decisions, and manual task completion are tracked in the Notion **Project Status** document.
@@ -143,8 +174,14 @@ All Spec documents are in Notion.
 | GlobalBootstrapper + GameContext | `문서 > [App] > GlobalBootstrapper + GameContext` |
 | SceneNavigator | `문서 > [Core] > SceneNavigator` |
 | PopupManager | `문서 > [Core] > PopupManager` |
+| Error Handling | `문서 > [Core] > Error Handling` |
+| CharacterRepository | `문서 > [Features] > CharacterRepository` |
+| StageRepository | `문서 > [Features] > StageRepository` |
+| MainScene | `문서 > [Features] > MainScene` |
+| MasterData (Character, Stage, Enemy, Event) | `문서 > [Features] > MasterData` |
 
-When implementing, use the **Tasks-MD** file of the target Feature as your primary guide.
+When implementing from Tasks: use the **Tasks-MD** file as your primary guide.
+When implementing from Patch: use the **Patch-NNN-MD** file as your primary guide.
 
 ---
 
@@ -153,7 +190,7 @@ When implementing, use the **Tasks-MD** file of the target Feature as your prima
 - [ ] Read this entire CLAUDE.md
 - [ ] Read `constitution.md` (project root)
 - [ ] Fetch **Project Status** from Notion (Page ID: `32652975d2df812f93abd1eecf7dd634`) and review current state
-- [ ] Open the Tasks-MD for the target Feature
+- [ ] Open the Tasks-MD (or Patch-MD) for the target Feature
 - [ ] Verify `Assets/_Game/` path rules
 - [ ] Confirm all referenced files in Tasks exist
   - If missing → create empty interface stubs first, then proceed
