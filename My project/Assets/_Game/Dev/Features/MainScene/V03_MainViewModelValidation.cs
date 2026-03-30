@@ -49,7 +49,6 @@ namespace Samsara.Dev.MainScene
             bool apPass    = vm.ActionPoints == runRepo.RunData.ActionPoints;
             bool maxApPass = vm.MaxActionPoints == runRepo.RunData.MaxActionPoints;
             bool nodePass  = vm.CurrentEvolutionNodeId == runRepo.RunData.EvolutionNodeId;
-            bool merchantPass = vm.IsMerchantActive == false;
 
             Debug.Log($"{_logClass} --- MainViewModel 매핑 검증 ---");
             LogCheck($"Day == {vm.Day} (expected: {runRepo.RunData.Day})",
@@ -66,11 +65,9 @@ namespace Samsara.Dev.MainScene
                 maxApPass, vm.MaxActionPoints.ToString());
             LogCheck($"EvolutionNodeId == \"{vm.CurrentEvolutionNodeId}\" (expected: \"{runRepo.RunData.EvolutionNodeId}\")",
                 nodePass, $"\"{vm.CurrentEvolutionNodeId}\"");
-            LogCheck("IsMerchantActive == false (OQ-02 미해결, v1 기본값)",
-                merchantPass, vm.IsMerchantActive.ToString());
 
             bool allPass = dayPass && goldPass && hpPass && maxHpPass && apPass
-                        && maxApPass && nodePass && merchantPass;
+                        && maxApPass && nodePass;
 
             Debug.Log($"{_logClass} -------------------------------------------");
             if (allPass)

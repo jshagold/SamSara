@@ -11,7 +11,6 @@ namespace Samsara.Features.MainScene.Domain
         public int ActionPoints;
         public int MaxActionPoints;
         public string CurrentEvolutionNodeId;
-        public bool IsMerchantActive;
     }
 
     public class MainUseCase
@@ -38,8 +37,6 @@ namespace Samsara.Features.MainScene.Domain
                 ActionPoints = runData.ActionPoints,
                 MaxActionPoints = runData.MaxActionPoints,
                 CurrentEvolutionNodeId = runData.EvolutionNodeId,
-                // OQ-02 미해결: Merchant 활성 조건이 아직 정의되지 않음. v1에서는 항상 false.
-                IsMerchantActive = false
             };
         }
     }

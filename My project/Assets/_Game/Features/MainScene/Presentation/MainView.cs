@@ -23,7 +23,6 @@ namespace Samsara.Features.MainScene.Presentation
         [SerializeField] private StageButtonView _stageButtonView;
         [SerializeField] private MaintenanceButtonView _maintenanceButtonView;
         [SerializeField] private CharacterInfoButtonView _characterInfoButtonView;
-        [SerializeField] private MerchantButtonView _merchantButtonView;
 
         // Events — forwarded from child Views
         public event Action OnHudToggleClicked;
@@ -31,7 +30,6 @@ namespace Samsara.Features.MainScene.Presentation
         public event Action OnStageClicked;
         public event Action OnMaintenanceClicked;
         public event Action OnCharacterInfoClicked;
-        public event Action OnMerchantClicked;
 
         private void Awake()
         {
@@ -40,7 +38,6 @@ namespace Samsara.Features.MainScene.Presentation
             _stageButtonView.OnButtonClicked += () => OnStageClicked?.Invoke();
             _maintenanceButtonView.OnButtonClicked += () => OnMaintenanceClicked?.Invoke();
             _characterInfoButtonView.OnButtonClicked += () => OnCharacterInfoClicked?.Invoke();
-            _merchantButtonView.OnMerchantClicked += () => OnMerchantClicked?.Invoke();
         }
 
         // HUD delegates
@@ -51,8 +48,5 @@ namespace Samsara.Features.MainScene.Presentation
         public void SetPortrait(Sprite sprite) => _characterStatusView.SetPortrait(sprite);
         public void ShowHud() => _hudView.ShowHud();
         public void HideHud() => _hudView.HideHud();
-
-        // Main delegates
-        public void SetMerchantVisible(bool visible) => _merchantButtonView.SetVisible(visible);
     }
 }

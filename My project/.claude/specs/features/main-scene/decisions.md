@@ -22,6 +22,21 @@
 - **결정:** 초기화 완료(Step 5) 직후 `_sceneNavigator.NavigateToAsync(SceneKey.Main)`을 호출하는 Step 6 추가.
 - **근거:** Bootstrap 씬은 초기화 전용이며, 완료 후 Main 씬으로 진입하는 것이 자연스러운 앱 흐름.
 
+## D-06: Patch-001 — Merchant NPC 코드 전체 제거 (Specify v1.2.0)
+
+[DECISION] Specify v1.2.0에서 Merchant NPC가 MaintenanceScene으로 이동함에 따라 MainScene의 모든 Merchant 관련 코드를 제거.
+- 삭제: `MerchantButtonView.cs`, `V07_MerchantDefaultStateValidation.cs`
+- 수정: `MainViewModel.IsMerchantActive` 필드 제거, `MainUseCase.GetMainViewModel()` OQ-02 하드코딩 제거
+- 수정: `MainView` — `_merchantButtonView` 필드, `OnMerchantClicked` 이벤트, `SetMerchantVisible()` 제거
+- 수정: `MainPresenter` — `HandleMerchantClicked()`, `SetMerchantVisible()` 호출, `OnMerchantClicked` 구독 제거
+- 수정: `V03_MainViewModelValidation` — `merchantPass` 검증 라인 제거
+
+## D-07: Patch-001 — Main.unity 씬에서 MerchantButtonView GameObject 수동 제거 필요
+
+[BACKLOG] `Main.unity` 씬 파일에 MerchantButtonView 컴포넌트 참조가 남아 있음. `MerchantButtonView.cs`가 삭제되었으므로 Unity Editor에서 "Missing Script" 경고가 발생할 수 있음.
+- Unity Editor에서 Main.unity 열기 → MerchantButtonView 컴포넌트가 붙은 GameObject 삭제 필요.
+- 씬 YAML 직접 편집은 파일 손상 위험이 있으므로 Editor에서 수행.
+
 ## D-05: 미구현 씬(Stage, Maintenance, CharacterInfo) 네비게이션 에러
 
 - **상황:** V-06 검증 시 Stage/Maintenance/CharacterInfo 버튼 클릭 후 씬 전환에서 "Scene couldn't be loaded" 에러 발생.

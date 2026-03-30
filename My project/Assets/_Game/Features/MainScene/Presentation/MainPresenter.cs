@@ -30,13 +30,11 @@ namespace Samsara.Features.MainScene.Presentation
             _mainView.SetDay(viewModel.Day);
             _mainView.SetHp(viewModel.CurrentHp, viewModel.MaxHp);
             _mainView.SetActionPoints(viewModel.ActionPoints, viewModel.MaxActionPoints);
-            _mainView.SetMerchantVisible(viewModel.IsMerchantActive);
 
             _mainView.OnHudToggleClicked += HandleHudToggle;
             _mainView.OnStageClicked += HandleStageClicked;
             _mainView.OnMaintenanceClicked += HandleMaintenanceClicked;
             _mainView.OnCharacterInfoClicked += HandleCharacterInfoClicked;
-            _mainView.OnMerchantClicked += HandleMerchantClicked;
             _mainView.OnOptionClicked += HandleOptionClicked;
 
             Debug.Log($"{_logClass} Initialize 완료.");
@@ -65,11 +63,6 @@ namespace Samsara.Features.MainScene.Presentation
         private void HandleCharacterInfoClicked()
         {
             _sceneNavigator.NavigateToAsync(SceneKey.CharacterInfo).Forget();
-        }
-
-        private void HandleMerchantClicked()
-        {
-            Debug.Log($"{_logClass} Merchant 클릭 — 아직 미구현.");
         }
 
         private void HandleOptionClicked()
