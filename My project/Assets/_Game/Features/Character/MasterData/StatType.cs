@@ -5,6 +5,6 @@ namespace Samsara.Features.Character.MasterData
         Hp,
         Strength,
         Toughness,
-        Speed
+        Agility
     }
 }

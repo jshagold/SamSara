@@ -71,7 +71,7 @@ namespace Samsara.Dev.Character
                 bool runHp       = runNotNull && runData.Hp         == 0;
                 bool runStr      = runNotNull && runData.Strength   == 0;
                 bool runTough    = runNotNull && runData.Toughness  == 0;
-                bool runSpeed    = runNotNull && runData.Speed      == 0;
+                bool runSpeed    = runNotNull && runData.Agility      == 0;
                 bool runEvoId    = runNotNull && runData.EvolutionNodeId == null;
                 bool runDay      = runNotNull && runData.Day        == 0;
                 bool runGold     = runNotNull && runData.Gold       == 0;
@@ -95,7 +95,7 @@ namespace Samsara.Dev.Character
                 LogCheck("Hp == 0",                 runHp);
                 LogCheck("Strength == 0",           runStr);
                 LogCheck("Toughness == 0",          runTough);
-                LogCheck("Speed == 0",              runSpeed);
+                LogCheck("Agility == 0",            runSpeed);
                 LogCheck("EvolutionNodeId == null", runEvoId);
                 LogCheck("Day == 0",                runDay);
                 LogCheck("Gold == 0",               runGold);
