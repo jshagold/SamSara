@@ -10,18 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 664884c69dd49ba47ad012bf2f145bca, type: 3}
-  m_Name: Stage_Default
+  m_Name: Stage_Test_01
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Stage.MasterData.StageSO
-  _stageId: 
-  _stageName: 
-  _backgroundSpriteKey: 
-  _backgroundMusicKey: 
-  _isFixed: 0
+  _stageId: stage_test_01
+  _stageName: Test Stage 01
+  _backgroundSpriteKey: bg_forest
+  _backgroundMusicKey: bgm_forest
+  _isFixed: 1
   _fixedNodes:
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 248757b3c87f3014195c1f33ef810d33, type: 2}
+  - {fileID: 11400000, guid: faf1b7070b2a38d43823c0797ae65486, type: 2}
+  - {fileID: 11400000, guid: 0d78afa1296111d45b2d4edea3e2d235, type: 2}
+  - {fileID: 11400000, guid: ad901a7e7621a5542a1af20facef4200, type: 2}
   _randomNodePool:
     _minBattleNodes: 0
     _maxBattleNodes: 0
     _minEventNodes: 0
     _maxEventNodes: 0
     _bossNodeCount: 0
+  _nextStageIds: []
