@@ -12,11 +12,13 @@ namespace Samsara.Features.Stage.MasterData
         [SerializeField] private string _nodeSpriteKey;
         [SerializeField] private BattleNodeDataSO _battleData;
         [SerializeField] private EventNodeDataSO _eventData;
+        [SerializeField] private bool _canReturnToMain = true;
 
         public string NodeId => _nodeId;
         public NodeType NodeType => _nodeType;
         public string NodeSpriteKey => _nodeSpriteKey;
         public BattleNodeDataSO BattleData => _battleData;
         public EventNodeDataSO EventData => _eventData;
+        public bool CanReturnToMain => _canReturnToMain;
     }
 }

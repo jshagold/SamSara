@@ -342,7 +342,7 @@ MonoBehaviour:
   _maxActionPoints: 3
   _day: 1
   _evolutionNodeId: test_node_id
-  _loadOnStart: 1
+  _loadOnStart: 0
   _applyOnStart: 1
 --- !u!4 &1101874598
 Transform:
