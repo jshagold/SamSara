@@ -29,6 +29,17 @@ namespace Samsara.Features.StageScene.Presentation
         public event Action<string> OnStageSelected;
         public event Action OnReturnToMainClicked;
 
+        private void Reset()
+        {
+            _dayView                  = GetComponentInChildren<DayView>();
+            _backButtonView           = GetComponentInChildren<BackButtonView>();
+            _optionButtonView         = GetComponentInChildren<OptionButtonView>();
+            _backgroundView           = GetComponentInChildren<BackgroundView>();
+            _nodeMapView              = GetComponentInChildren<NodeMapView>();
+            _characterMarkerView      = GetComponentInChildren<CharacterMarkerView>();
+            _stageCompletePopupView   = GetComponentInChildren<StageCompletePopupView>();
+        }
+
         private void Awake()
         {
             _nodeMapView.OnNodeClicked             += HandleNodeClicked;

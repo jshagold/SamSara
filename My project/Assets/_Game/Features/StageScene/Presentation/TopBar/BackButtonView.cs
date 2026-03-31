@@ -24,6 +24,12 @@ namespace Samsara.Features.StageScene.Presentation.TopBar
             _canvasGroup.alpha = interactable ? 1f : 0.4f;
         }
 
+        private void Reset()
+        {
+            _button = GetComponentInChildren<Button>();
+            _canvasGroup = GetComponentInChildren<CanvasGroup>();
+        }
+
         private void OnDestroy()
         {
             _button?.onClick.RemoveAllListeners();

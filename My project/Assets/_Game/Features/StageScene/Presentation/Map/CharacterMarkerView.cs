@@ -11,6 +11,11 @@ namespace Samsara.Features.StageScene.Presentation.Map
 
         [SerializeField] private Image _characterSprite;
 
+        private void Reset()
+        {
+            _characterSprite = GetComponentInChildren<Image>();
+        }
+
         public void SetSprite(Sprite sprite)
         {
             _characterSprite.sprite = sprite;

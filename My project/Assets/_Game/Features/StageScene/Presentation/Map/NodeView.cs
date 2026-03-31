@@ -49,6 +49,16 @@ namespace Samsara.Features.StageScene.Presentation.Map
             _nodeIcon.color = color;
         }
 
+        private void Reset()
+        {
+            // Image 순서: [0] NodeIcon, [1] HighlightEffect, [2] CompletedMark
+            var images = GetComponentsInChildren<Image>();
+            if (images.Length > 0) _nodeIcon        = images[0];
+            if (images.Length > 1) _highlightEffect = images[1];
+            if (images.Length > 2) _completedMark   = images[2];
+            _button = GetComponentInChildren<Button>();
+        }
+
         private void OnDestroy()
         {
             _button?.onClick.RemoveAllListeners();

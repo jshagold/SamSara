@@ -20,6 +20,12 @@ namespace Samsara.Features.StageScene.Presentation.Map
 
         public event Action<int> OnNodeClicked;
 
+        private void Reset()
+        {
+            // _nodeViewPrefab: 프리팹 참조 — GetComponentInChildren 할당 불가, Inspector에서 수동 연결
+            // _nodeContainer: Transform — Constitution §7 예외, 자동 할당 제외
+        }
+
         public void RenderNodes(StageNodeSO[] nodes)
         {
             ClearNodes();

@@ -15,5 +15,10 @@ namespace Samsara.Features.StageScene.Presentation.TopBar
             _dayText.text = $"Day {day}";
             _dayText.transform.DOPunchScale(Vector3.one * 0.2f, 0.3f, 5, 0.5f);
         }
+
+        private void Reset()
+        {
+            _dayText = GetComponentInChildren<TMP_Text>();
+        }
     }
 }

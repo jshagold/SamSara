@@ -26,6 +26,14 @@ namespace Samsara.Features.StageScene.Presentation.Popup
         public event Action<string> OnStageSelected;
         public event Action OnReturnToMainClicked;
 
+        private void Reset()
+        {
+            _clearMessageText    = GetComponentInChildren<TMP_Text>();
+            _returnToMainButton  = GetComponentInChildren<Button>();
+            // _buttonContainer: Transform — Constitution §7 예외, 자동 할당 제외
+            // _buttonPrefab: 프리팹 참조 — GetComponentInChildren 할당 불가, Inspector에서 수동 연결
+        }
+
         private void Awake()
         {
             _returnToMainButton.onClick.AddListener(() => OnReturnToMainClicked?.Invoke());

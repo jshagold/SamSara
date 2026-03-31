@@ -9,3 +9,6 @@ D-06 [DECISION] NodeMapView._nodeTypeIcons Sprite[] 배열 추가 — NodeType e
 D-07 [DECISION] NodeMapView.FocusOnNode는 _nodeContainer 자체를 DOTween으로 이동 — 별도 _focusRoot 없이 스크롤 처리
 D-08 [DECISION] OptionButtonView 탭 핸들러 미구현 (TODO 주석) — 스펙에 옵션 버튼 동작 미정의
 D-09 [SPEC-GAP] CharacterMarkerView의 좌표계 미정의 — world position 사용하나, 올바른 시각적 동작을 위해 캐릭터 마커를 _nodeContainer의 자식으로 Inspector 배치 권장
+D-10 [DECISION] NodeView.Reset()에서 Image 3개를 GetComponentsInChildren<Image>()로 할당 — 인덱스 [0]=NodeIcon, [1]=HighlightEffect, [2]=CompletedMark. 프리팹 계층 순서 유지 필요
+D-11 [DECISION] NodeMapView.Reset()은 빈 구현 — _nodeContainer(Transform 예외), _nodeViewPrefab(프리팹 참조)은 자동 할당 불가
+D-12 [DECISION] StageCompletePopupView.Reset()에서 _buttonPrefab은 프리팹 참조이므로 자동 할당 제외 — Inspector에서 수동 연결 필요
