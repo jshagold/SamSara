@@ -38,6 +38,7 @@ public class GameContext
     // Public Accessors — UseCase 및 Core 시스템
     // ──────────────────────────────────────────────
     public IPopupManager               PopupManager         { get; }
+    public IStageRepository            StageRepo            => _stageRepo;
     public ICharacterRunRepository     CharacterRunRepo     => _characterRunRepo;
     public ICharacterAccountRepository CharacterAccountRepo => _characterAccountRepo;
     public IStageMasterDataRepository  StageMasterDataRepo  => _stageMasterDataRepo;
