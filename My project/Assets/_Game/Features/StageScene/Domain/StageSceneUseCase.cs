@@ -1,0 +1,130 @@
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using Samsara.Features.Character.Domain;
+using Samsara.Features.Stage.Domain;
+using Samsara.Features.Stage.MasterData;
+
+namespace Samsara.Features.StageScene.Domain
+{
+    public class StageSceneViewModel
+    {
+        public string CurrentStageId;
+        public int CurrentNodeIndex;
+        public List<int> CompletedNodeIndices;
+        public int Day;
+        public string CurrentEvolutionNodeId;
+        public string BiomeSpriteKey;
+        public bool CanReturnToMain;
+    }
+
+    public class StageSceneUseCase
+    {
+        private readonly string _logClass = $"[{nameof(StageSceneUseCase)}]";
+
+        private readonly IStageRepository _stageRepo;
+        private readonly IStageMasterDataRepository _stageMasterDataRepo;
+        private readonly ICharacterRunRepository _characterRunRepo;
+
+        public StageSceneUseCase(
+            IStageRepository stageRepo,
+            IStageMasterDataRepository stageMasterDataRepo,
+            ICharacterRunRepository characterRunRepo)
+        {
+            _stageRepo = stageRepo;
+            _stageMasterDataRepo = stageMasterDataRepo;
+            _characterRunRepo = characterRunRepo;
+        }
+
+        public StageSceneViewModel GetStageSceneViewModel()
+        {
+            var stageData = _stageRepo.RunData;
+            var characterData = _characterRunRepo.RunData;
+            return new StageSceneViewModel
+            {
+                CurrentStageId       = stageData.CurrentStageId,
+                CurrentNodeIndex     = stageData.CurrentNodeIndex,
+                CompletedNodeIndices = stageData.CompletedNodeIndices,
+                Day                  = characterData.Day,
+                CurrentEvolutionNodeId = characterData.EvolutionNodeId,
+                BiomeSpriteKey       = GetBiomeBackground(),
+                CanReturnToMain      = CanReturnToMain()
+            };
+        }
+
+        public StageNodeSO[] GetCurrentStageNodes()
+        {
+            var stageData = _stageRepo.RunData;
+            var stageSO = _stageMasterDataRepo.GetStageById(stageData.CurrentStageId);
+
+            if (stageSO.IsFixed)
+                return stageSO.FixedNodes;
+
+            var nodeIds = stageData.GeneratedNodeIds;
+            var nodes = new StageNodeSO[nodeIds.Count];
+            for (var i = 0; i < nodeIds.Count; i++)
+                nodes[i] = _stageMasterDataRepo.GetNodeById(nodeIds[i]);
+            return nodes;
+        }
+
+        public async UniTask MoveToNode(int targetIndex)
+        {
+            _characterRunRepo.RunData.Day += 1;
+            _stageRepo.CompleteNode(_stageRepo.RunData.CurrentNodeIndex);
+            await UniTask.WhenAll(
+                _stageRepo.SaveAsync(),
+                _characterRunRepo.SaveDataAsync()
+            );
+        }
+
+        public NodeType GetNodeType(int index)
+        {
+            var nodes = GetCurrentStageNodes();
+            return nodes[index].NodeType;
+        }
+
+        public bool CanReturnToMain()
+        {
+            var nodes = GetCurrentStageNodes();
+            var currentIndex = _stageRepo.RunData.CurrentNodeIndex;
+            if (currentIndex < 0 || currentIndex >= nodes.Length) return true;
+            return nodes[currentIndex].CanReturnToMain;
+        }
+
+        public bool IsStageComplete(int nodeIndex)
+        {
+            var nodes = GetCurrentStageNodes();
+            if (nodeIndex < 0 || nodeIndex >= nodes.Length) return false;
+            var node = nodes[nodeIndex];
+            return node.BattleData != null && node.BattleData.IsBoss;
+        }
+
+        public List<StageSO> GetNextStageOptions()
+        {
+            var stageSO = _stageMasterDataRepo.GetStageById(_stageRepo.RunData.CurrentStageId);
+            var result = new List<StageSO>();
+            foreach (var nextId in stageSO.NextStageIds)
+                result.Add(_stageMasterDataRepo.GetStageById(nextId));
+            return result;
+        }
+
+        public async UniTask SelectNextStage(string stageId)
+        {
+            _stageRepo.TransitionToStage(stageId);
+
+            var newStageSO = _stageMasterDataRepo.GetStageById(stageId);
+            if (!newStageSO.IsFixed)
+            {
+                // TODO: [BACKLOG] Random node generation algorithm not specified in spec.
+                _stageRepo.SetGeneratedNodes(new List<string>());
+            }
+
+            await _stageRepo.SaveAsync();
+        }
+
+        public string GetBiomeBackground()
+        {
+            var stageSO = _stageMasterDataRepo.GetStageById(_stageRepo.RunData.CurrentStageId);
+            return stageSO.BackgroundSpriteKey;
+        }
+    }
+}

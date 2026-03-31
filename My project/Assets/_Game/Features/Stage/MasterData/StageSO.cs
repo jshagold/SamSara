@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Samsara.Features.Stage.MasterData
@@ -15,6 +16,7 @@ namespace Samsara.Features.Stage.MasterData
         [SerializeField] private bool _isFixed;
         [SerializeField] private StageNodeSO[] _fixedNodes;
         [SerializeField] private StageNodePool _randomNodePool;
+        [SerializeField] private List<string> _nextStageIds;
 
         public string StageId => _stageId;
         public string StageName => _stageName;
@@ -23,6 +25,7 @@ namespace Samsara.Features.Stage.MasterData
         public bool IsFixed => _isFixed;
         public StageNodeSO[] FixedNodes => _fixedNodes;
         public StageNodePool RandomNodePool => _randomNodePool;
+        public List<string> NextStageIds => _nextStageIds;
     }
 
     [Serializable]
