@@ -16,6 +16,7 @@ namespace Samsara.Features.MaintenanceScene.Presentation
         private readonly MaintenanceView    _maintenanceView;
         private readonly ISceneNavigator    _sceneNavigator;
         private readonly IPopupManager      _popupManager;
+        private readonly GameContext        _gameContext;
 
         // 캐시된 핸들러 — Dispose 시 정확한 구독 해제를 위해 보관
         private System.Action<StatType> _statSelectedHandler;
@@ -24,12 +25,14 @@ namespace Samsara.Features.MaintenanceScene.Presentation
             MaintenanceUseCase maintenanceUseCase,
             MaintenanceView    maintenanceView,
             ISceneNavigator    sceneNavigator,
-            IPopupManager      popupManager)
+            IPopupManager      popupManager,
+            GameContext        gameContext)
         {
             _maintenanceUseCase = maintenanceUseCase;
             _maintenanceView    = maintenanceView;
             _sceneNavigator     = sceneNavigator;
             _popupManager       = popupManager;
+            _gameContext        = gameContext;
         }
 
         public void Initialize()
@@ -104,11 +107,9 @@ namespace Samsara.Features.MaintenanceScene.Presentation
                 return;
             }
 
-            _maintenanceUseCase.ConsumeActionPoint();
-            _maintenanceView.SetInteractable(_maintenanceUseCase.CanPerformAction());
-
-            // TODO: [SPEC-GAP] D-02 — MaintenanceScene → MiniGame 씬 전환 미구현. 별도 Patch에서 처리 예정.
-            Debug.Log($"{_logClass} {statType} 훈련 선택 — 미니게임 씬 전환 미구현, 전환 스킵.");
+            // AP 소비는 MiniGame 완료 시 MiniGameUseCase.ApplyResultAndSave에서 처리 (Patch-001)
+            _gameContext.PendingTrainingStat = statType;
+            _sceneNavigator.NavigateToAsync(SceneKey.MiniGame).Forget();
         }
 
         private void HandleExplorationClickedAsync()

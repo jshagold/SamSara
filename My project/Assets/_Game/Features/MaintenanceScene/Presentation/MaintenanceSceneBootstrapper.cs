@@ -33,7 +33,8 @@ namespace Samsara.Features.MaintenanceScene.Presentation
                 maintenanceUseCase,
                 _maintenanceView,
                 sceneNavigator,
-                popupManager);
+                popupManager,
+                gameContext);
 
             _maintenancePresenter.Initialize();
 

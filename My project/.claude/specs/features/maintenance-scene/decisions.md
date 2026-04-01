@@ -35,3 +35,16 @@
 
 ## D-12: InitializeNewRun() 호출 시점 미정의 (SPEC-GAP)
 [SPEC-GAP] 저장 데이터가 없을 때 새 게임을 시작하는 흐름(InitializeNewRun 호출, 초기 ActionPoints 설정 포함)이 스펙에 정의되어 있지 않음. Phase 6에서 구현 예정. 현재는 InitializeNewRun()이 호출되지 않아 모든 런타임 값이 기본값(0)으로 시작됨.
+
+---
+
+## Patch-001
+
+## D-13: GameContext를 MaintenancePresenter에 constructor injection으로 전달
+[DECISION] Patch 명세의 "constructor injection or passed from Bootstrapper" 중 constructor injection 채택. MaintenanceSceneBootstrapper에서 이미 `gameContext` 변수가 확보되어 있어 5번째 인자로 추가하는 것으로 처리.
+
+## D-14: ConsumeActionPoint() 제거 — MiniGame에 AP 소비 위임
+[DECISION] HandleStatSelectedAsync에서 ConsumeActionPoint() 및 SetInteractable() 제거. AP 소비는 MiniGame 완료 후 MiniGameUseCase.ApplyResultAndSave에서 처리. MiniGame → Maintenance 복귀 시 씬이 재로드되어 Initialize()가 재호출되므로 AP 반영 후 UI 상태는 자동 갱신됨.
+
+## D-15: D-05 SPEC-GAP 해소
+[DECISION] 기존 D-05("훈련 미니게임 씬 전환 미구현")가 Patch-001로 해소됨. HandleStatSelectedAsync에서 PendingTrainingStat 설정 후 SceneKey.MiniGame으로 전환.
