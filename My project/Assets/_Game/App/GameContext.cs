@@ -3,6 +3,8 @@ using Cysharp.Threading.Tasks;
 using Samsara.Core.Popup;
 using Samsara.Features.Character.Data;
 using Samsara.Features.Character.Domain;
+using Samsara.Features.Character.MasterData;
+using Samsara.Features.MiniGame.Domain;
 using Samsara.Features.Stage.Data;
 using Samsara.Features.Stage.Domain;
 using UnityEngine;
@@ -49,6 +51,9 @@ public class GameContext
     public EventUseCase     EventUseCase      => _eventUseCase;
     public MiniGameUseCase  MiniGameUseCase   => _miniGameUseCase;
 
+    /// <summary>씬 간 데이터 전달 — 훈련 대상 StatType. MiniGameScene 진입 전 설정, 진입 후 즉시 소비.</summary>
+    public StatType? PendingTrainingStat { get; set; }
+
     // ──────────────────────────────────────────────
     // Constructor — DI 조립. new 사용은 여기서만 허용.
     // ──────────────────────────────────────────────
@@ -72,7 +77,7 @@ public class GameContext
         _stageUseCase     = new StageUseCase(_stageRepo);
         _battleUseCase    = new BattleUseCase(_characterRepo, _stageRepo);
         _eventUseCase     = new EventUseCase(_characterRepo, _stageRepo);
-        _miniGameUseCase  = new MiniGameUseCase(_characterRepo);
+        _miniGameUseCase  = new MiniGameUseCase(_characterRunRepo);
 
         Debug.Log($"{_logClass} DI 조립 완료.");
     }

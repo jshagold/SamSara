@@ -11,6 +11,7 @@ namespace Samsara.Core.Navigation
         Stage,
         Battle,
         ActionEvent,
+        MiniGame,
         Ending,
         Replay,
         GameOver

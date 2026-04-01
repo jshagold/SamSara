@@ -8,6 +8,7 @@ namespace Samsara.Features.Character.Domain
     {
         CharacterRunData RunData { get; }
         void InitializeNewRun(string startingEvolutionNodeId, CharacterStatsSO baseStats);
+        void MarkDirty();
         UniTask SaveDataAsync();
         void SaveDataSync();
         UniTask LoadDataAsync();

@@ -107,8 +107,8 @@ namespace Samsara.Features.MaintenanceScene.Presentation
             _maintenanceUseCase.ConsumeActionPoint();
             _maintenanceView.SetInteractable(_maintenanceUseCase.CanPerformAction());
 
-            // TODO: [SPEC-GAP] D-04 — 훈련 미니게임 씬이 Tasks에 정의되어 있지 않음. 전환 스킵.
-            Debug.Log($"{_logClass} {statType} 훈련 선택 — 미니게임 씬 미정의, 전환 스킵.");
+            // TODO: [SPEC-GAP] D-02 — MaintenanceScene → MiniGame 씬 전환 미구현. 별도 Patch에서 처리 예정.
+            Debug.Log($"{_logClass} {statType} 훈련 선택 — 미니게임 씬 전환 미구현, 전환 스킵.");
         }
 
         private void HandleExplorationClickedAsync()
