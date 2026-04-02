@@ -5,6 +5,8 @@ using Samsara.Features.Character.Data;
 using Samsara.Features.Character.Domain;
 using Samsara.Features.Character.MasterData;
 using Samsara.Features.MiniGame.Domain;
+using Samsara.Features.Skill.Data;
+using Samsara.Features.Skill.Domain;
 using Samsara.Features.Stage.Data;
 using Samsara.Features.Stage.Domain;
 using UnityEngine;
@@ -25,6 +27,7 @@ public class GameContext
     private readonly IStageMasterDataRepository  _stageMasterDataRepo;
     private readonly ICharacterRunRepository     _characterRunRepo;
     private readonly ICharacterAccountRepository _characterAccountRepo;
+    private readonly ISkillMasterDataRepository  _skillMasterDataRepo;
 
     // ──────────────────────────────────────────────
     // UseCases (public 프로퍼티로만 노출)
@@ -35,6 +38,7 @@ public class GameContext
     private readonly BattleUseCase     _battleUseCase;
     private readonly EventUseCase      _eventUseCase;
     private readonly MiniGameUseCase   _miniGameUseCase;
+    private readonly SkillUseCase      _skillUseCase;
 
     // ──────────────────────────────────────────────
     // Public Accessors — UseCase 및 Core 시스템
@@ -50,6 +54,7 @@ public class GameContext
     public BattleUseCase    BattleUseCase     => _battleUseCase;
     public EventUseCase     EventUseCase      => _eventUseCase;
     public MiniGameUseCase  MiniGameUseCase   => _miniGameUseCase;
+    public SkillUseCase     SkillUseCase      => _skillUseCase;
 
     /// <summary>씬 간 데이터 전달 — 훈련 대상 StatType. MiniGameScene 진입 전 설정, 진입 후 즉시 소비.</summary>
     public StatType? PendingTrainingStat { get; set; }
@@ -69,6 +74,7 @@ public class GameContext
         _stageMasterDataRepo  = new StageMasterDataRepository();
         _characterRunRepo     = new CharacterRunRepository();
         _characterAccountRepo = new CharacterAccountRepository();
+        _skillMasterDataRepo  = new SkillMasterDataRepository();
         Debug.Log($"{_logClass} [V-02] StageRepo={_stageRepo.GetType().Name} / StageMasterDataRepo={_stageMasterDataRepo.GetType().Name} 등록 확인.");
 
         // Step 2 — UseCase 생성 (Repository 주입)
@@ -78,6 +84,7 @@ public class GameContext
         _battleUseCase    = new BattleUseCase(_characterRepo, _stageRepo);
         _eventUseCase     = new EventUseCase(_characterRepo, _stageRepo);
         _miniGameUseCase  = new MiniGameUseCase(_characterRunRepo);
+        _skillUseCase     = new SkillUseCase(_skillMasterDataRepo);
 
         Debug.Log($"{_logClass} DI 조립 완료.");
     }
@@ -95,6 +102,9 @@ public class GameContext
         {
             // StageMasterDataRepository는 Resources API 사용으로 메인 스레드에서 동기 초기화
             _stageMasterDataRepo.Initialize();
+
+            // SkillMasterDataRepository — Resources API 사용으로 메인 스레드에서 초기화
+            await _skillMasterDataRepo.LoadAsync();
 
             await UniTask.WhenAll(
                 _characterRepo.LoadDataAsync(),

@@ -25,6 +25,7 @@ namespace Samsara.Features.Character.MasterData
         [SerializeField] private string _battleSpriteKeyHp0;
         [SerializeField] private string _attackAnimSpriteKey;
         [SerializeField] private string _stageMoveSpriteKey;
+        [SerializeField] private int[] _skillIds;
 
         public string NodeId => _nodeId;
         public string CharacterName => _characterName;
@@ -41,6 +42,7 @@ namespace Samsara.Features.Character.MasterData
         public string BattleSpriteKeyHp0 => _battleSpriteKeyHp0;
         public string AttackAnimSpriteKey => _attackAnimSpriteKey;
         public string StageMoveSpriteKey => _stageMoveSpriteKey;
+        public int[] SkillIds => _skillIds;
     }
 
     [Serializable]
