@@ -13,7 +13,13 @@
       "mcp__claude_ai_Notion__notion-update-page",
       "mcp__claude_ai_Notion__notion-fetch",
       "mcp__claude_ai_Notion__notion-search",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(rm \"C:\\\\Users\\\\admin\\\\Documents\\\\SamSara\\\\My project\\\\Assets\\\\_Game\\\\Features\\\\Battle\\\\Domain\\\\BattleUseCase.cs\")",
+      "Bash(rm \"C:\\\\Users\\\\admin\\\\Documents\\\\SamSara\\\\My project\\\\Assets\\\\_Game\\\\Features\\\\Battle\\\\Domain\\\\BattleUseCase.cs.meta\")",
+      "Bash(rm -rf \"C:\\\\Users\\\\admin\\\\Documents\\\\SamSara\\\\My project\\\\Assets\\\\_Game\\\\Features\\\\Battle\\\\Domain\")",
+      "Bash(rm -f \"C:\\\\Users\\\\admin\\\\Documents\\\\SamSara\\\\My project\\\\Assets\\\\_Game\\\\Features\\\\Battle\\\\Domain.meta\")",
+      "Bash(rmdir \"C:\\\\Users\\\\admin\\\\Documents\\\\SamSara\\\\My project\\\\Assets\\\\_Game\\\\Features\\\\Battle\")",
+      "Bash(rm -f \"C:\\\\Users\\\\admin\\\\Documents\\\\SamSara\\\\My project\\\\Assets\\\\_Game\\\\Features\\\\Battle.meta\")"
     ]
   }
 }
