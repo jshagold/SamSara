@@ -13,3 +13,16 @@ D-03 [DECISION] SkillRuntimeData에 GetAllSkillIds() 헬퍼 메서드 추가
 
 D-04 [DECISION] CanUseSkill에서 HP 비용 체크 시 currentHp <= cost.Value (같을 때도 사용 불가)
   - Spec 원문: "check currentHp > cost.Value" — 등호 시 사용 불가로 해석
+  - [SUPERSEDED by Patch-001] CanUseSkill 자체가 제거됨
+
+D-05 [DECISION] Patch-001 적용 — SkillUseCase 전투 런타임 기능 일체 제거
+  - InitializeBattle, CleanupBattle, CanUseSkill, ConsumeSkill, TickCooldowns, GetAvailableSkills 제거
+  - SkillRuntimeData.cs 삭제 (전투 세션 쿨다운 상태 관리 전담 클래스였으므로 불필요)
+  - 이에 따라 D-01, D-03, D-04는 실효됨
+  - 근거: 쿨다운은 전투 흐름(틱 기반 행동 순서) 의존 로직 → BattleUseCase 책임
+
+D-06 [DECISION] Specify v1.1.0 명세에 맞춰 메서드 이름 변경
+  - GetSkill() → GetSkillById()
+  - GetQTEPattern() → GetQTEPatternById()
+  - GetSkillsForNode() → GetSkillsForEvolutionNode()
+  - 기존 코드(tasks.md 기반)의 이름이 Specify v1.1.0 명칭과 달랐으므로 Patch-001 적용 시점에 일치시킴
