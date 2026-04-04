@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Samsara.Core.Navigation;
 using Samsara.Core.Popup;
+using Samsara.Features.BattleScene.Domain;
 using Samsara.Features.Stage.MasterData;
 using Samsara.Features.StageScene.Domain;
 using Samsara.Features.StageScene.Presentation.Popup;
@@ -17,21 +18,27 @@ namespace Samsara.Features.StageScene.Presentation
         private readonly StageView _view;
         private readonly ISceneNavigator _sceneNavigator;
         private readonly IPopupManager _popupManager;
+        private readonly GameContext _gameContext;
 
         public StagePresenter(
             StageSceneUseCase useCase,
             StageView view,
             ISceneNavigator sceneNavigator,
-            IPopupManager popupManager)
+            IPopupManager popupManager,
+            GameContext gameContext)
         {
             _useCase       = useCase;
             _view          = view;
             _sceneNavigator = sceneNavigator;
             _popupManager  = popupManager;
+            _gameContext    = gameContext;
         }
 
         public void Initialize()
         {
+            // Handle battle result from returning BattleScene
+            HandleBattleResultIfAny().Forget();
+
             var vm    = _useCase.GetStageSceneViewModel();
             var nodes = _useCase.GetCurrentStageNodes();
 
@@ -87,13 +94,41 @@ namespace Samsara.Features.StageScene.Presentation
                 return;
             }
 
+            var nodeType = _useCase.GetNodeType(index);
+
+            // Battle/Event 노드: 씬 전환 전에 노드 완료 처리하지 않음
+            // 전투 결과 확인 후 StageScene 복귀 시 처리
+            if (nodeType == NodeType.Battle || nodeType == NodeType.Boss)
+            {
+                var nodeWorldPos = _view.GetNodeWorldPosition(index);
+                await _view.MoveCharacterTo(nodeWorldPos, 0.3f);
+
+                var nodes = _useCase.GetCurrentStageNodes();
+                var battleData = nodes[index].BattleData;
+                _gameContext.PendingBattleContext = new PendingBattleContext(battleData);
+
+                await _sceneNavigator.NavigateToAsync(SceneKey.Battle);
+                return;
+            }
+
+            if (nodeType == NodeType.Event)
+            {
+                var nodeWorldPos = _view.GetNodeWorldPosition(index);
+                await _view.MoveCharacterTo(nodeWorldPos, 0.3f);
+
+                // TODO: [BACKLOG] PendingEventContext 설정
+                await _sceneNavigator.NavigateToAsync(SceneKey.ActionEvent);
+                return;
+            }
+
+            // 그 외 노드: 즉시 완료 처리
             await _useCase.MoveToNode(index);
 
             var updatedVm = _useCase.GetStageSceneViewModel();
             _view.SetDay(updatedVm.Day);
 
-            var nodeWorldPos = _view.GetNodeWorldPosition(index);
-            await _view.MoveCharacterTo(nodeWorldPos, 0.3f);
+            var worldPos = _view.GetNodeWorldPosition(index);
+            await _view.MoveCharacterTo(worldPos, 0.3f);
 
             _view.MarkNodeCompleted(index - 1);
             _view.HighlightNode(index);
@@ -108,21 +143,28 @@ namespace Samsara.Features.StageScene.Presentation
                     options.Add(new StageOptionData { StageId = stage.StageId, StageName = stage.StageName });
                 _view.ShowStageCompletePopup("Stage Complete!", options);
             }
+        }
+
+        private async UniTaskVoid HandleBattleResultIfAny()
+        {
+            var result = _gameContext.LastBattleResult;
+            if (result == null) return;
+
+            _gameContext.LastBattleResult = null;
+
+            if (result.Value == BattleResult.Victory)
+            {
+                var vm = _useCase.GetStageSceneViewModel();
+                int battleNodeIndex = vm.CurrentNodeIndex + 1;
+
+                await _useCase.MoveToNode(battleNodeIndex);
+
+                Debug.Log($"{_logClass} 전투 승리 — 노드 {battleNodeIndex} 완료 처리.");
+            }
             else
             {
-                var nodeType = _useCase.GetNodeType(index);
-                switch (nodeType)
-                {
-                    case NodeType.Battle:
-                    case NodeType.Boss:
-                        // TODO: [BACKLOG] BattleScene 구현 후 연결
-                        await _sceneNavigator.NavigateToAsync(SceneKey.Battle);
-                        break;
-                    case NodeType.Event:
-                        // TODO: [BACKLOG] EventScene 구현 후 연결
-                        await _sceneNavigator.NavigateToAsync(SceneKey.ActionEvent);
-                        break;
-                }
+                // Defeat: 노드 완료하지 않음 — 현재 위치 유지
+                Debug.Log($"{_logClass} 전투 패배 — 노드 미완료, 현재 위치 유지.");
             }
         }
 

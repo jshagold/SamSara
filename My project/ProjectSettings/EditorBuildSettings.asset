@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Game/Scenes/MiniGame.unity
     guid: 4f649610509d2394bbbf2a6fc8887bbe
+  - enabled: 1
+    path: Assets/_Game/Scenes/Battle.unity
+    guid: 33998fe13087d974ba2c087ce45f636d
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 702a1a7cfa6f21f4d8a8b213dec1a3ba,
       type: 2}

@@ -13,4 +13,8 @@ MonoBehaviour:
   m_Name: BattleNodeData_Test
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Stage.MasterData.BattleNodeDataSO
   _isBoss: 0
-  _enemySpawns: []
+  _enemySpawns:
+  - _enemyId: 9001
+    _count: 1
+  - _enemyId: 9002
+    _count: 1

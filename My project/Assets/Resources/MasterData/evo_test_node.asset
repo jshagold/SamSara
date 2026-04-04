@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c940a4430c8a56549b890eb86da8dde2, type: 3}
+  m_Name: evo_test_node
+  m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Character.MasterData.EvolutionNodeSO
+  _nodeId: test_node_id
+  _characterName: Test Hero
+  _baseStats: {fileID: 11400000, guid: 193c663725568454289f2d0bfcf30ea8, type: 2}
+  _maxActionPoints: 3
+  _unlockConditions: []
+  _isHidden: 0
+  _nextNodes: []
+  _nodeIconSpriteKey: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
+  _mainStandingSpriteKey: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
+  _portraitSpriteKey: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
+  _battleSpriteKeyHp100: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
+  _battleSpriteKeyHp50: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
+  _battleSpriteKeyHp0: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
+  _attackAnimSpriteKey: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
+  _stageMoveSpriteKey: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
+  _skillIds: 292300002a2300002b230000

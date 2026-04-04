@@ -1,6 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Samsara.Core.Popup;
+using Samsara.Features.BattleScene.Domain;
 using Samsara.Features.Character.Data;
 using Samsara.Features.Character.Domain;
 using Samsara.Features.Character.MasterData;
@@ -35,7 +36,6 @@ public class GameContext
     private readonly CharacterUseCase  _characterUseCase;
     private readonly EvolutionUseCase  _evolutionUseCase;
     private readonly StageUseCase      _stageUseCase;
-    private readonly BattleUseCase     _battleUseCase;
     private readonly EventUseCase      _eventUseCase;
     private readonly MiniGameUseCase   _miniGameUseCase;
     private readonly SkillUseCase      _skillUseCase;
@@ -48,16 +48,22 @@ public class GameContext
     public ICharacterRunRepository     CharacterRunRepo     => _characterRunRepo;
     public ICharacterAccountRepository CharacterAccountRepo => _characterAccountRepo;
     public IStageMasterDataRepository  StageMasterDataRepo  => _stageMasterDataRepo;
+    public ISkillMasterDataRepository  SkillMasterDataRepo  => _skillMasterDataRepo;
     public CharacterUseCase CharacterUseCase  => _characterUseCase;
     public EvolutionUseCase EvolutionUseCase  => _evolutionUseCase;
     public StageUseCase     StageUseCase      => _stageUseCase;
-    public BattleUseCase    BattleUseCase     => _battleUseCase;
     public EventUseCase     EventUseCase      => _eventUseCase;
     public MiniGameUseCase  MiniGameUseCase   => _miniGameUseCase;
     public SkillUseCase     SkillUseCase      => _skillUseCase;
 
     /// <summary>씬 간 데이터 전달 — 훈련 대상 StatType. MiniGameScene 진입 전 설정, 진입 후 즉시 소비.</summary>
     public StatType? PendingTrainingStat { get; set; }
+
+    /// <summary>씬 간 데이터 전달 — 전투 진입 컨텍스트. BattleScene 진입 전 설정, 진입 후 즉시 소비.</summary>
+    public PendingBattleContext PendingBattleContext { get; set; }
+
+    /// <summary>씬 간 데이터 전달 — 마지막 전투 결과. BattleScene 종료 시 설정, StageScene에서 소비.</summary>
+    public BattleResult? LastBattleResult { get; set; }
 
     // ──────────────────────────────────────────────
     // Constructor — DI 조립. new 사용은 여기서만 허용.
@@ -81,7 +87,6 @@ public class GameContext
         _characterUseCase = new CharacterUseCase(_characterRepo);
         _evolutionUseCase = new EvolutionUseCase(_characterRepo);
         _stageUseCase     = new StageUseCase(_stageRepo);
-        _battleUseCase    = new BattleUseCase(_characterRepo, _stageRepo);
         _eventUseCase     = new EventUseCase(_characterRepo, _stageRepo);
         _miniGameUseCase  = new MiniGameUseCase(_characterRunRepo);
         _skillUseCase     = new SkillUseCase(_skillMasterDataRepo);

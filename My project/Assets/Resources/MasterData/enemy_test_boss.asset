@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e03a1f7f126ee25439fc277f25ed0cef, type: 3}
+  m_Name: enemy_test_boss
+  m_EditorClassIdentifier: Assembly-CSharp::Samsara.Core.MasterData.EnemySO
+  _enemyId: 9003
+  _enemyName: Boss Enemy
+  _baseStats: {fileID: 11400000, guid: 8858652be395c2c409c038e3a296e2ec, type: 2}
+  _skillIds: 292300002a2300002b230000
+  _battleSpriteKeyHp100: Assets/_Game/Dev/Features/Battle/Sprites/test_enemy_boss.png
+  _battleSpriteKeyHp50: Assets/_Game/Dev/Features/Battle/Sprites/test_enemy_boss.png
+  _battleSpriteKeyHp0: Assets/_Game/Dev/Features/Battle/Sprites/test_enemy_boss.png
