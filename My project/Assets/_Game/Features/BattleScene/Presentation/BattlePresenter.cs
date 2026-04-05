@@ -126,6 +126,9 @@ namespace Samsara.Features.BattleScene.Presentation
 
                     _useCase.ConsumeGauge(actor);
 
+                    // Show current actor highlighted at top of action order
+                    UpdateActionOrderUI(actor);
+
                     if (actor.IsAlly)
                         await ProcessAllyTurn(actor);
                     else
@@ -327,25 +330,62 @@ namespace Samsara.Features.BattleScene.Presentation
             }
         }
 
-        private void UpdateActionOrderUI()
+        private void UpdateActionOrderUI(BattleParticipant currentActor = null)
         {
-            var order = _useCase.GetPredictedActionOrder(8);
             var runtimeData = _useCase.RuntimeData;
             if (runtimeData == null) return;
 
-            var entries = new ActionOrderEntry[order.Count];
-            for (int i = 0; i < order.Count; i++)
+            const int maxDisplay = 5;
+            int upcomingToFetch = currentActor != null ? maxDisplay - 1 : maxDisplay;
+            var order = _useCase.GetPredictedActionOrder(upcomingToFetch);
+
+            var entries = new List<ActionOrderEntry>(maxDisplay);
+            int turnBase = runtimeData.TurnNumber;
+
+            // Current actor at index 0 (large + highlighted)
+            if (currentActor != null)
             {
-                var participant = FindParticipantById(order[i]);
-                entries[i] = new ActionOrderEntry
+                entries.Add(new ActionOrderEntry
                 {
-                    Id = participant.Id,
-                    SpriteKey = participant.SpriteKey,
-                    IsAlly = participant.IsAlly
-                };
+                    Id = currentActor.Id,
+                    SpriteKey = currentActor.SpriteKey,
+                    IsAlly = currentActor.IsAlly,
+                    IsCurrent = true,
+                    TurnNumber = turnBase
+                });
             }
 
-            _view.ActionOrder.SetOrder(entries);
+            // Upcoming actors — validate each ID against live participants
+            for (int i = 0; i < order.Count && entries.Count < maxDisplay; i++)
+            {
+                int id = order[i];
+                if (!IsLiveParticipant(id, runtimeData))
+                {
+                    Debug.LogWarning($"{_logClass} Predicted order contains invalid participant ID: {id}, skipping.");
+                    continue;
+                }
+
+                var p = FindParticipantById(id);
+                entries.Add(new ActionOrderEntry
+                {
+                    Id = p.Id,
+                    SpriteKey = p.SpriteKey,
+                    IsAlly = p.IsAlly,
+                    IsCurrent = false,
+                    TurnNumber = turnBase + entries.Count
+                });
+            }
+
+            _view.ActionOrder.SetOrder(entries.ToArray());
+        }
+
+        private static bool IsLiveParticipant(int id, BattleRuntimeData data)
+        {
+            for (int i = 0; i < data.Allies.Count; i++)
+                if (data.Allies[i].Id == id && !data.Allies[i].IsDead) return true;
+            for (int i = 0; i < data.Enemies.Count; i++)
+                if (data.Enemies[i].Id == id && !data.Enemies[i].IsDead) return true;
+            return false;
         }
 
         private BattleParticipant FindParticipantById(int id)
