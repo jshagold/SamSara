@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bde1bb42d13ddc04eb868b24537e8d5a, type: 3}
-  m_Name: Stats_Warrior
+  m_Name: Stats_Rogue
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Character.MasterData.CharacterStatsSO
-  _hp: 150
-  _strength: 15
-  _toughness: 10
-  _agility: 5
+  _hp: 80
+  _strength: 8
+  _toughness: 5
+  _agility: 15
