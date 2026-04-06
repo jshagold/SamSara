@@ -12,5 +12,6 @@ namespace Samsara.Features.Character.Data
         public int Gold;
         public int ActionPoints;
         public int MaxActionPoints;
+        public bool IsReincarnationPending;
     }
 }

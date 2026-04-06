@@ -29,3 +29,15 @@ Save responsibility belongs to the caller (UseCase).
 - CharacterRunRepository.MarkDirty() 구현 — 원본 코드에 이미 존재. 인터페이스에 선언만 추가.
 - MiniGameUseCase.ApplyResultAndSave() — MarkDirty() 호출 후 SaveDataAsync() 호출 패턴 이미 구현 완료.
 - Patch-001 기준 신규 코드 변경 없음. Validation 항목 전부 충족 상태.
+
+---
+
+## D-03 [DECISION] — Patch-002 IsReincarnationPending 필드 패턴
+
+**Date:** 2026-04-06
+
+**Context:** Patch-002는 `[JsonProperty] private bool _isReincarnationPending` + public property 패턴을 명시했으나,
+기존 CharacterRunData의 모든 필드는 `public bool/int/string FieldName;` 직접 선언 방식을 사용 중.
+
+**Decision:** "Read existing patterns and write consistently" 지시에 따라 `public bool IsReincarnationPending;` 단일 필드로 추가.
+Newtonsoft.Json은 저장 파일에 해당 키가 없을 경우 bool 기본값 `false`로 역직렬화하므로 하위 호환성 유지됨.
