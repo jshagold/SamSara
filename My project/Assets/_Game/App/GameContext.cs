@@ -31,6 +31,11 @@ public class GameContext
     private readonly ISkillMasterDataRepository  _skillMasterDataRepo;
 
     // ──────────────────────────────────────────────
+    // MasterData Cache
+    // ──────────────────────────────────────────────
+    private readonly EvolutionNodeSO[] _evolutionNodes;
+
+    // ──────────────────────────────────────────────
     // UseCases (public 프로퍼티로만 노출)
     // ──────────────────────────────────────────────
     private readonly CharacterUseCase  _characterUseCase;
@@ -49,6 +54,7 @@ public class GameContext
     public ICharacterAccountRepository CharacterAccountRepo => _characterAccountRepo;
     public IStageMasterDataRepository  StageMasterDataRepo  => _stageMasterDataRepo;
     public ISkillMasterDataRepository  SkillMasterDataRepo  => _skillMasterDataRepo;
+    public EvolutionNodeSO[]           EvolutionNodes       => _evolutionNodes;
     public CharacterUseCase CharacterUseCase  => _characterUseCase;
     public EvolutionUseCase EvolutionUseCase  => _evolutionUseCase;
     public StageUseCase     StageUseCase      => _stageUseCase;
@@ -73,6 +79,12 @@ public class GameContext
     public GameContext(ScriptableObject[] masterData, IPopupManager popupManager)
     {
         PopupManager = popupManager;
+
+        // MasterData Cache — masterData 배열에서 EvolutionNodeSO만 필터링
+        var nodeList = new System.Collections.Generic.List<EvolutionNodeSO>();
+        foreach (var so in masterData)
+            if (so is EvolutionNodeSO node) nodeList.Add(node);
+        _evolutionNodes = nodeList.ToArray();
 
         // Step 1 — Repository 생성
         _characterRepo        = new CharacterRepository();
