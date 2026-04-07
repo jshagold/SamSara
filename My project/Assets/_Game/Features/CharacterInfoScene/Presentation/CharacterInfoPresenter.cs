@@ -81,8 +81,7 @@ namespace Samsara.Features.CharacterInfoScene.Presentation
 
         private void HandleEvolutionStageClicked()
         {
-            _popupManager.ShowConfirmAsync(
-                new PopupRequest("Coming Soon", "이 기능은 아직 준비 중입니다.", "확인")).Forget();
+            _sceneNavigator.NavigateToAsync(SceneKey.EvolutionTree).Forget();
         }
 
         private void HandleSkillSlotClicked(int index)

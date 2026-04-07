@@ -21,9 +21,7 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation.TreeArea
         {
             _content.sizeDelta = new Vector2(layoutResult.ContentWidth, layoutResult.ContentHeight);
 
-            // Offset so center-aligned coords map to content space
-            float offsetX = layoutResult.ContentWidth / 2f;
-            float offsetY = -layoutResult.ContentHeight / 2f;
+            Debug.Log($"{_logClass} Content size={_content.sizeDelta} pivot={_content.pivot} anchorMin={_content.anchorMin} anchorMax={_content.anchorMax}");
 
             foreach (var nodeLayout in layoutResult.Nodes)
             {
@@ -33,6 +31,8 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation.TreeArea
                 rt.anchorMax = new Vector2(0.5f, 1f);
                 rt.pivot = new Vector2(0.5f, 0.5f);
                 rt.anchoredPosition = new Vector2(nodeLayout.X, nodeLayout.Y);
+
+                Debug.Log($"{_logClass} Node [{nodeLayout.NodeId}] anchoredPosition={rt.anchoredPosition}");
 
                 _nodeViews.Add(nodeView);
                 _nodeViewMap[nodeLayout.NodeId] = nodeView;

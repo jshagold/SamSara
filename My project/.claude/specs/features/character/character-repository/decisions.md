@@ -1,6 +1,6 @@
 # CharacterRepository — Decisions
 
-**Version:** 1.1.0 | **Date:** 2026-04-01 | **Status:** ✅ Complete
+**Version:** 1.2.0 | **Date:** 2026-04-06 | **Status:** ✅ Complete
 **Feature:** CharacterRepository
 **Constitution Ref:** §9
 

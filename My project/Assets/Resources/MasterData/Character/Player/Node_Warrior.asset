@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c940a4430c8a56549b890eb86da8dde2, type: 3}
   m_Name: Node_Warrior
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Character.MasterData.EvolutionNodeSO
-  _nodeId: 
-  _characterName: 
+  _nodeId: node_warrior
+  _characterName: Warrior
   _baseStats: {fileID: 11400000, guid: b0b7dd43cf40d114eaae4c3ce99817bd, type: 2}
   _maxActionPoints: 0
   _unlockConditions: []

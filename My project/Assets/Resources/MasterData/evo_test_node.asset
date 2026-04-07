@@ -18,7 +18,8 @@ MonoBehaviour:
   _maxActionPoints: 3
   _unlockConditions: []
   _isHidden: 0
-  _nextNodes: []
+  _nextNodes:
+  - {fileID: 11400000, guid: 6775ae952597bcb4db3067bc5dc8760a, type: 2}
   _nodeIconSpriteKey: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
   _mainStandingSpriteKey: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
   _portraitSpriteKey: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png

@@ -29,3 +29,7 @@ Phase 2에서 Addressables 비동기 로딩으로 교체 예정.
 D-07 [DECISION] Patch-001: `GameContext` 생성자가 이미 `ScriptableObject[] masterData`를 파라미터로 받으므로
 `Resources.LoadAll<EvolutionNodeSO>()` 재호출 없이 해당 배열을 순회해 `EvolutionNodeSO` 항목만 필터링함.
 Resources 캐시를 통해 동일한 결과지만, 불필요한 재호출을 피하고 생성자 내부에서 일관되게 처리.
+
+D-08 [BACKLOG] Patch-002 이후 `CharacterInfoPresenter`의 `_popupManager` 필드 및 생성자 파라미터가 미사용 상태.
+패치 범위가 `CharacterInfoPresenter.cs` 단일 파일이므로 `CharacterInfoSceneBootstrapper` 수정은 제외함.
+추후 `_popupManager` 의존성을 생성자와 Bootstrapper에서 제거하는 정리 작업 필요.

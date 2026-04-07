@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c940a4430c8a56549b890eb86da8dde2, type: 3}
   m_Name: Node_Default
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Character.MasterData.EvolutionNodeSO
-  _nodeId: 
-  _characterName: 
+  _nodeId: node_default
+  _characterName: Default
   _baseStats: {fileID: 11400000, guid: 0527ec4a310892646bbe1fa4ef58dec5, type: 2}
   _maxActionPoints: 0
   _unlockConditions: []

@@ -33,6 +33,7 @@ namespace Samsara.Features.EvolutionTreeScene.Domain
 
         private const float NodeSpacingX = 200f;
         private const float NodeSpacingY = 250f;
+        private const float PaddingTop   = 125f;
 
         public TreeLayoutResult CalculateLayout(EvolutionNodeSO[] allNodes)
         {
@@ -101,14 +102,18 @@ namespace Samsara.Features.EvolutionTreeScene.Domain
                     {
                         NodeId = nodesAtDepth[i],
                         X = startX + i * NodeSpacingX,
-                        Y = -depth * NodeSpacingY,
+                        Y = -(depth * NodeSpacingY) - PaddingTop,
                         Depth = depth
                     });
                 }
             }
 
-            float contentWidth = globalMaxWidth + NodeSpacingX;
-            float contentHeight = maxDepth * NodeSpacingY + NodeSpacingY;
+            float contentWidth  = globalMaxWidth + NodeSpacingX;
+            float contentHeight = maxDepth * NodeSpacingY + NodeSpacingY + PaddingTop;
+
+            Debug.Log($"{_logClass} Layout result — nodes:{nodeLayouts.Count} connections:{connections.Count} content:({contentWidth}x{contentHeight})");
+            foreach (var n in nodeLayouts)
+                Debug.Log($"{_logClass} Node [{n.NodeId}] depth={n.Depth} pos=({n.X}, {n.Y})");
 
             return new TreeLayoutResult
             {
