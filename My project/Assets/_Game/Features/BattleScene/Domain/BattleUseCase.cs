@@ -22,7 +22,14 @@ namespace Samsara.Features.BattleScene.Domain
         // Pre-allocated buffers (§8 GC optimization — ProcessTick is called every tick)
         private readonly List<BattleParticipant> _tickReadyBuffer = new List<BattleParticipant>();
         private readonly List<int> _usableSkillsBuffer = new List<int>();
-        private readonly List<int> _predictedOrderBuffer = new List<int>();
+
+        // Pre-allocated simulation buffers for GetPredictedActionOrder (§8 GC)
+        private readonly BattleParticipant[] _simParticipants = new BattleParticipant[20];
+        private readonly float[] _simGauges = new float[20];
+        private readonly BattleParticipant[] _predictedResultBuffer = new BattleParticipant[10];
+        private readonly int[] _simReadyIndices = new int[20];
+        private int _simParticipantCount;
+        private int _simReadyCount;
 
         public static readonly int DefaultAttackId = -1;
 
@@ -70,7 +77,9 @@ namespace Samsara.Features.BattleScene.Domain
                 SkillIds = evolutionNode.SkillIds,
                 SkillCooldowns = new Dictionary<int, int>(),
                 IsDead = false,
-                SpriteKey = evolutionNode.BattleSpriteKeyHp100
+                SpriteKey = evolutionNode.BattleSpriteKeyHp100,
+                PortraitSpriteKey = evolutionNode.PortraitSpriteKey,
+                DisplayName = evolutionNode.CharacterName
             };
 
             foreach (var skillId in ally.SkillIds)
@@ -105,7 +114,9 @@ namespace Samsara.Features.BattleScene.Domain
                         SkillIds = enemySO.SkillIds,
                         SkillCooldowns = new Dictionary<int, int>(),
                         IsDead = false,
-                        SpriteKey = enemySO.BattleSpriteKeyHp100
+                        SpriteKey = enemySO.BattleSpriteKeyHp100,
+                        PortraitSpriteKey = enemySO.BattleSpriteKeyHp100,  // D-13: EnemySO has no portrait key
+                        DisplayName = enemySO.EnemyName
                     };
 
                     foreach (var skillId in enemy.SkillIds)
@@ -144,10 +155,10 @@ namespace Samsara.Features.BattleScene.Domain
                     _tickReadyBuffer.Add(p);
             }
 
-            // Sort by agility descending; random tiebreak
+            // Sort by actionGauge descending; random tiebreak on equal gauge
             _tickReadyBuffer.Sort((a, b) =>
             {
-                int cmp = b.Agility.CompareTo(a.Agility);
+                int cmp = b.ActionGauge.CompareTo(a.ActionGauge);
                 if (cmp != 0) return cmp;
                 return UnityEngine.Random.Range(0, 2) == 0 ? -1 : 1;
             });
@@ -230,6 +241,33 @@ namespace Samsara.Features.BattleScene.Domain
         public void ConsumeGauge(BattleParticipant actor)
         {
             actor.ActionGauge -= 100f;
+        }
+
+        // ──────────────────────────────────────────────
+        // ExecuteWait
+        // ──────────────────────────────────────────────
+
+        public void ExecuteWait(BattleParticipant actor)
+        {
+            ReduceCooldowns(actor);
+            ConsumeGauge(actor);
+            IncrementTurn();
+        }
+
+        // ──────────────────────────────────────────────
+        // CalculatePerHitDamage
+        // ──────────────────────────────────────────────
+
+        public int[] CalculatePerHitDamage(int totalDamage, int hitCount)
+        {
+            if (hitCount <= 0) return System.Array.Empty<int>();
+
+            var damages = new int[hitCount];
+            int perHit = Mathf.FloorToInt((float)totalDamage / hitCount);
+            for (int i = 0; i < hitCount - 1; i++)
+                damages[i] = perHit;
+            damages[hitCount - 1] = totalDamage - (perHit * (hitCount - 1));
+            return damages;
         }
 
         // ──────────────────────────────────────────────
@@ -352,63 +390,85 @@ namespace Samsara.Features.BattleScene.Domain
         // GetPredictedActionOrder
         // ──────────────────────────────────────────────
 
-        public List<int> GetPredictedActionOrder(int lookAhead)
+        /// <summary>
+        /// 다음 lookAhead명의 행동 순서를 시뮬레이션하여 반환.
+        /// 동일 틱 내 동점: actionGauge 높은 순.
+        /// Pre-allocated 버퍼 사용 (§8 GC 최적화).
+        /// </summary>
+        public BattleParticipant[] GetPredictedActionOrder(int lookAhead = 4)
         {
-            _predictedOrderBuffer.Clear();
+            int resultCount = 0;
+            _simParticipantCount = 0;
 
-            // Collect all surviving participants
-            var allParticipants = new List<BattleParticipant>();
             for (int i = 0; i < _runtimeData.Allies.Count; i++)
             {
-                if (!_runtimeData.Allies[i].IsDead)
-                    allParticipants.Add(_runtimeData.Allies[i]);
+                if (!_runtimeData.Allies[i].IsDead && _simParticipantCount < _simParticipants.Length)
+                {
+                    _simParticipants[_simParticipantCount] = _runtimeData.Allies[i];
+                    _simGauges[_simParticipantCount] = _runtimeData.Allies[i].ActionGauge;
+                    _simParticipantCount++;
+                }
             }
             for (int i = 0; i < _runtimeData.Enemies.Count; i++)
             {
-                if (!_runtimeData.Enemies[i].IsDead)
-                    allParticipants.Add(_runtimeData.Enemies[i]);
+                if (!_runtimeData.Enemies[i].IsDead && _simParticipantCount < _simParticipants.Length)
+                {
+                    _simParticipants[_simParticipantCount] = _runtimeData.Enemies[i];
+                    _simGauges[_simParticipantCount] = _runtimeData.Enemies[i].ActionGauge;
+                    _simParticipantCount++;
+                }
             }
 
-            if (allParticipants.Count == 0) return _predictedOrderBuffer;
+            if (_simParticipantCount == 0) return System.Array.Empty<BattleParticipant>();
 
-            // Copy current gauge values for simulation
-            var tempGauges = new float[allParticipants.Count];
-            for (int i = 0; i < allParticipants.Count; i++)
-                tempGauges[i] = allParticipants[i].ActionGauge;
-
-            int found = 0;
-            int safetyLimit = lookAhead * 1000;
+            int maxResults = Mathf.Min(lookAhead, _predictedResultBuffer.Length);
+            int safetyLimit = maxResults * 1000;
             int iterations = 0;
 
-            while (found < lookAhead && iterations < safetyLimit)
+            while (resultCount < maxResults && iterations < safetyLimit)
             {
                 iterations++;
 
                 // Tick all gauges
-                for (int i = 0; i < allParticipants.Count; i++)
-                    tempGauges[i] += allParticipants[i].Agility;
+                for (int i = 0; i < _simParticipantCount; i++)
+                    _simGauges[i] += _simParticipants[i].Agility;
 
-                // Collect ready participants in this tick
-                var readyThisTick = new List<(int index, int agility)>();
-                for (int i = 0; i < allParticipants.Count; i++)
+                // Collect ready indices
+                _simReadyCount = 0;
+                for (int i = 0; i < _simParticipantCount; i++)
                 {
-                    if (tempGauges[i] >= 100f)
-                        readyThisTick.Add((i, allParticipants[i].Agility));
+                    if (_simGauges[i] >= 100f)
+                        _simReadyIndices[_simReadyCount++] = i;
                 }
 
-                // Sort by agility descending
-                readyThisTick.Sort((a, b) => b.agility.CompareTo(a.agility));
+                if (_simReadyCount == 0) continue;
 
-                foreach (var (index, _) in readyThisTick)
+                // Insertion sort by gauge descending (small count — allocation-free)
+                for (int i = 1; i < _simReadyCount; i++)
                 {
-                    _predictedOrderBuffer.Add(allParticipants[index].Id);
-                    tempGauges[index] -= 100f;
-                    found++;
-                    if (found >= lookAhead) break;
+                    int key = _simReadyIndices[i];
+                    float keyGauge = _simGauges[key];
+                    int j = i - 1;
+                    while (j >= 0 && _simGauges[_simReadyIndices[j]] < keyGauge)
+                    {
+                        _simReadyIndices[j + 1] = _simReadyIndices[j];
+                        j--;
+                    }
+                    _simReadyIndices[j + 1] = key;
+                }
+
+                // Add to result, consume gauge
+                for (int i = 0; i < _simReadyCount && resultCount < maxResults; i++)
+                {
+                    int idx = _simReadyIndices[i];
+                    _predictedResultBuffer[resultCount++] = _simParticipants[idx];
+                    _simGauges[idx] -= 100f;
                 }
             }
 
-            return _predictedOrderBuffer;
+            var result = new BattleParticipant[resultCount];
+            System.Array.Copy(_predictedResultBuffer, result, resultCount);
+            return result;
         }
 
         // ──────────────────────────────────────────────

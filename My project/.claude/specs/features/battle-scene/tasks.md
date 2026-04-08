@@ -1,6 +1,6 @@
 # BattleScene — Tasks
 
-**Version:** 1.0.0 | **Date:** 2026-04-03 | **Status:** ✅ Confirmed
+**Version:** 2.0.0 | **Date:** 2026-04-08 | **Status:** ✅ Confirmed
 **Feature:** BattleScene
 **Phase:** 3 — Battle System
 **Constitution Ref:** §2, §3, §4, §5, §6, §7, §8, §9, §10, §11
@@ -9,366 +9,304 @@
 
 ## 1. Overview
 
-Implementation instruction set for BattleScene Feature. Based on the design confirmed in Plan. Claude Code executes these tasks in order.
+Implementation instruction set for BattleScene v2.0.0. This is a **modification/extension of existing v1.0.0 implementation**, NOT a from-scratch creation. Each task reads existing files and modifies/extends them.
 
-**IMPORTANT:** SkillSystem Patch-001 must be completed before BattleScene implementation (removes combat runtime features from SkillUseCase).
+**v2.0.0 Key Changes:**
+- Turn loop presentation timing + attack motion (coordinate movement)
+- Battle start/end presentation
+- Skill → target → confirm button UX with cancel/reselect
+- Skill UI ↔ QTE panel slide-in/out transition
+- QTE closing ring animation + per-hit damage display + success/failure effects
+- "Wait" action (skill slots + action slots structure)
+- Skill icon 3-state dim
+- Long-press info pattern
+- Action order UI overhaul (portrait+name, 5 slots, queue touch→field highlight)
+- Gauge-value-based simultaneous action sorting
+- 4 battle event hook points
 
 ---
 
 ## 2. Prerequisites
 
 - Read CLAUDE.md before any implementation
-- Read the following existing files first:
-  - Assets/_Game/Features/Battle/Domain/BattleUseCase.cs (existing stub — deletion target)
-  - Assets/_Game/Features/Character/Data/CharacterRunData.cs
-  - Assets/_Game/Features/Character/Domain/ICharacterRunRepository.cs
-  - Assets/_Game/Features/Character/MasterData/CharacterStatsSO.cs
-  - Assets/_Game/Features/Character/MasterData/EvolutionNodeSO.cs
-  - Assets/_Game/Features/Character/MasterData/StatType.cs
-  - Assets/_Game/Features/Skill/Domain/SkillUseCase.cs
-  - Assets/_Game/Features/Skill/Data/SkillMasterDataRepository.cs
-  - Assets/_Game/Features/Skill/Domain/ISkillMasterDataRepository.cs
-  - Assets/_Game/Core/MasterData/SkillSO.cs
-  - Assets/_Game/Core/MasterData/QTEPatternSO.cs
-  - Assets/_Game/Core/MasterData/EnemySO.cs
-  - Assets/_Game/Core/MasterData/CostType.cs
-  - Assets/_Game/Core/MasterData/EffectType.cs
-  - Assets/_Game/Features/Stage/MasterData/BattleNodeDataSO.cs
+- Read the following **existing BattleScene implementation files** (modification targets):
+  - Assets/_Game/Features/BattleScene/Domain/BattleUseCase.cs
+  - Assets/_Game/Features/BattleScene/Domain/BattleRuntimeData.cs
+  - Assets/_Game/Features/BattleScene/Domain/BattleParticipant.cs
+  - Assets/_Game/Features/BattleScene/Domain/PendingBattleContext.cs
+  - Assets/_Game/Features/BattleScene/Domain/BattleResult.cs
+  - Assets/_Game/Features/BattleScene/Presentation/BattleSceneBootstrapper.cs
+  - Assets/_Game/Features/BattleScene/Presentation/BattlePresenter.cs
+  - Assets/_Game/Features/BattleScene/Presentation/BattleView.cs
+  - Assets/_Game/Features/BattleScene/Presentation/TopBar/TurnNumberView.cs
+  - Assets/_Game/Features/BattleScene/Presentation/TopBar/OptionButtonView.cs
+  - Assets/_Game/Features/BattleScene/Presentation/ActionOrder/ActionOrderView.cs
+  - Assets/_Game/Features/BattleScene/Presentation/Field/CharacterUnitView.cs
+  - Assets/_Game/Features/BattleScene/Presentation/Field/AllyFieldView.cs
+  - Assets/_Game/Features/BattleScene/Presentation/Field/EnemyFieldView.cs
+  - Assets/_Game/Features/BattleScene/Presentation/Skill/SkillSelectionView.cs
+  - Assets/_Game/Features/BattleScene/Presentation/QTE/BattleQTEView.cs
+  - Assets/_Game/Features/BattleScene/Presentation/Damage/DamagePopupView.cs
+  - Assets/_Game/Features/BattleScene/Presentation/Result/BattleResultPopupView.cs
+- Also read **reference files**:
   - Assets/_Game/App/GameContext.cs
   - Assets/_Game/App/GlobalBootstrapper.cs
-  - Assets/_Game/Core/Navigation/ISceneNavigator.cs
-  - Assets/_Game/Core/Navigation/SceneKey.cs
-  - Assets/_Game/Core/Popup/IPopupManager.cs
-  - Assets/_Game/Features/MainScene/Presentation/MainSceneBootstrapper.cs (existing pattern reference)
-  - Assets/_Game/Features/MiniGame/Presentation/MiniGameSceneBootstrapper.cs (existing pattern reference)
-- Create Assets/_Game/Features/BattleScene/ folder
-- Create .claude/specs/features/battle-scene/ folder
+  - Assets/_Game/Core/MasterData/QTEPatternSO.cs
+  - Assets/_Game/Core/MasterData/SkillSO.cs
+  - Assets/_Game/Core/MasterData/EnemySO.cs
+  - Assets/_Game/Features/Skill/Domain/ISkillMasterDataRepository.cs
+  - Assets/_Game/Features/Stage/MasterData/BattleNodeDataSO.cs
 
 ---
 
 ## 3. Files to Create/Modify
 
-| Order | File | Path | Action |
+All paths relative to Assets/_Game/. Create folders if they don't exist.
+
+| # | File | Path | Action |
 |---|---|---|---|
-| 0 | BattleUseCase.cs (stub) | Assets/_Game/Features/Battle/Domain/ | Delete |
-| 1 | SceneKey.cs | Assets/_Game/Core/Navigation/ | Modify (add Battle value, skip if exists) |
-| 2 | BattleResult.cs | Assets/_Game/Features/BattleScene/Domain/ | Create |
-| 3 | PendingBattleContext.cs | Assets/_Game/Features/BattleScene/Domain/ | Create |
-| 4 | BattleParticipant.cs | Assets/_Game/Features/BattleScene/Domain/ | Create |
-| 5 | BattleRuntimeData.cs | Assets/_Game/Features/BattleScene/Domain/ | Create |
-| 6 | BattleUseCase.cs | Assets/_Game/Features/BattleScene/Domain/ | Create |
-| 7 | GameContext.cs | Assets/_Game/App/ | Modify (add PendingBattleContext?, LastBattleResult?) |
-| 8 | TurnNumberView.cs | Assets/_Game/Features/BattleScene/Presentation/TopBar/ | Create |
-| 9 | OptionButtonView.cs | Assets/_Game/Features/BattleScene/Presentation/TopBar/ | Create |
-| 10 | ActionOrderView.cs | Assets/_Game/Features/BattleScene/Presentation/ActionOrder/ | Create |
-| 11 | CharacterUnitView.cs | Assets/_Game/Features/BattleScene/Presentation/Field/ | Create |
-| 12 | AllyFieldView.cs | Assets/_Game/Features/BattleScene/Presentation/Field/ | Create |
-| 13 | EnemyFieldView.cs | Assets/_Game/Features/BattleScene/Presentation/Field/ | Create |
-| 14 | SkillSelectionView.cs | Assets/_Game/Features/BattleScene/Presentation/Skill/ | Create |
-| 15 | BattleQTEView.cs | Assets/_Game/Features/BattleScene/Presentation/QTE/ | Create |
-| 16 | DamagePopupView.cs | Assets/_Game/Features/BattleScene/Presentation/Damage/ | Create |
-| 17 | BattleResultPopupView.cs | Assets/_Game/Features/BattleScene/Presentation/Result/ | Create |
-| 18 | BattleView.cs | Assets/_Game/Features/BattleScene/Presentation/ | Create |
-| 19 | BattlePresenter.cs | Assets/_Game/Features/BattleScene/Presentation/ | Create |
-| 20 | BattleSceneBootstrapper.cs | Assets/_Game/Features/BattleScene/Presentation/ | Create |
-| 21 | decisions.md | .claude/specs/features/battle-scene/ | Create (empty) |
+| 1 | BattleHookType.cs | Features/BattleScene/Domain/ | New |
+| 2 | BattleEventData.cs | Features/BattleScene/Domain/ | New |
+| 3 | BattleEventHookRunner.cs | Features/BattleScene/Domain/ | New |
+| 4 | PendingBattleContext.cs | Features/BattleScene/Domain/ | Modify |
+| 5 | BattleParticipant.cs | Features/BattleScene/Domain/ | Modify |
+| 6 | BattleUseCase.cs | Features/BattleScene/Domain/ | Modify |
+| 7 | ActionOrderSlotView.cs | Features/BattleScene/Presentation/ActionOrder/ | New |
+| 8 | ActionSlotView.cs | Features/BattleScene/Presentation/Skill/ | New |
+| 9 | ConfirmButtonView.cs | Features/BattleScene/Presentation/Skill/ | New |
+| 10 | QTERingView.cs | Features/BattleScene/Presentation/QTE/ | New |
+| 11 | BattleStartView.cs | Features/BattleScene/Presentation/Result/ | New |
+| 12 | InfoTooltipView.cs | Features/BattleScene/Presentation/Info/ | New |
+| 13 | ActionOrderView.cs | Features/BattleScene/Presentation/ActionOrder/ | Modify |
+| 14 | CharacterUnitView.cs | Features/BattleScene/Presentation/Field/ | Modify |
+| 15 | SkillSelectionView.cs | Features/BattleScene/Presentation/Skill/ | Modify |
+| 16 | BattleQTEView.cs | Features/BattleScene/Presentation/QTE/ | Modify |
+| 17 | DamagePopupView.cs | Features/BattleScene/Presentation/Damage/ | Modify |
+| 18 | EnemyFieldView.cs | Features/BattleScene/Presentation/Field/ | Modify |
+| 19 | BattleResultPopupView.cs | Features/BattleScene/Presentation/Result/ | Modify |
+| 20 | BattleView.cs | Features/BattleScene/Presentation/ | Modify |
+| 21 | BattlePresenter.cs | Features/BattleScene/Presentation/ | Modify |
+| 22 | BattleSceneBootstrapper.cs | Features/BattleScene/Presentation/ | Modify |
+| 23 | decisions.md | .claude/specs/features/battle-scene/ | Reset |
 
 ---
 
 ## 4. Implementation Order and Instructions
 
-### Task 0 — Delete existing stub
-
-Delete Assets/_Game/Features/Battle/Domain/BattleUseCase.cs. If Features/Battle/ folder is empty after deletion, delete the folder too.
-
----
-
-### Task 1 — Modify SceneKey.cs
-
-Add Battle entry to SceneKey enum. Skip if already exists. Constitution §6 SceneKey rules.
-
----
-
-### Task 2 — Create BattleResult.cs
-
-- BattleResult enum: Victory, Defeat
+### Task 1 — New BattleHookType.cs
+- enum: PreBattle, PerTick, PostDamage, PostBattle
 - Namespace: Samsara.Features.BattleScene.Domain
-- Constitution §8: enum, no _logClass needed.
+- Constitution §8: enum, no _logClass.
 
----
-
-### Task 3 — Create PendingBattleContext.cs
-
+### Task 2 — New BattleEventData.cs
 - Pure C# class.
-- BattleNodeDataSO battleNodeData field (read-only property).
+- Fields: BattleHookType hookType, string triggerCondition (future use), string eventReference (future event data ref)
 - Constructor injection.
-- Namespace: Samsara.Features.BattleScene.Domain
+- Namespace: Samsara.Features.BattleScene.Domain. Constitution §8: _logClass.
 
----
+### Task 3 — New BattleEventHookRunner.cs
+- Pure C# class.
+- Constructor: BattleEventData[] events (nullable)
+- async UniTask CheckHook(BattleHookType hookType, BattleRuntimeData data): If events null or no matching hookType, return immediately. If match exists, execute (Phase 1: always returns immediately).
+- Constitution §5: UniTask. §8: _logClass.
 
-### Task 4 — Create BattleParticipant.cs
+### Task 4 — Modify PendingBattleContext.cs
+- Read existing file, add: BattleEventData[] battleEvents (nullable, default null in constructor)
+- Keep existing battleNodeData field/constructor.
 
-- Pure C# class (DTO). Must be serializable via Newtonsoft.Json in the future.
-- Fields: id (int), isAlly (bool), currentHp (int), maxHp (int), strength (int), toughness (int), agility (int), actionGauge (float), skillIds (int[]), skillCooldowns (Dictionary<int, int>), isDead (bool), spriteKey (string).
-- Constitution §8: _camelCase private fields, PascalCase public properties.
+### Task 5 — Modify BattleParticipant.cs
+- Read existing file, add fields: string portraitSpriteKey, string displayName
+- Keep all existing fields.
 
----
+### Task 6 — Modify BattleUseCase.cs
+- Read existing file and apply:
+- **Modify ProcessTick():** Sort gauge >= 100 participants by **actionGauge descending** (was: agility descending). Random on equal gauge.
+- **Add ExecuteWait(BattleParticipant actor):** No action. Call ReduceCooldowns(actor) + ConsumeGauge(actor). IncrementTurn().
+- **Add CalculatePerHitDamage(int totalDamage, int hitCount) -> int[]:** perHitDamage = floor(totalDamage / hitCount). Last hit = totalDamage - (perHitDamage * (hitCount-1)). Return int[]. Empty array if hitCount 0.
+- **Add GetPredictedActionOrder(int lookAhead = 4) -> BattleParticipant[]:** Copy all surviving participants' actionGauge, simulate ticks, return next lookAhead actors. Same-tick: actionGauge descending. Constitution §8 GC: consider pre-allocated simulation arrays.
+- Keep all existing methods. In InitializeBattle, also set portraitSpriteKey and displayName on BattleParticipant (from EnemySO spriteKey, name).
 
-### Task 5 — Create BattleRuntimeData.cs
-
-- Pure C# class (DTO). Must be serializable via Newtonsoft.Json in the future.
-- Fields: allies (List<BattleParticipant>), enemies (List<BattleParticipant>), turnNumber (int), currentPhase (BattlePhase enum).
-- Define BattlePhase enum in same file: SkillSelect, QTE, DamageProcess, Result.
-- Constitution §2: Data classes have no logic.
-
----
-
-### Task 6 — Create BattleUseCase.cs
-
-Pure C# class. Core combat logic. Constitution §2 Data/Logic separation, §3 new only in Bootstrapper, §8 _logClass included.
-
-**Constructor injection:**
-- ISkillMasterDataRepository — skill/QTE pattern queries
-- ICharacterRunRepository — ally HP/stats read
-
-**Internal state:**
-- BattleRuntimeData _runtimeData
-
-**Methods (see Plan §3-2):**
-- InitializeBattle(PendingBattleContext context): Get EnemySO[] from BattleNodeDataSO, convert each EnemySO to BattleParticipant (copy stats from CharacterStatsSO, copy skill IDs). Convert CharacterRunData + EvolutionNodeSO to ally BattleParticipant. Initialize all participant actionGauge = 0, all skillCooldowns to 0. turnNumber = 1.
-- ProcessTick(): All surviving participants gauge += agility. Return participants with gauge >= 100 sorted by agility descending. Random on equal agility. Constitution §8: use pre-allocated list (called every tick, GC caution).
-- ExecuteAction(BattleParticipant actor, int skillId, BattleParticipant target, float qteRate): Query SkillSO, baseDamage = actor.strength * skillDamageMultiplier. defense = target.toughness. finalDamage = max(1, floor((baseDamage - defense) * qteRate)). target.currentHp -= finalDamage. If target.currentHp <= 0, target.isDead = true. Set used skill cooldown to SkillSO.coolDown value. If HP cost exists, actor.currentHp -= cost (check actual SkillSO CostType/value fields). Return: finalDamage (int).
-- ReduceCooldowns(BattleParticipant actor): All values in actor.skillCooldowns -= 1 (min 0).
-- ConsumeGauge(BattleParticipant actor): actor.actionGauge -= 100.
-- GetUsableSkills(BattleParticipant actor): Return skill ID list where cooldown is 0 and HP cost payable.
-- SelectEnemySkill(BattleParticipant enemy): Random from GetUsableSkills() result. If no usable skills, handle default attack (record in decisions.md if judgment needed).
-- SelectEnemyTarget(BattleParticipant enemy): First non-dead ally (Phase 1: 1 ally, auto).
-- CalculateQTERate(bool isAttack, bool[] inputResults, int inputCount): successCount = count of true. successRate = successCount / inputCount. isAttack: return 1.0f + (0.5f * successRate). !isAttack: return 1.0f - (0.5f * successRate).
-- CheckBattleEnd(): All enemies isDead -> Victory, all allies isDead -> Defeat, otherwise null.
-- GetPredictedActionOrder(int lookAhead): Copy current gauge values and simulate, return next lookAhead action participant IDs.
-- CleanupBattle(): _runtimeData = null.
-- IncrementTurn(): _runtimeData.turnNumber++.
-
----
-
-### Task 7 — Modify GameContext.cs
-
-- Add PendingBattleContext? field + public accessor.
-- Add BattleResult? field (LastBattleResult) + public accessor.
-- Constitution §6: GameContext is pure C# class. New fields are nullable.
-
----
-
-### Task 8 — Create TurnNumberView.cs
-
-- MonoBehaviour. [SerializeField] private TMP_Text reference.
-- SetTurn(int turn): Set "Turn {turn}" text.
-- Constitution §7: Reset() auto-assignment. §8: _logClass, [SerializeField] private.
-
----
-
-### Task 9 — Create OptionButtonView.cs
-
-- MonoBehaviour. Button component.
-- OnOptionClicked event.
-- Reference existing OptionButtonView files for identical pattern.
-- Constitution §7: Reset() auto-assignment.
-
----
-
-### Task 10 — Create ActionOrderView.cs
-
-- MonoBehaviour. Side vertical list.
-- [SerializeField] private Transform _iconContainer, Image _iconPrefab.
-- SetOrder(ActionOrderEntry[] entries): Render icon list. Define ActionOrderEntry in same file (id, spriteKey, isAlly).
-- HighlightCurrent(int id): Highlight currently acting character.
-- ClearOrder(): Remove all icons.
-- Constitution §8: GC optimization — consider object pooling or pre-allocation. §5: ObjectPool candidate.
-
----
-
-### Task 11 — Create CharacterUnitView.cs
-
-- MonoBehaviour. Shared ally/enemy character UI.
-- [SerializeField] private: Image _characterSprite, Image _hpBarFill, TMP_Text _hpText, CanvasGroup _canvasGroup, GameObject _highlightEffect, Transform _statusIconContainer (Phase 1: reserved only).
+### Task 7 — New ActionOrderSlotView.cs
+- MonoBehaviour. Individual action order queue slot.
+- [SerializeField] private: Image _portraitImage, TMP_Text _nameText, Image _borderImage, GameObject _highlightEffect
 - ParticipantId property (int).
-- Setup(int id, string spriteKey, int maxHp): Initial setup.
-- SetHp(int current, int max): HP bar + text update. 3-stage sprite switch (100%/50%/0%).
-- SetHighlight(bool on): Target selection highlight.
-- SetDim(bool dim): CanvasGroup.alpha dimming.
-- SetDead(): Death visual treatment.
-- Constitution §7: Reset() auto-assignment (except Transform/RectTransform). §8: Safe Cleanup.
+- Setup(int id, string portraitKey, string name, bool isAlly): Initial setup. Ally=blue border, enemy=red.
+- SetHighlight(bool on): Current actor highlight.
+- OnSlotTouched event (for field highlight linkage).
+- Button or EventTrigger for touch detection.
+- Constitution §7: Reset(). §8: _logClass.
 
----
+### Task 8 — New ActionSlotView.cs
+- MonoBehaviour. Non-skill action buttons.
+- [SerializeField] private: Button _waitButton, TMP_Text _waitButtonText ("Wait")
+- OnWaitSelected event. SetActive(bool active).
+- Constitution §7: Reset().
 
-### Task 12 — Create AllyFieldView.cs
+### Task 9 — New ConfirmButtonView.cs
+- MonoBehaviour. Confirm button.
+- [SerializeField] private: Button _confirmButton, TMP_Text _buttonText ("Confirm")
+- OnConfirm event. SetInteractable(bool interactable).
+- Constitution §7: Reset().
 
-- MonoBehaviour. Ally area management.
-- [SerializeField] private Transform _allyContainer, CharacterUnitView _unitPrefab.
-- RenderAllies(BattleParticipant[] allies): Create CharacterUnitView instances.
-- GetUnit(int participantId): Return CharacterUnitView by ID.
-- ClearAllies(): Cleanup instances.
+### Task 10 — New QTERingView.cs
+- MonoBehaviour. Individual QTE input — closing ring animation.
+- [SerializeField] private: Image _buttonImage, Image _ringImage, RectTransform _ringRect
+- async UniTask<bool> RunRing(QTEData qteData):
+  1. Position button+ring at coordinate.
+  2. Ring scale from large (e.g. 3.0) to 1.0 over duration via DOTween.
+  3. During shrink, detect touch: if ring scale within success range (e.g. 1.0~1.3) on touch = success.
+  4. Timeout or out-of-range touch = failure.
+  5. Return bool.
+- Success range defined as constant (future: split for grade levels).
+- Constitution §5: UniTask. §11: No Coroutines. DOTween. §8: _logClass.
 
----
+### Task 11 — New BattleStartView.cs
+- MonoBehaviour. Battle start presentation.
+- [SerializeField] private: TMP_Text _battleStartText, CanvasGroup _canvasGroup
+- async UniTask PlayStartPresentation():
+  1. Show "Battle Start!" text.
+  2. DOTween scale up + fade in (~0.5s).
+  3. Hold (~0.5s).
+  4. Fade out (~0.3s).
+  5. Deactivate on complete.
+- Enemy slide-in: handled by EnemyFieldView.PlaySlideIn() separately (can be omitted if costly, record in decisions.md).
+- Constitution §5: UniTask. §11: DOTween.
 
-### Task 13 — Create EnemyFieldView.cs
+### Task 12 — New InfoTooltipView.cs
+- MonoBehaviour. Long-press info tooltip (enemy/ally/skill shared).
+- [SerializeField] private: GameObject _root, TMP_Text _titleText, TMP_Text _detailText, RectTransform _tooltipRect
+- Show(string title, string detail, Vector2 screenPosition): Display tooltip near target. Clamp to screen bounds.
+- Hide(): Hide tooltip.
+- Constitution §7: Reset(). §8: _logClass.
 
-- MonoBehaviour. Enemy area management.
-- [SerializeField] private Transform _enemyContainer, CharacterUnitView _unitPrefab.
-- RenderEnemies(BattleParticipant[] enemies): Create CharacterUnitView instances. Connect touch events per unit.
-- GetUnit(int participantId): Return CharacterUnitView by ID.
-- EnableTargetSelection(bool enable): Enable/disable target selection mode.
-- OnTargetSelected(int participantId) event.
-- ClearEnemies(): Cleanup instances.
+### Task 13 — Modify ActionOrderView.cs
+- Read existing file, full overhaul:
+- Replace Image-based icon rendering with **5 ActionOrderSlotView** based system.
+- [SerializeField] private ActionOrderSlotView[] _slots (5 slots from Inspector) or _slotPrefab + object pool.
+- SetOrder(BattleParticipant[] predicted): Setup 5 slots with portrait+name+border. predicted[0] = current actor.
+- HighlightCurrent(int participantId): Highlight matching slot.
+- OnSlotTouched(int participantId) event → Presenter → field highlight.
+- Remove old icon rendering code.
+- Ensure prediction queue displays in correct order (existing bug fix point).
+- Constitution §5: ObjectPool if applicable. §8: GC optimization.
 
----
+### Task 14 — Modify CharacterUnitView.cs
+- Read existing file, add:
+- **Active highlight:** [SerializeField] private GameObject _activeHighlight (separate from target selection highlight). SetActiveHighlight(bool on): Turn start to action end.
+- **Attack motion:** async UniTask PlayAttackMotion(Vector3 targetPosition): DOTween move toward target (~0.3s, ~70% of distance). async UniTask PlayReturnMotion(): Return to _originalPosition (~0.2s). Store _originalPosition (Vector3) on Setup().
+- **Long-press:** EventTrigger or IPointerDownHandler/IPointerUpHandler. Threshold: 0.5s. OnLongPress(int participantId) event. Short touch retains existing target selection.
+- Constitution §11: DOTween. §5: UniTask.
 
-### Task 14 — Create SkillSelectionView.cs
+### Task 15 — Modify SkillSelectionView.cs
+- Read existing file, add:
+- **3-state dim:** Add SkillState enum: Usable, OnCooldown, HpInsufficient. Usable=normal, OnCooldown(dimA)=dark overlay+remaining turns, HpInsufficient(dimB)=red overlay/border. Extend SkillDisplayData with SkillState. Replace single dim with 3-state.
+- **Long-press:** Add long-press detection per skill button. OnSkillLongPress(int skillId) event. Short touch retains OnSkillSelected.
+- **ConfirmButtonView:** [SerializeField] private ConfirmButtonView _confirmButton (or BattleView manages separately).
 
-- MonoBehaviour. Skill icon list.
-- [SerializeField] private Transform _skillContainer, Button _skillButtonPrefab.
-- SetSkills(SkillDisplayData[] skills): Render skill icons. Define SkillDisplayData in same file (skillId, spriteKey, cooldownRemaining, isUsable).
-- OnSkillSelected(int skillId) event.
-- SetActive(bool active): Enable/disable. Dim when inactive.
-- RefreshCooldowns(Dictionary<int, int> cooldowns): Update cooldown states.
-- Constitution §5: Button prefab ObjectPool candidate.
+### Task 16 — Modify BattleQTEView.cs
+- Read existing file, full overhaul:
+- **Closing ring:** Remove existing touch judgment. Delegate to QTERingView per input. RunQTE internally: for each qteData → await QTERingView.RunRing(qteData) → collect bool[]. Or Presenter iterates QTERingView directly (Plan RQ-P01).
+- **Slide-in/out:** async UniTask SlideIn(bool isDefense): Slide from bottom. isDefense=warning color border. async UniTask SlideOut(): Slide out.
+- **Panel visuals:** [SerializeField] private Image _panelBackground, Image _panelBorder. Attack QTE=default color. Defense QTE=warning (red) border.
+- **QTERingView ref:** [SerializeField] private QTERingView _ringView.
+- Constitution §5: UniTask. §11: DOTween, no Coroutines.
 
----
+### Task 17 — Modify DamagePopupView.cs
+- Read existing file, add:
+- ShowHitDamage(int damage, bool success, Vector3 worldPosition): success=large bright font + scale punch effect. failure="Miss" text + small dim font. Font size/color as constants for future extension.
+- Keep existing ShowDamage method.
+- Constitution §5: ObjectPool. §11: DOTween.
 
-### Task 15 — Create BattleQTEView.cs
+### Task 18 — Modify EnemyFieldView.cs
+- Read existing file, add:
+- **Same-enemy numbering:** In RenderEnemies, assign numbers to enemies with same EnemySO. 2+ same name: "Slime①", "Slime②". 1 only: original name. Set displayName on BattleParticipant.
+- **Slide-in (optional):** async UniTask PlaySlideIn(): Enemy characters slide in from off-screen. Can be omitted if costly (record in decisions.md).
 
-- MonoBehaviour. QTE panel.
-- Receives QTEPatternSO's QTEData[] array and displays QTE input UI sequentially.
-- RunQTE(QTEData[] qteDataList, bool isAttack) -> UniTask<bool[]>. For each QTEData: display touch target at coordinate position, judge success/failure within duration, wait intervalToNext, next input. Return bool[] (per-input success/failure) after all inputs complete.
-- Hide(): Hide QTE panel.
-- Reference MiniGame TimingBarView pattern, but BattleQTEView is a separate implementation using QTEData coordinate/duration.
-- Constitution §5: UniTask-based async. §11: Coroutines forbidden.
+### Task 19 — Modify BattleResultPopupView.cs
+- Read existing file, add:
+- async UniTask ShowEndPresentation(BattleResult result):
+  1. Display "Victory" or "Defeat" large center text.
+  2. DOTween scale up + fade in.
+  3. Hold (~1s).
+  4. Text disappears.
+  5. Show existing result popup.
+  6. await user confirm (existing OnConfirm event).
+- Refactor existing Show() to be called internally.
 
----
+### Task 20 — Modify BattleView.cs
+- Read existing file, add:
+- **New View refs:** [SerializeField] private ActionSlotView, ConfirmButtonView, BattleStartView, InfoTooltipView. Keep all existing refs.
+- **UI transition:** async UniTask TransitionToQTE(bool isDefense): SkillSelectionView+ActionSlotView+ConfirmButtonView slide out → BattleQTEView.SlideIn(isDefense). async UniTask TransitionToSkillUI(): BattleQTEView.SlideOut() → skill area slide in. ShowSkillUI()/HideSkillUI(): immediate show/hide.
+- **Enemy turn labels:** [SerializeField] private TMP_Text _turnLabel. async UniTask ShowEnemyTurnLabel(string displayName): Show + delay + disappear. async UniTask ShowSkillNameLabel(string skillName): Show + delay + disappear.
+- Constitution §7: Update Reset() for new fields.
 
-### Task 16 — Create DamagePopupView.cs
+### Task 21 — Modify BattlePresenter.cs
+- Read existing file, **full turn loop overhaul**. Implement Plan §6-2 flow directly.
+- **Add to constructor:** BattleEventHookRunner.
+- **Modify Initialize():** Add same-enemy numbering (displayName), await hookRunner.CheckHook(PreBattle), await battleStartView.PlayStartPresentation().
+- **Modify RunBattleLoop():** Full revision per Plan §6-2. Key: per-tick hook check, gauge-desc sorting, ally turn (skill UI + action slots + confirm + TransitionToQTE + attack motion + per-hit QTE/damage + TransitionToSkillUI + return motion), enemy turn (turn label + skill label + attack motion + defense QTE + return motion), active highlight on/off, action order queue refresh.
+- **Add long-press handling:** CharacterUnitView.OnLongPress → InfoTooltipView. SkillSelectionView.OnSkillLongPress → InfoTooltipView.
+- **Add queue touch handling:** ActionOrderView.OnSlotTouched → CharacterUnitView highlight.
+- **Modify HandleBattleEnd():** Add hookRunner.CheckHook(PostBattle). Call ShowEndPresentation instead of Show.
+- Constitution §2: No direct UI manipulation. §5: UniTask, .Forget(). §8: Safe Cleanup.
 
-- MonoBehaviour. Damage number popup.
-- [SerializeField] private TMP_Text _damageTextPrefab.
-- ShowDamage(int damage, Vector3 worldPosition): Instantiate prefab, set text, DOTween (move up + fade out), Destroy on complete.
-- Constitution §5: ObjectPool candidate (frequent create/destroy). §8: GC optimization.
+### Task 22 — Modify BattleSceneBootstrapper.cs
+- Read existing file, add:
+- Get battleEvents from PendingBattleContext.
+- Create BattleEventHookRunner instance (Constitution §3: new only in Bootstrapper).
+- Inject BattleEventHookRunner into BattlePresenter constructor.
+- Keep all existing code.
 
----
-
-### Task 17 — Create BattleResultPopupView.cs
-
-- MonoBehaviour. Battle result popup.
-- [SerializeField] private: TMP_Text _resultText, TMP_Text _statChangesText, Button _confirmButton, GameObject _root.
-- Show(BattleResult result): Set text per result + show popup.
-- OnConfirm event.
-- Hide(): Hide popup.
-- Constitution §7: Reset() auto-assignment.
-
----
-
-### Task 18 — Create BattleView.cs
-
-- MonoBehaviour. Scene root View.
-- [SerializeField] private all child Views: TurnNumberView, OptionButtonView, ActionOrderView, AllyFieldView, EnemyFieldView, SkillSelectionView, BattleQTEView, DamagePopupView, BattleResultPopupView.
-- [SerializeField] private Image _backgroundImage: Battle background.
-- Expose public events relaying child View events to Presenter.
-- SetBackground(Sprite sprite): Set background sprite.
-- Constitution §7: Reset() auto-assignment. §8: _logClass.
-
----
-
-### Task 19 — Create BattlePresenter.cs
-
-Pure C# class. Bridges BattleUseCase and BattleView. Constitution §2: Presenter must NOT directly manipulate UI — delegate to View methods.
-
-**Constructor injection:**
-- BattleUseCase, BattleView, ISceneNavigator, IPopupManager, ISkillMasterDataRepository, GameContext
-
-**Initialize(PendingBattleContext context):**
-- Call BattleUseCase.InitializeBattle(context)
-- AllyFieldView.RenderAllies() + EnemyFieldView.RenderEnemies()
-- ActionOrderView.SetOrder() initial display
-- TurnNumberView.SetTurn(1)
-- BattleView.SetBackground() background setup
-- Subscribe to events (SkillSelected, TargetSelected, QTE complete, etc.)
-- RunBattleLoop().Forget() — start async turn loop
-
-**async UniTask RunBattleLoop():**
-- Implement Plan §6-2 turn loop flow directly.
-- Per tick: ProcessTick -> action queue -> ally/enemy turn processing -> death check -> battle end check
-- Ally turn: Activate SkillSelectionView -> await skill selection -> await target selection -> QTE (if applicable, await) -> ExecuteAction -> update UI
-- Enemy turn: AI skill/target -> defense QTE (if applicable, await) -> ExecuteAction -> update UI
-- On battle end call HandleBattleEnd()
-
-**async UniTask HandleBattleEnd(BattleResult result):**
-- BattleUseCase.CleanupBattle()
-- BattleResultPopupView.Show(result)
-- await OnConfirm
-- GameContext.LastBattleResult = result
-- GameContext.PendingBattleContext = null
-- ISceneNavigator.LoadScene(SceneKey.Stage)
-
-**Dispose():** Unsubscribe events. Constitution §8: Safe Cleanup (?. operator).
-
----
-
-### Task 20 — Create BattleSceneBootstrapper.cs
-
-- MonoBehaviour. Async initialization in Start(). Constitution §3: SceneBootstrapper initializes from Start().
-- await GlobalBootstrapper.Instance.InitializationTask.
-- Acquire ICharacterRunRepository, ISkillMasterDataRepository, IStageMasterDataRepository, PendingBattleContext from GameContext.
-- Acquire ISceneNavigator, IPopupManager from GlobalBootstrapper. (G-06 reference)
-- Create BattleUseCase instance (Constitution §3: new only in Bootstrapper).
-- BattleView connected via Inspector ([SerializeField] private).
-- Create BattlePresenter instance with injected dependencies.
-- Call BattlePresenter.Initialize(PendingBattleContext).
-- In OnDestroy(): BattlePresenter?.Dispose(). Constitution §8: Safe Cleanup.
-
----
-
-### Task 21 — Create decisions.md
-
-Create empty file at .claude/specs/features/battle-scene/decisions.md.
+### Task 23 — Reset decisions.md
+- Clear .claude/specs/features/battle-scene/decisions.md and write v2.0.0 header:
+  # BattleScene v2.0.0 Decisions
+  (Record any decisions made during implementation here)
 
 ---
 
 ## 5. Validation
 
-| # | Item | Verification Method |
+| # | Item | Method |
 |---|---|---|
-| V-01 | No compile errors in Unity console | Console check |
-| V-02 | Battle entry exists in SceneKey enum | File check |
-| V-03 | Features/Battle/ folder deleted | File system check |
-| V-04 | GameContext has PendingBattleContext?, LastBattleResult? fields | File check |
-| V-05 | No console errors when placing BattleSceneBootstrapper in scene and pressing Play | Editor check |
-| V-06 | Ally/enemy characters render in battle field | Editor Play check |
-| V-07 | Action order UI displays on side | Editor Play check |
-| V-08 | Skill selection UI activates on player turn and deactivates on enemy turn | Editor Play check |
-| V-09 | Enemy sprite touch selects target with highlight | Editor Play check |
-| V-10 | QTE panel displays when using skill with QTE pattern | Editor Play check |
-| V-11 | Damage number popup shows and HP bar updates on damage | Editor Play check |
-| V-12 | Victory result popup shows when all enemies dead | Editor Play check |
-| V-13 | Defeat result popup shows when ally HP reaches 0 | Editor Play check |
-| V-14 | Scene transitions to StageScene after result popup confirm | Editor Play check |
-| V-15 | Turn number increments per action | Editor Play check |
+| V-01 | No compile errors in Unity console | Console |
+| V-02 | "Battle Start!" presentation displays on battle entry | Editor Play |
+| V-03 | Action order queue shows 5 slots with portrait+name | Editor Play |
+| V-04 | Queue order is correct (gauge descending) | Editor Play |
+| V-05 | Queue slot touch highlights corresponding field character | Editor Play |
+| V-06 | Active character has highlight border during their turn | Editor Play |
+| V-07 | Skill → target → confirm button flow works | Editor Play |
+| V-08 | Touching different skill during target selection changes skill | Editor Play |
+| V-09 | "Wait" button skips turn and reduces cooldowns | Editor Play |
+| V-10 | Skill icons show cooldown (dim A) and HP insufficient (dim B) distinctly | Editor Play |
+| V-11 | After confirm, skill UI slides out and QTE panel slides in | Editor Play |
+| V-12 | QTE ring shrinks and touch judgment works | Editor Play |
+| V-13 | Per-hit damage numbers display (success: bright, failure: Miss) | Editor Play |
+| V-14 | Characters move toward target on attack and return | Editor Play |
+| V-15 | Enemy turn shows "[name]'s turn" + skill name | Editor Play |
+| V-16 | Defense QTE panel has warning (red) border | Editor Play |
+| V-17 | Long-press on enemy/ally/skill shows info tooltip | Editor Play |
+| V-18 | Same-type enemies get numbered names (Slime①, Slime②) | Editor Play |
+| V-19 | Victory/Defeat text presentation then result popup on battle end | Editor Play |
+| V-20 | Scene returns to StageScene after result popup confirm | Editor Play |
 
 ---
 
 ## 6. Manual Tasks (Hak performs after Claude Code implementation)
 
+Additions to existing M-01~M-11:
+
 | Order | Task |
 |---|---|
-| M-01 | Create Assets/_Game/Scenes/Battle.unity scene file |
-| M-02 | Place Main Camera + Canvas (Screen Space - Camera) |
-| M-03 | Place BattleSceneBootstrapper at scene root, connect BattleView in Inspector |
-| M-04 | Connect each View's [SerializeField] fields in Inspector |
-| M-05 | Add Battle scene to Build Settings |
-| M-06 | Create CharacterUnitView prefab + connect _unitPrefab in AllyFieldView, EnemyFieldView |
-| M-07 | Create skill button prefab + connect _skillButtonPrefab in SkillSelectionView |
-| M-08 | Create ActionOrderView icon prefab + connect _iconPrefab |
-| M-09 | Create DamagePopupView text prefab + connect _damageTextPrefab |
-| M-10 | Prepare battle background Sprite and connect to BattleView |
-| M-11 | Prepare character/enemy Sprites (HP 3-stage) |
+| M-12 | Create ActionOrderSlotView prefab (portrait+name+border) + connect to ActionOrderView |
+| M-13 | Place ActionSlotView GameObject + "Wait" button + Inspector connections |
+| M-14 | Place ConfirmButtonView GameObject + "Confirm" button + Inspector connections |
+| M-15 | Create QTERingView prefab (ring image + button image) + connect to BattleQTEView |
+| M-16 | Place BattleStartView GameObject + "Battle Start!" text + Inspector connections |
+| M-17 | Create InfoTooltipView prefab/GameObject + connect to BattleView |
+| M-18 | Connect BattleView new SerializeField refs (_actionSlotView, _confirmButtonView, _battleStartView, _infoTooltipView, _turnLabel) |
+| M-19 | Prepare per-character portrait sprites + place in Art/Sprites/ |
+| M-20 | Prepare QTE panel background/border sprites |
+| M-21 | Complete M-01~M-11 if not yet done |
 
 ---
 
@@ -376,8 +314,7 @@ Create empty file at .claude/specs/features/battle-scene/decisions.md.
 
 - Run claude from project root
 - CLAUDE.md loads automatically
-- **Apply Patch first:** Verify SkillSystem Patch-001 is already applied. If not, deliver .claude/specs/skill-system/patch-001.md first to complete SkillUseCase cleanup before BattleScene Tasks
-- **Test data:** Battle test SO asset creation editor script is delivered as separate instruction (Dev/Features/Battle/BattleTestDataCreator.cs). After BattleScene code implementation, run test data creation script for validation
 - Deliver .claude/specs/features/battle-scene/tasks.md for sequential implementation
-- Record any judgment calls in .claude/specs/features/battle-scene/decisions.md
+- **IMPORTANT:** v2.0.0 modifies existing files — each task MUST read existing file first as instructed
+- Record any judgment calls in .claude/specs/features/battle-scene/decisions.md with [DECISION], [BACKLOG], or [SPEC-GAP] tags
 - DO NOT create files outside Assets/_Game/ (except decisions.md)

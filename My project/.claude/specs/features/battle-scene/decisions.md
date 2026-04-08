@@ -1,25 +1,29 @@
-# BattleScene — Decisions
+# BattleScene v2.0.0 Decisions
 
-D-01 [SPEC-GAP] IStageMasterDataRepository에 GetEnemyById(int), GetEvolutionNodeById(string) 추가. Task 6의 InitializeBattle에서 EnemySO와 EvolutionNodeSO를 조회해야 하지만, 기존 Repository에 해당 메서드가 없었음. StageMasterDataRepository가 이미 Resources/MasterData를 로드하는 패턴이므로 여기에 추가.
+(v1.0.0 decisions archived — below records v2.0.0 implementation judgments)
 
-D-02 [SPEC-GAP] BattleUseCase 생성자에 IStageMasterDataRepository 추가 (spec에는 ISkillMasterDataRepository, ICharacterRunRepository만 명시). Task 20 BattleSceneBootstrapper가 IStageMasterDataRepository를 이미 acquire하므로 주입 가능.
+---
 
-D-03 [DECISION] SkillSO에 coolDown 필드가 없으므로, SkillCost 배열에서 CostType.CoolDown 항목의 Value를 쿨다운 턴 수로 사용. Task spec의 "SkillSO.coolDown" 참조는 이 방식으로 해석.
+D-01 [DECISION] GetPredictedActionOrder 반환 타입을 List<int> → BattleParticipant[]로 교체. Task 6 스펙 요구. BattlePresenter 호출부도 동시에 업데이트하여 컴파일 유지.
 
-D-04 [DECISION] SelectEnemySkill에서 사용 가능한 스킬이 없을 때 DefaultAttackId(-1)를 반환. ExecuteAction에서 DefaultAttackId인 경우 스킬 없이 순수 Strength vs Toughness로 데미지 계산 (damageMultiplier = 1.0, 쿨다운/HP코스트 없음).
+D-02 [SPEC-GAP] EnemySO에 portraitSpriteKey 필드 없음. BattleParticipant.PortraitSpriteKey 초기화 시 BattleSpriteKeyHp100을 임시 사용. 추후 EnemySO에 별도 portrait key 추가 필요.
 
-D-05 [DECISION] GetUsableSkills의 HP 코스트 판정: actor.CurrentHp <= cost.Value이면 사용 불가 (사용 시 사망 방지). 즉, HP 코스트를 지불한 후에도 HP > 0이어야 사용 가능.
+D-03 [DECISION] QTERingView.RunRing에 CancellationToken을 optional 파라미터로 추가. 스펙에는 없으나 async 메서드 취소 지원이 없으면 씬 전환 시 문제 발생 가능.
 
-D-06 [DECISION] ReduceCooldowns에서 Dictionary 키 순회를 위해 new List<int>(keys) 사용. Dictionary 순회 중 값 변경이 필요하므로 키 복사본 생성. 이 메서드는 턴당 1회 호출이므로 GC 영향 미미.
+D-04 [DECISION] ActionOrderView를 ObjectPool<Image> 방식에서 5개 고정 ActionOrderSlotView 방식으로 전환. ActionOrderEntry struct 제거. 기존 BattlePresenter 호출부도 Task 21에서 BattleParticipant[] 기반으로 동시 업데이트.
 
-D-07 [SPEC-GAP] GameContext에 ISkillMasterDataRepository public accessor(SkillMasterDataRepo) 추가. BattleSceneBootstrapper가 BattleUseCase와 BattlePresenter에 주입하기 위해 필요하나 기존 GameContext에는 SkillUseCase만 노출되어 있었음.
+D-05 [DECISION] SkillSelectionView 3-state 시각 표현: 별도 overlay Image 없이 Button.Image.color tint 방식으로 구현. Usable=white, OnCooldown=dark gray, HpInsufficient=red. 프리팹 구조 의존성 없음.
 
-D-08 [DECISION] CharacterUnitView의 3-stage sprite switch를 Addressables 대신 Image.color tint로 구현 (Phase 1). 실제 HP 단계별 스프라이트 전환은 Addressables 로드 구현 후 Phase 2에서 적용 예정.
+D-06 [DECISION] BattlePresenter의 아군 턴 입력을 단일 UniTaskCompletionSource<AllyInput>(_allyInputTcs)로 통합. 스킬/타겟/Wait/Confirm 4가지 입력을 하나의 대기 루프로 처리. 타겟 재선택·스킬 재선택 가능.
 
-D-09 [BACKLOG] BattleQTEView의 터치 판정은 Input.GetMouseButtonDown/Input.GetTouch 기반 직접 구현. 새 Input System 전환 시 리팩토링 필요.
+D-07 [DECISION] Wait 선택 시 ExecuteWait(UseCase) 미호출. 메인 루프가 ConsumeGauge+ReduceCooldowns를 동일하게 처리. ExecuteWait는 BattleUseCase에 제공되어 있으나 현재 Presenter에서는 직접 호출하지 않음. 단순성 우선.
 
-D-10 [DECISION] ActionOrderView, SkillSelectionView, DamagePopupView에 UnityEngine.Pool.ObjectPool<T> 적용하여 빈번한 Instantiate/Destroy 방지.
+D-08 [BACKLOG] BattleResultPopupView.ShowEndPresentation의 _endAnnouncementText/_endAnnouncementGroup은 Inspector 연결 필요 (M-18 작업). 없으면 연출 스킵 후 결과 팝업만 표시 (null-safe 처리됨).
 
-D-11 [DECISION] BattlePresenter의 비동기 이벤트 대기(스킬 선택, 타겟 선택, 결과 확인)를 UniTaskCompletionSource 패턴으로 구현. 이벤트 핸들러가 TrySetResult 호출하여 await 해제.
+D-09 [DECISION] 방어 QTE 후 SlideOut은 BattlePresenter.ProcessEnemyTurn에서 직접 호출. TransitionToSkillUI를 경유하지 않음 (적 턴에는 스킬 UI 복귀 불필요).
 
-D-12 [DECISION] GameContext에서 구 BattleUseCase 필드/생성 코드 제거 (Task 0에서 스텁 삭제됨). 신규 BattleUseCase는 BattleSceneBootstrapper에서 씬 단위로 생성.
+D-10 [SPEC-GAP] SkillSO에 hitCount 필드 없음. per-hit QTE에서 hitCount = qteDataList.Length로 대체. 스킬 1개 = QTE 입력 1회이면 hit 1개. 추후 SkillSO에 hitCount 추가 시 교체 필요.
+
+D-11 [DECISION] AllyFieldView에 OnLongPress 이벤트 추가. 스펙에는 명시 없으나 아군 롱프레스 → InfoTooltip 표시를 위해 필요. EnemyFieldView와 동일한 패턴 적용.
+
+D-12 [DECISION] InfoTooltipView.Show의 화면 위치는 Screen.width*0.5f, Screen.height*0.5f 고정값 사용. 롱프레스 발생 위치를 정확히 넘기려면 PointerEventData가 필요하나 현재 핸들러 시그니처에 없음. 추후 refine 가능.

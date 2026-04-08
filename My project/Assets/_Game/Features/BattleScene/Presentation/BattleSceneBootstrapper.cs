@@ -51,20 +51,26 @@ namespace Samsara.Features.BattleScene.Presentation
                     $"{_logClass} PendingBattleContext가 null입니다. BattleScene은 StageScene에서만 진입 가능합니다.");
 #endif
 
-            // Create BattleUseCase (Constitution §3: new only in Bootstrapper)
+            // BattleEventHookRunner 생성 (Constitution §3: new는 Bootstrapper에서만)
+            var battleEvents = pendingContext.BattleEvents;
+            var hookRunner = new BattleEventHookRunner(battleEvents);
+
+            // BattleUseCase 생성
             var battleUseCase = new BattleUseCase(
                 skillMasterDataRepo,
                 characterRunRepo,
                 stageMasterDataRepo
             );
 
+            // BattlePresenter 생성 — v2.0.0: hookRunner 주입
             _battlePresenter = new BattlePresenter(
                 battleUseCase,
                 _battleView,
                 sceneNavigator,
                 popupManager,
                 skillMasterDataRepo,
-                gameContext
+                gameContext,
+                hookRunner
             );
 
             _battlePresenter.Initialize(pendingContext);

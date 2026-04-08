@@ -20,18 +20,22 @@ namespace Samsara.Features.BattleScene.Domain
         private Dictionary<int, int> _skillCooldowns;
         private bool _isDead;
         private string _spriteKey;
+        private string _portraitSpriteKey;
+        private string _displayName;
 
-        public int Id                               { get => _id;             set => _id = value; }
-        public bool IsAlly                          { get => _isAlly;         set => _isAlly = value; }
-        public int CurrentHp                        { get => _currentHp;      set => _currentHp = value; }
-        public int MaxHp                            { get => _maxHp;          set => _maxHp = value; }
-        public int Strength                         { get => _strength;       set => _strength = value; }
-        public int Toughness                        { get => _toughness;      set => _toughness = value; }
-        public int Agility                          { get => _agility;        set => _agility = value; }
-        public float ActionGauge                    { get => _actionGauge;    set => _actionGauge = value; }
-        public int[] SkillIds                       { get => _skillIds;       set => _skillIds = value; }
-        public Dictionary<int, int> SkillCooldowns  { get => _skillCooldowns; set => _skillCooldowns = value; }
-        public bool IsDead                          { get => _isDead;         set => _isDead = value; }
-        public string SpriteKey                     { get => _spriteKey;      set => _spriteKey = value; }
+        public int Id                               { get => _id;                set => _id = value; }
+        public bool IsAlly                          { get => _isAlly;            set => _isAlly = value; }
+        public int CurrentHp                        { get => _currentHp;         set => _currentHp = value; }
+        public int MaxHp                            { get => _maxHp;             set => _maxHp = value; }
+        public int Strength                         { get => _strength;          set => _strength = value; }
+        public int Toughness                        { get => _toughness;         set => _toughness = value; }
+        public int Agility                          { get => _agility;           set => _agility = value; }
+        public float ActionGauge                    { get => _actionGauge;       set => _actionGauge = value; }
+        public int[] SkillIds                       { get => _skillIds;          set => _skillIds = value; }
+        public Dictionary<int, int> SkillCooldowns  { get => _skillCooldowns;    set => _skillCooldowns = value; }
+        public bool IsDead                          { get => _isDead;            set => _isDead = value; }
+        public string SpriteKey                     { get => _spriteKey;         set => _spriteKey = value; }
+        public string PortraitSpriteKey             { get => _portraitSpriteKey; set => _portraitSpriteKey = value; }
+        public string DisplayName                   { get => _displayName;       set => _displayName = value; }
     }
 }
