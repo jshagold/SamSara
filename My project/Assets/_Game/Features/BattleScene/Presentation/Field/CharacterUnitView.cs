@@ -37,7 +37,6 @@ namespace Samsara.Features.BattleScene.Presentation.Field
         {
             _participantId = id;
             _maxHp = maxHp;
-            _originalPosition = transform.position;
 
             LoadSprite(spriteKey);
 
@@ -45,6 +44,12 @@ namespace Samsara.Features.BattleScene.Presentation.Field
             SetHighlight(false);
             SetActiveHighlight(false);
             SetDim(false);
+        }
+
+        /// <summary>배치 완료 후 호출. 현재 위치를 원래 위치로 저장 (공격 모션 복귀용).</summary>
+        public void SetOriginalPosition()
+        {
+            _originalPosition = transform.position;
         }
 
         private void LoadSprite(string spriteKey)

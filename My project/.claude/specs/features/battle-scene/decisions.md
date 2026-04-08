@@ -27,3 +27,7 @@ D-10 [SPEC-GAP] SkillSO에 hitCount 필드 없음. per-hit QTE에서 hitCount = 
 D-11 [DECISION] AllyFieldView에 OnLongPress 이벤트 추가. 스펙에는 명시 없으나 아군 롱프레스 → InfoTooltip 표시를 위해 필요. EnemyFieldView와 동일한 패턴 적용.
 
 D-12 [DECISION] InfoTooltipView.Show의 화면 위치는 Screen.width*0.5f, Screen.height*0.5f 고정값 사용. 롱프레스 발생 위치를 정확히 넘기려면 PointerEventData가 필요하나 현재 핸들러 시그니처에 없음. 추후 refine 가능.
+
+D-13 [DECISION] EnemyFieldView/AllyFieldView에 DistributeUnits() 메서드 추가. HorizontalLayoutGroup 대신 코드에서 컨테이너 폭 기반 anchoredPosition을 직접 계산하여 유닛 균등 배치. CharacterUnitView.Setup()에서 _originalPosition 즉시 저장 제거, SetOriginalPosition() 퍼블릭 메서드로 분리하여 배치 완료 후 호출. 이유: Instantiate 직후에는 레이아웃 미반영으로 좌표가 (0,0)이 되며, HorizontalLayoutGroup도 동적 Instantiate 자식에 대해 안정적으로 동작하지 않음.
+
+D-14 [DECISION] ProcessEnemyTurn의 ShowHitDamage success 파라미터 버그 수정. QTE 없는 적 공격(기본공격/스킬)에서 success=false로 하드코딩되어 데미지가 적용되면서도 "Miss" 표시. true로 변경하여 실제 데미지 수치 표시. 방어 QTE per-hit에서는 qteResults[j] → !qteResults[j]로 반전 (플레이어 방어 성공=공격 빗나감, 방어 실패=공격 적중).

@@ -49,6 +49,9 @@ namespace Samsara.Features.BattleScene.Presentation.Field
                 unit.OnLongPress += HandleUnitLongPress;
             }
 
+            // ── 적 유닛 가로 균등 배치 ──
+            DistributeUnits();
+
             EnableTargetSelection(false);
         }
 
@@ -80,6 +83,40 @@ namespace Samsara.Features.BattleScene.Presentation.Field
             _units.Clear();
             _unitById.Clear();
             _unitButtons.Clear();
+        }
+
+        // ──────────────────────────────────────────────
+        // Unit Distribution
+        // ──────────────────────────────────────────────
+
+        /// <summary>
+        /// _enemyContainer 내에서 적 유닛들을 가로 균등 배치.
+        /// 컨테이너 폭을 적 수로 나눠 각 유닛의 anchoredPosition을 설정.
+        /// </summary>
+        private void DistributeUnits()
+        {
+            if (_units.Count == 0) return;
+
+            var containerRect = _enemyContainer as RectTransform;
+            if (containerRect == null) return;
+
+            float containerWidth = containerRect.rect.width;
+            int count = _units.Count;
+
+            // 컨테이너를 count등분, 각 구간의 중앙에 배치
+            float slotWidth = containerWidth / count;
+
+            for (int i = 0; i < count; i++)
+            {
+                var unitRect = _units[i].GetComponent<RectTransform>();
+                if (unitRect == null) continue;
+
+                // 좌측 기준: -containerWidth/2 + slotWidth * (i + 0.5)
+                float x = -containerWidth / 2f + slotWidth * (i + 0.5f);
+                unitRect.anchoredPosition = new Vector2(x, 0f);
+
+                _units[i].SetOriginalPosition();
+            }
         }
 
         // ──────────────────────────────────────────────

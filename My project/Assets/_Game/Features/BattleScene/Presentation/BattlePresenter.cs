@@ -389,21 +389,24 @@ namespace Samsara.Features.BattleScene.Presentation
                     int[] perHitDamages = _useCase.CalculatePerHitDamage(totalDamage, Mathf.Max(1, qteDataList.Length));
                     for (int j = 0; j < perHitDamages.Length; j++)
                     {
-                        _view.DamagePopup.ShowHitDamage(perHitDamages[j], qteResults[j], targetUnit.transform.position);
+                        // 방어 QTE: 플레이어 방어 성공 = 공격 빗나감(Miss), 방어 실패 = 공격 적중
+                        _view.DamagePopup.ShowHitDamage(perHitDamages[j], !qteResults[j], targetUnit.transform.position);
                         if (j < perHitDamages.Length - 1)
                             await UniTask.Delay(100);
                     }
                 }
                 else
                 {
+                    // QTE 없는 스킬: 무조건 적중
                     int damage = _useCase.ExecuteAction(actor, skillId, target, qteRate);
-                    _view.DamagePopup.ShowHitDamage(damage, false, targetUnit.transform.position);
+                    _view.DamagePopup.ShowHitDamage(damage, true, targetUnit.transform.position);
                 }
             }
             else
             {
+                // 기본 공격: 무조건 적중
                 int damage = _useCase.ExecuteAction(actor, skillId, target, qteRate);
-                _view.DamagePopup.ShowHitDamage(damage, false, targetUnit.transform.position);
+                _view.DamagePopup.ShowHitDamage(damage, true, targetUnit.transform.position);
             }
 
             if (target.IsDead)

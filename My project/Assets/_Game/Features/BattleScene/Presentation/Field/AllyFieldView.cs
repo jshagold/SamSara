@@ -30,6 +30,33 @@ namespace Samsara.Features.BattleScene.Presentation.Field
 
                 unit.OnLongPress += HandleUnitLongPress;
             }
+
+            // ── 아군 유닛 가로 균등 배치 ──
+            DistributeUnits();
+        }
+
+        private void DistributeUnits()
+        {
+            if (_units.Count == 0) return;
+
+            var containerRect = _allyContainer as RectTransform;
+            if (containerRect == null) return;
+
+            float containerWidth = containerRect.rect.width;
+            int count = _units.Count;
+
+            float slotWidth = containerWidth / count;
+
+            for (int i = 0; i < count; i++)
+            {
+                var unitRect = _units[i].GetComponent<RectTransform>();
+                if (unitRect == null) continue;
+
+                float x = -containerWidth / 2f + slotWidth * (i + 0.5f);
+                unitRect.anchoredPosition = new Vector2(x, 0f);
+
+                _units[i].SetOriginalPosition();
+            }
         }
 
         public CharacterUnitView GetUnit(int participantId)
