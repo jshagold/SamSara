@@ -19,8 +19,9 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation.TreeArea
         [SerializeField] private Sprite _lockedFrameSprite;
         [SerializeField] private Sprite _hiddenFrameSprite;
 
+        [SerializeField] private Sprite _questionMarkSprite;
+
         private string _nodeId;
-        private Sprite _questionMarkSprite;
         private Sprite _originalIcon;
 
         public string NodeId => _nodeId;
@@ -63,11 +64,6 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation.TreeArea
                     }
                     break;
             }
-        }
-
-        public void SetQuestionMarkSprite(Sprite questionMark)
-        {
-            _questionMarkSprite = questionMark;
         }
 
         private void OnEnable()

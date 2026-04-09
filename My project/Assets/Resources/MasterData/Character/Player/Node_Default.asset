@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: Node_Default
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Character.MasterData.EvolutionNodeSO
   _nodeId: node_default
-  _characterName: Default
-  _baseStats: {fileID: 11400000, guid: 0527ec4a310892646bbe1fa4ef58dec5, type: 2}
+  _characterName: Base
+  _baseStats: {fileID: 11400000, guid: b53bf6e5dd4d60d4aaae34c85cdb0f05, type: 2}
   _maxActionPoints: 0
   _unlockConditions: []
   _isHidden: 0
   _nextNodes:
   - {fileID: 11400000, guid: c8447e99e0c686549bc80d5c0986548d, type: 2}
+  _nodeIconSprite: {fileID: 21300000, guid: a991d7bd9ade5fc43b1022af00c3459e, type: 3}
   _nodeIconSpriteKey: 
   _mainStandingSpriteKey: 
   _portraitSpriteKey: 
@@ -28,3 +29,4 @@ MonoBehaviour:
   _battleSpriteKeyHp0: 
   _attackAnimSpriteKey: 
   _stageMoveSpriteKey: 
+  _skillIds: 

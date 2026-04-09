@@ -53,7 +53,7 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation
                 var nodeView = _view.TreeScrollView.GetNodeView(node.NodeId);
                 if (nodeView == null) continue;
 
-                nodeView.Setup(node.NodeId, null);
+                nodeView.Setup(node.NodeId, node.NodeIconSprite);
                 var state = _useCase.ClassifyNodeState(node, _currentNode);
                 nodeView.SetNodeState(state);
             }

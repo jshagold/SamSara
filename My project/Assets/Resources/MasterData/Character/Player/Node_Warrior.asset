@@ -19,6 +19,8 @@ MonoBehaviour:
   _unlockConditions: []
   _isHidden: 0
   _nextNodes: []
+  _nodeIconSprite: {fileID: -7217552388783171287, guid: f3bc76af0524911498c9daef7d95e56b,
+    type: 3}
   _nodeIconSpriteKey: 
   _mainStandingSpriteKey: 
   _portraitSpriteKey: 
@@ -27,3 +29,4 @@ MonoBehaviour:
   _battleSpriteKeyHp0: 
   _attackAnimSpriteKey: 
   _stageMoveSpriteKey: 
+  _skillIds: 
