@@ -9,7 +9,6 @@ using Samsara.Features.BattleScene.Presentation.QTE;
 using Samsara.Features.BattleScene.Presentation.Result;
 using Samsara.Features.BattleScene.Presentation.Skill;
 using Samsara.Features.BattleScene.Presentation.TopBar;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -37,9 +36,8 @@ namespace Samsara.Features.BattleScene.Presentation
         [SerializeField] private BattleStartView _battleStartView;
         [SerializeField] private InfoTooltipView _infoTooltipView;
 
-        // ── 턴 레이블 ──
-        [SerializeField] private TMP_Text _turnLabel;
-        [SerializeField] private CanvasGroup _turnLabelGroup;
+        // ── 적 턴 정보 패널 (스킬 UI와 같은 하단 영역 공유) ──
+        [SerializeField] private EnemyTurnInfoView _enemyTurnInfoView;
 
         // ── 스킬 영역 슬라이드 루트 ──
         [SerializeField] private RectTransform _skillAreaRect;  // SkillSelection + ActionSlot + Confirm 부모
@@ -62,16 +60,12 @@ namespace Samsara.Features.BattleScene.Presentation
         public ConfirmButtonView Confirm         => _confirmButtonView;
         public BattleStartView BattleStart       => _battleStartView;
         public InfoTooltipView InfoTooltip       => _infoTooltipView;
+        public EnemyTurnInfoView EnemyTurnInfo  => _enemyTurnInfoView;
 
         private void Awake()
         {
             if (_skillAreaRect != null)
                 _skillAreaOriginalPos = _skillAreaRect.anchoredPosition;
-
-            if (_turnLabelGroup != null)
-                _turnLabelGroup.alpha = 0f;
-            if (_turnLabel != null)
-                _turnLabel.gameObject.SetActive(false);
         }
 
         // ── Relayed Events (기존) ──
@@ -181,40 +175,28 @@ namespace Samsara.Features.BattleScene.Presentation
         }
 
         // ──────────────────────────────────────────────
-        // Turn Labels
+        // Enemy Turn Panel
         // ──────────────────────────────────────────────
 
-        /// <summary>"[displayName]'s Turn" 텍스트를 표시 후 자동으로 사라진다.</summary>
-        public async UniTask ShowEnemyTurnLabel(string displayName)
+        /// <summary>
+        /// 스킬 UI를 숨기고 하단 영역에 적 턴 정보 패널을 표시한다.
+        /// 텍스트 형식: "적 [이름]이(가) [스킬명] 사용"
+        /// </summary>
+        public void ShowEnemyTurnPanel(string text)
         {
-            await ShowLabel($"{displayName}'s Turn", 1000);
+            HideSkillUI();
+            _enemyTurnInfoView.Show(text);
         }
 
-        /// <summary>스킬 이름 레이블을 표시 후 자동으로 사라진다.</summary>
-        public async UniTask ShowSkillNameLabel(string skillName)
+        /// <summary>적 턴 정보 패널을 숨긴다. (아군 턴 시작 시 ShowSkillUI가 별도 호출됨)</summary>
+        public void HideEnemyTurnPanel()
         {
-            await ShowLabel(skillName, 800);
-        }
-
-        private async UniTask ShowLabel(string text, int holdMs)
-        {
-            if (_turnLabel == null || _turnLabelGroup == null) return;
-
-            _turnLabel.text = text;
-            _turnLabelGroup.alpha = 0f;
-            _turnLabel.gameObject.SetActive(true);
-
-            await _turnLabelGroup.DOFade(1f, 0.2f).SetEase(Ease.OutQuad).AsyncWaitForCompletion();
-            await UniTask.Delay(holdMs);
-            await _turnLabelGroup.DOFade(0f, 0.2f).SetEase(Ease.InQuad).AsyncWaitForCompletion();
-
-            _turnLabel.gameObject.SetActive(false);
+            _enemyTurnInfoView.Hide();
         }
 
         private void OnDestroy()
         {
             _skillAreaRect?.DOKill();
-            _turnLabelGroup?.DOKill();
         }
 
         private void Reset()
@@ -232,6 +214,7 @@ namespace Samsara.Features.BattleScene.Presentation
             _confirmButtonView = GetComponentInChildren<ConfirmButtonView>();
             _battleStartView = GetComponentInChildren<BattleStartView>();
             _infoTooltipView = GetComponentInChildren<InfoTooltipView>();
+            _enemyTurnInfoView = GetComponentInChildren<EnemyTurnInfoView>();
             _backgroundImage = GetComponent<Image>();
         }
     }

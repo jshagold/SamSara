@@ -23,13 +23,27 @@ namespace Samsara.Features.BattleScene.Domain
         private readonly List<BattleParticipant> _tickReadyBuffer = new List<BattleParticipant>();
         private readonly List<int> _usableSkillsBuffer = new List<int>();
 
+        // ── 행동 순서 큐 설계 상수 ──
+        // QueueBuildCount = 참가자 최대 수 × 전투 예상 최대 턴 수
+        // 정상 플레이 중 큐가 소진되지 않도록 충분히 크게 설정.
+        // 사망/이탈 없이 이 값을 초과하는 행동이 발생하면 그때 재계산 허용.
+        private const int MaxParticipants = 6;   // 최대 참가자 수 (1아군 + 5적 기준)
+        private const int MaxBattleTurns  = 100;  // 예상 최대 전투 턴 수 (안전 마진 포함)
+        private const int QueueBuildCount = MaxParticipants * MaxBattleTurns; // = 600
+        private const int MinQueueDisplay = 5;    // ActionOrderView 슬롯 수 (UI 최소 표시량)
+
         // Pre-allocated simulation buffers for GetPredictedActionOrder (§8 GC)
         private readonly BattleParticipant[] _simParticipants = new BattleParticipant[20];
         private readonly float[] _simGauges = new float[20];
-        private readonly BattleParticipant[] _predictedResultBuffer = new BattleParticipant[10];
+        private readonly BattleParticipant[] _predictedResultBuffer = new BattleParticipant[QueueBuildCount];
         private readonly int[] _simReadyIndices = new int[20];
         private int _simParticipantCount;
         private int _simReadyCount;
+
+        // Committed action queue — 선계산 후 사망/이탈 시 부분 수정만 허용
+        private readonly List<BattleParticipant> _committedQueue = new List<BattleParticipant>(QueueBuildCount);
+
+        public bool IsCommittedQueueEmpty => _committedQueue.Count == 0;
 
         public static readonly int DefaultAttackId = -1;
 
@@ -155,12 +169,14 @@ namespace Samsara.Features.BattleScene.Domain
                     _tickReadyBuffer.Add(p);
             }
 
-            // Sort by actionGauge descending; random tiebreak on equal gauge
+            // Sort by actionGauge descending; deterministic tiebreak by Id (lower Id = earlier)
+            // Random tiebreak was removed: committed queue uses insertion-order tiebreak
+            // (allies added before enemies → lower Id first), so both sorts must agree.
             _tickReadyBuffer.Sort((a, b) =>
             {
                 int cmp = b.ActionGauge.CompareTo(a.ActionGauge);
                 if (cmp != 0) return cmp;
-                return UnityEngine.Random.Range(0, 2) == 0 ? -1 : 1;
+                return a.Id.CompareTo(b.Id);
             });
 
             return _tickReadyBuffer;
@@ -472,12 +488,80 @@ namespace Samsara.Features.BattleScene.Domain
         }
 
         // ──────────────────────────────────────────────
+        // Committed Queue API
+        // ──────────────────────────────────────────────
+
+        /// <summary>현재 게이지 상태로 QueueBuildCount명분 행동 순서를 확정 큐에 저장.</summary>
+        public void BuildCommittedQueue(int count = QueueBuildCount)
+        {
+            _committedQueue.Clear();
+            var predicted = GetPredictedActionOrder(count);
+            for (int i = 0; i < predicted.Length; i++)
+                _committedQueue.Add(predicted[i]);
+            Debug.Log($"{_logClass} 행동 큐 확정 ({_committedQueue.Count}명)");
+        }
+
+        /// <summary>행동을 완료한 액터를 큐에서 제거.</summary>
+        public void ConsumeActorFromCommittedQueue(int actorId)
+        {
+            for (int i = 0; i < _committedQueue.Count; i++)
+            {
+                if (_committedQueue[i].Id == actorId)
+                {
+                    _committedQueue.RemoveAt(i);
+                    return;
+                }
+            }
+        }
+
+        /// <summary>다음 count명을 미리 보기 (UI 전용, 큐 소비 없음).</summary>
+        public BattleParticipant[] PeekCommittedQueue(int count)
+        {
+            int take = Mathf.Min(count, _committedQueue.Count);
+            var result = new BattleParticipant[take];
+            for (int i = 0; i < take; i++)
+                result[i] = _committedQueue[i];
+            return result;
+        }
+
+        /// <summary>
+        /// 사망/이탈한 참가자의 큐 항목만 제거한다.
+        /// 남은 참가자들의 상대적 순서는 유지.
+        /// 제거 후 MinQueueDisplay 미만이 되면 큐 끝에 추가 예측을 덧붙인다.
+        ///   - fresh[0..existing-1] ≈ 기존 큐 항목 (동일 게이지 상태 기반 예측)
+        ///   - fresh[existing..] 만 새로 덧붙여 기존 순서 불변 보장
+        /// </summary>
+        public void PruneDeadFromCommittedQueue()
+        {
+            int before = _committedQueue.Count;
+            _committedQueue.RemoveAll(p => p.IsDead);
+            int after = _committedQueue.Count;
+
+            if (after == before) return; // 사망자 없음
+
+            Debug.Log($"{_logClass} 사망 참가자 제거 — {before} → {after}");
+
+            if (_committedQueue.Count < MinQueueDisplay)
+            {
+                int existing = _committedQueue.Count;
+                // 현재 게이지 기준으로 QueueBuildCount개 예측.
+                // fresh[0..existing-1] ≈ 기존 큐 → fresh[existing..] 만 끝에 덧붙임.
+                var fresh = GetPredictedActionOrder(QueueBuildCount);
+                for (int i = existing; i < fresh.Length; i++)
+                    _committedQueue.Add(fresh[i]);
+
+                Debug.Log($"{_logClass} 큐 보충 — {existing} → {_committedQueue.Count}");
+            }
+        }
+
+        // ──────────────────────────────────────────────
         // CleanupBattle
         // ──────────────────────────────────────────────
 
         public void CleanupBattle()
         {
             _runtimeData = null;
+            _committedQueue.Clear();
         }
 
         // ──────────────────────────────────────────────

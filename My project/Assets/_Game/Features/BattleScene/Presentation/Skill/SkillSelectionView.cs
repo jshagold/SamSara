@@ -41,10 +41,14 @@ namespace Samsara.Features.BattleScene.Presentation.Skill
         private CancellationTokenSource _longPressCts;
         private const float LongPressThreshold = 0.5f;
 
-        // Normal 색상 (기준)
+        // 버튼 배경 색상
         private static readonly Color ColorUsable = Color.white;
         private static readonly Color ColorOnCooldown = new Color(0.3f, 0.3f, 0.3f, 1f);    // dimA — 어두운
         private static readonly Color ColorHpInsufficient = new Color(1f, 0.25f, 0.25f, 1f); // dimB — 붉은
+
+        // 텍스트 색상 (배경 색상과 별개)
+        private static readonly Color TextColorNormal   = Color.black;
+        private static readonly Color TextColorCooldown = new Color(1f, 0.78f, 0.2f, 1f);  // 골드 — 쿨다운 구분
 
         public event Action<int> OnSkillSelected;
         public event Action<int> OnSkillLongPress;
@@ -78,14 +82,7 @@ namespace Samsara.Features.BattleScene.Presentation.Skill
                 btn.onClick.AddListener(() => OnSkillSelected?.Invoke(capturedId));
                 btn.interactable = skill.State == SkillState.Usable;
 
-                // 텍스트 표시
-                var label = btn.GetComponentInChildren<TMP_Text>();
-                if (label != null)
-                {
-                    label.text = skill.State == SkillState.OnCooldown
-                        ? $"CD:{skill.CooldownRemaining}"
-                        : $"Skill {skill.SkillId}";
-                }
+                ApplyButtonLabel(btn, skill.State, skill.SkillId, skill.CooldownRemaining);
 
                 // 3-state 색상
                 ApplySkillState(btn, skill.State);
@@ -129,10 +126,7 @@ namespace Samsara.Features.BattleScene.Presentation.Skill
 
                 btn.interactable = isUsable;
                 ApplySkillState(btn, data.State);
-
-                var label = btn.GetComponentInChildren<TMP_Text>();
-                if (label != null)
-                    label.text = kvp.Value > 0 ? $"CD:{kvp.Value}" : $"Skill {kvp.Key}";
+                ApplyButtonLabel(btn, data.State, kvp.Key, kvp.Value);
             }
         }
 
@@ -151,6 +145,36 @@ namespace Samsara.Features.BattleScene.Presentation.Skill
                 SkillState.HpInsufficient => ColorHpInsufficient,
                 _ => ColorUsable
             };
+        }
+
+        // ──────────────────────────────────────────────
+        // Label
+        // ──────────────────────────────────────────────
+
+        /// <summary>
+        /// 버튼의 모든 TMP_Text를 초기화한 뒤 주 레이블만 설정.
+        /// GetComponentInChildren(단수)는 첫 번째 컴포넌트만 수정하므로 나머지 텍스트가 이전
+        /// 상태 그대로 남아 겹치는 문제가 있음. 복수 버전으로 전부 초기화하여 방지.
+        /// </summary>
+        private static void ApplyButtonLabel(Button btn, SkillState state, int skillId, int cooldownRemaining)
+        {
+            var labels = btn.GetComponentsInChildren<TMP_Text>(true);
+            if (labels.Length == 0) return;
+
+            // 모든 TMP_Text 초기화 — 이전 상태 텍스트가 겹치는 현상 방지
+            for (int i = 1; i < labels.Length; i++)
+                labels[i].text = "";
+
+            if (state == SkillState.OnCooldown)
+            {
+                labels[0].text  = $"CD:{cooldownRemaining}";
+                labels[0].color = TextColorCooldown;
+            }
+            else
+            {
+                labels[0].text  = $"Skill {skillId}";
+                labels[0].color = TextColorNormal;
+            }
         }
 
         // ──────────────────────────────────────────────
@@ -181,6 +205,7 @@ namespace Samsara.Features.BattleScene.Presentation.Skill
 
         private void HandleSkillPointerDown(int skillId)
         {
+            Debug.Log($"{_logClass} PointerDown skillId={skillId}");
             _longPressCts?.Cancel();
             _longPressCts?.Dispose();
             _longPressCts = new CancellationTokenSource();
@@ -189,6 +214,7 @@ namespace Samsara.Features.BattleScene.Presentation.Skill
 
         private void HandleSkillPointerUp()
         {
+            Debug.Log($"{_logClass} PointerUp — timer cancelled");
             _longPressCts?.Cancel();
             _longPressCts?.Dispose();
             _longPressCts = null;
@@ -196,9 +222,13 @@ namespace Samsara.Features.BattleScene.Presentation.Skill
 
         private async UniTaskVoid StartLongPressTimer(int skillId, CancellationToken token)
         {
+            Debug.Log($"{_logClass} LongPress timer started skillId={skillId}");
             await UniTask.Delay(TimeSpan.FromSeconds(LongPressThreshold), cancellationToken: token);
             if (!token.IsCancellationRequested)
+            {
+                Debug.Log($"{_logClass} OnSkillLongPress event fired skillId={skillId} (subscribers={OnSkillLongPress?.GetInvocationList()?.Length ?? 0})");
                 OnSkillLongPress?.Invoke(skillId);
+            }
         }
 
         // ──────────────────────────────────────────────

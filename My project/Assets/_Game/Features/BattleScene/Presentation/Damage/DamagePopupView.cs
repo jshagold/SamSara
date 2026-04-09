@@ -51,7 +51,7 @@ namespace Samsara.Features.BattleScene.Presentation.Damage
         }
 
         /// <summary>
-        /// QTE 히트별 데미지 표시. success=큰 황색 폰트 + 펀치 스케일. failure="Miss" + 작은 회색 폰트.
+        /// QTE 히트별 데미지 표시. success=보너스/감소 적용(큰 황색 폰트 + 펀치 스케일). failure=일반 데미지(작은 회색 폰트).
         /// </summary>
         public void ShowHitDamage(int damage, bool success, Vector3 worldPosition)
         {
@@ -74,7 +74,7 @@ namespace Samsara.Features.BattleScene.Presentation.Damage
             }
             else
             {
-                text.text = "Miss";
+                text.text = damage.ToString();
                 text.fontSize = HitFailFontSize;
                 text.color = HitFailColor;
                 text.alpha = 1f;

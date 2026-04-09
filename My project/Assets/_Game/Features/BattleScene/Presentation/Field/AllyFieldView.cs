@@ -80,6 +80,7 @@ namespace Samsara.Features.BattleScene.Presentation.Field
 
         private void HandleUnitLongPress(int participantId)
         {
+            Debug.Log($"{_logClass} HandleUnitLongPress id={participantId} → relay OnLongPress (subscribers={OnLongPress?.GetInvocationList()?.Length ?? 0})");
             OnLongPress?.Invoke(participantId);
         }
 

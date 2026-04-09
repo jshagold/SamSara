@@ -151,6 +151,10 @@ namespace Samsara.Features.BattleScene.Presentation
                 // PerTick 훅
                 await _hookRunner.CheckHook(BattleHookType.PerTick, _useCase.RuntimeData);
 
+                // ── 틱 시작 시 행동 큐 확정 (비어있을 때만) ──
+                if (_useCase.IsCommittedQueueEmpty)
+                    _useCase.BuildCommittedQueue();
+
                 // ── 각 액터 처리 ──
                 for (int i = 0; i < readyQueue.Count; i++)
                 {
@@ -158,6 +162,7 @@ namespace Samsara.Features.BattleScene.Presentation
                     if (actor.IsDead) continue;
 
                     _useCase.ConsumeGauge(actor);
+                    _useCase.ConsumeActorFromCommittedQueue(actor.Id);  // 현재 액터를 큐에서 소비
 
                     // 액티브 하이라이트 ON + 행동 순서 UI 갱신
                     SetActiveHighlight(actor, true);
@@ -173,6 +178,7 @@ namespace Samsara.Features.BattleScene.Presentation
 
                     _useCase.ReduceCooldowns(actor);
                     UpdateAllUnitHP();
+                    _useCase.PruneDeadFromCommittedQueue();  // 사망 항목만 제거, 나머지 순서 유지
                     UpdateActionOrderUI();
 
                     // PostDamage 훅
@@ -340,24 +346,21 @@ namespace Samsara.Features.BattleScene.Presentation
 
         private async UniTask ProcessEnemyTurn(BattleParticipant actor)
         {
-            // 턴 레이블 표시
             string actorName = !string.IsNullOrEmpty(actor.DisplayName) ? actor.DisplayName : actor.SpriteKey;
-            await _view.ShowEnemyTurnLabel(actorName);
 
-            // 스킬 선택 및 타겟 결정
+            // 스킬/타겟 선택 (패널 표시 전에 먼저 결정)
             int skillId = _useCase.SelectEnemySkill(actor);
-            var target = _useCase.SelectEnemyTarget(actor);
+            var target  = _useCase.SelectEnemyTarget(actor);
             if (target == null) return;
 
-            // 스킬 이름 표시
-            if (skillId != BattleUseCase.DefaultAttackId)
-            {
-                var skillSO = _skillMasterDataRepo.GetSkill(skillId);
-                await _view.ShowSkillNameLabel(skillSO.SkillName);
-            }
+            // 하단 패널: 스킬 UI 숨김 + 적 턴 정보 표시
+            string skillName = skillId != BattleUseCase.DefaultAttackId
+                ? _skillMasterDataRepo.GetSkill(skillId).SkillName
+                : "기본 공격";
+            _view.ShowEnemyTurnPanel($"적 {actorName}{KoreanSubjectParticle(actorName)} {skillName} 사용");
 
             // 공격 모션 (적 → 아군)
-            var actorUnit = _view.EnemyField.GetUnit(actor.Id);
+            var actorUnit  = _view.EnemyField.GetUnit(actor.Id);
             var targetUnit = _view.AllyField.GetUnit(target.Id);
             await actorUnit.PlayAttackMotion(targetUnit.transform.position);
 
@@ -368,9 +371,11 @@ namespace Samsara.Features.BattleScene.Presentation
                 var skillSO = _skillMasterDataRepo.GetSkill(skillId);
                 if (skillSO.QtePatternId > 0)
                 {
-                    var qtePattern = _skillMasterDataRepo.GetQTEPattern(skillSO.QtePatternId);
+                    var qtePattern  = _skillMasterDataRepo.GetQTEPattern(skillSO.QtePatternId);
                     var qteDataList = qtePattern.QteDataList;
 
+                    // QTE 전환 전 패널 숨김 (QTE 패널이 같은 영역에 슬라이드인)
+                    _view.HideEnemyTurnPanel();
                     await _view.TransitionToQTE(isDefense: true);
 
                     var qteResults = new bool[qteDataList.Length];
@@ -389,8 +394,8 @@ namespace Samsara.Features.BattleScene.Presentation
                     int[] perHitDamages = _useCase.CalculatePerHitDamage(totalDamage, Mathf.Max(1, qteDataList.Length));
                     for (int j = 0; j < perHitDamages.Length; j++)
                     {
-                        // 방어 QTE: 플레이어 방어 성공 = 공격 빗나감(Miss), 방어 실패 = 공격 적중
-                        _view.DamagePopup.ShowHitDamage(perHitDamages[j], !qteResults[j], targetUnit.transform.position);
+                        // 방어 성공 = 감소 데미지(success 시각), 방어 실패 = 일반 데미지(fail 시각)
+                        _view.DamagePopup.ShowHitDamage(perHitDamages[j], qteResults[j], targetUnit.transform.position);
                         if (j < perHitDamages.Length - 1)
                             await UniTask.Delay(100);
                     }
@@ -415,7 +420,22 @@ namespace Samsara.Features.BattleScene.Presentation
             // 귀환 모션
             await actorUnit.PlayReturnMotion();
 
+            // 패널 닫기 (QTE 경로는 이미 닫혔으나 non-QTE 경로를 위해 통일 처리)
+            _view.HideEnemyTurnPanel();
             await UniTask.Delay(300);
+        }
+
+        /// <summary>
+        /// 한국어 주격 조사 반환. 이름 마지막 글자의 받침 유무에 따라 "이" 또는 "가".
+        /// 한국어 음절 범위(AC00-D7A3) 외 문자(영문 등)는 "이" 반환.
+        /// </summary>
+        private static string KoreanSubjectParticle(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return "이";
+            char last = name[name.Length - 1];
+            if (last >= 0xAC00 && last <= 0xD7A3)
+                return (last - 0xAC00) % 28 == 0 ? "가" : "이";
+            return "이";
         }
 
         // ──────────────────────────────────────────────
@@ -498,22 +518,35 @@ namespace Samsara.Features.BattleScene.Presentation
 
         private void HandleCharacterLongPress(int participantId, bool isAlly)
         {
+            Debug.Log($"{_logClass} HandleCharacterLongPress id={participantId} isAlly={isAlly}");
+
             var runtimeData = _useCase.RuntimeData;
-            if (runtimeData == null) return;
+            if (runtimeData == null)
+            {
+                Debug.LogWarning($"{_logClass} HandleCharacterLongPress — RuntimeData is null, returning");
+                return;
+            }
 
             BattleParticipant p = FindParticipantByIdSafe(participantId);
-            if (p == null) return;
+            if (p == null)
+            {
+                Debug.LogWarning($"{_logClass} HandleCharacterLongPress — participant {participantId} not found, returning");
+                return;
+            }
 
             string name = !string.IsNullOrEmpty(p.DisplayName) ? p.DisplayName : p.SpriteKey;
             string detail = $"HP: {p.CurrentHp}/{p.MaxHp}\nSTR: {p.Strength}  TGH: {p.Toughness}  AGI: {p.Agility}";
 
+            Debug.Log($"{_logClass} → InfoTooltip.Show({name})");
             // 화면 중앙 근처에 툴팁 표시
             _view.InfoTooltip.Show(name, detail, new Vector2(Screen.width * 0.5f, Screen.height * 0.5f));
         }
 
         private void HandleSkillLongPress(int skillId)
         {
+            Debug.Log($"{_logClass} HandleSkillLongPress skillId={skillId}");
             var skillSO = _skillMasterDataRepo.GetSkill(skillId);
+            Debug.Log($"{_logClass} → InfoTooltip.Show({skillSO?.SkillName})");
             _view.InfoTooltip.Show(skillSO.SkillName, skillSO.Description,
                 new Vector2(Screen.width * 0.5f, Screen.height * 0.3f));
         }
@@ -563,7 +596,12 @@ namespace Samsara.Features.BattleScene.Presentation
 
             const int maxSlots = 5;
             int lookAhead = currentActor != null ? maxSlots - 1 : maxSlots;
-            var predicted = _useCase.GetPredictedActionOrder(lookAhead);
+
+            // 큐가 비어있을 때만 재계산 (전투 초기화 또는 사망 후 무효화 직후)
+            // 정상 플레이 중 순서가 바뀌지 않도록 큐는 500개로 선계산됨
+            if (_useCase.IsCommittedQueueEmpty)
+                _useCase.BuildCommittedQueue();
+            var predicted = _useCase.PeekCommittedQueue(lookAhead);
 
             BattleParticipant[] ordered;
             if (currentActor != null)

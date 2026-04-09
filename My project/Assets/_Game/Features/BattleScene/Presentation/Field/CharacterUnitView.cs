@@ -131,6 +131,7 @@ namespace Samsara.Features.BattleScene.Presentation.Field
 
         public void OnPointerDown(PointerEventData eventData)
         {
+            Debug.Log($"{_logClass} OnPointerDown id={_participantId}");
             _longPressCts?.Cancel();
             _longPressCts?.Dispose();
             _longPressCts = new CancellationTokenSource();
@@ -139,6 +140,7 @@ namespace Samsara.Features.BattleScene.Presentation.Field
 
         public void OnPointerUp(PointerEventData eventData)
         {
+            Debug.Log($"{_logClass} OnPointerUp — timer cancelled id={_participantId}");
             _longPressCts?.Cancel();
             _longPressCts?.Dispose();
             _longPressCts = null;
@@ -146,9 +148,13 @@ namespace Samsara.Features.BattleScene.Presentation.Field
 
         private async UniTaskVoid StartLongPressTimer(CancellationToken token)
         {
+            Debug.Log($"{_logClass} LongPress timer started id={_participantId}");
             await UniTask.Delay(TimeSpan.FromSeconds(LongPressThreshold), cancellationToken: token);
             if (!token.IsCancellationRequested)
+            {
+                Debug.Log($"{_logClass} OnLongPress event fired id={_participantId}");
                 OnLongPress?.Invoke(_participantId);
+            }
         }
 
         private void OnDestroy()
