@@ -19,9 +19,15 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation.TreeArea
 
         public void BuildTree(TreeLayoutResult layoutResult)
         {
+            Canvas.ForceUpdateCanvases();
+            var viewportSize = _scrollRect.viewport.rect.size;
+
             _content.sizeDelta = new Vector2(layoutResult.ContentWidth, layoutResult.ContentHeight);
 
-            Debug.Log($"{_logClass} Content size={_content.sizeDelta} pivot={_content.pivot} anchorMin={_content.anchorMin} anchorMax={_content.anchorMax}");
+            // Shift nodes down by half viewport to create top padding (pivot is top-center)
+            float verticalPadding = viewportSize.y / 2f;
+
+            Debug.Log($"{_logClass} Content sizeDelta={_content.sizeDelta} viewport={viewportSize} verticalPadding={verticalPadding}");
 
             foreach (var nodeLayout in layoutResult.Nodes)
             {
@@ -30,7 +36,7 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation.TreeArea
                 rt.anchorMin = new Vector2(0.5f, 1f);
                 rt.anchorMax = new Vector2(0.5f, 1f);
                 rt.pivot = new Vector2(0.5f, 0.5f);
-                rt.anchoredPosition = new Vector2(nodeLayout.X, nodeLayout.Y);
+                rt.anchoredPosition = new Vector2(nodeLayout.X, nodeLayout.Y - verticalPadding);
 
                 Debug.Log($"{_logClass} Node [{nodeLayout.NodeId}] anchoredPosition={rt.anchoredPosition}");
 
@@ -63,13 +69,24 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation.TreeArea
             if (!_nodeViewMap.TryGetValue(nodeId, out var nodeView)) return;
 
             var nodeRt = nodeView.GetComponent<RectTransform>();
-            var contentSize = _content.sizeDelta;
             var viewportSize = _scrollRect.viewport.rect.size;
+            // Content uses stretch anchors (0,0)-(1,1), so actual size = viewport + sizeDelta
+            var contentSize = viewportSize + _content.sizeDelta;
 
-            float normalizedX = Mathf.Clamp01(
-                (nodeRt.anchoredPosition.x + contentSize.x / 2f) / (contentSize.x - viewportSize.x));
-            float normalizedY = Mathf.Clamp01(
-                1f - (-nodeRt.anchoredPosition.y) / (contentSize.y - viewportSize.y));
+            float scrollableX = contentSize.x - viewportSize.x;
+            float scrollableY = contentSize.y - viewportSize.y;
+
+            // Node distance from content edges (content pivot = 0.5, 1 = top-center)
+            float nodeDistFromLeft = contentSize.x / 2f + nodeRt.anchoredPosition.x;
+            float nodeDistFromTop = Mathf.Abs(nodeRt.anchoredPosition.y);
+
+            // Center node in viewport
+            float normalizedX = scrollableX > 0f
+                ? Mathf.Clamp01((nodeDistFromLeft - viewportSize.x / 2f) / scrollableX)
+                : 0.5f;
+            float normalizedY = scrollableY > 0f
+                ? Mathf.Clamp01(1f - (nodeDistFromTop - viewportSize.y / 2f) / scrollableY)
+                : 0.5f;
 
             _scrollRect.normalizedPosition = new Vector2(normalizedX, normalizedY);
         }

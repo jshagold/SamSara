@@ -11,9 +11,13 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation.TreeArea
 
         [SerializeField] private Button _button;
         [SerializeField] private Image _nodeIcon;
-        [SerializeField] private Image _highlightBorder;
-        [SerializeField] private Image _dimOverlay;
-        [SerializeField] private GameObject _evolvableIndicator;
+        [SerializeField] private Image _frameImage;
+
+        [SerializeField] private Sprite _currentFrameSprite;
+        [SerializeField] private Sprite _evolvableFrameSprite;
+        [SerializeField] private Sprite _reachableFrameSprite;
+        [SerializeField] private Sprite _lockedFrameSprite;
+        [SerializeField] private Sprite _hiddenFrameSprite;
 
         private string _nodeId;
         private Sprite _questionMarkSprite;
@@ -28,32 +32,35 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation.TreeArea
             _nodeId = nodeId;
             _originalIcon = icon;
             _nodeIcon.sprite = icon;
+            _nodeIcon.enabled = icon != null;
         }
 
         public void SetNodeState(NodeState state)
         {
-            _highlightBorder.gameObject.SetActive(false);
-            _dimOverlay.gameObject.SetActive(false);
-            _evolvableIndicator.SetActive(false);
             _nodeIcon.sprite = _originalIcon;
+            _nodeIcon.enabled = _originalIcon != null;
 
             switch (state)
             {
                 case NodeState.Current:
-                    _highlightBorder.gameObject.SetActive(true);
+                    _frameImage.sprite = _currentFrameSprite;
                     break;
                 case NodeState.Evolvable:
-                    _evolvableIndicator.SetActive(true);
+                    _frameImage.sprite = _evolvableFrameSprite;
                     break;
                 case NodeState.Reachable:
+                    _frameImage.sprite = _reachableFrameSprite;
                     break;
                 case NodeState.Locked:
-                    _dimOverlay.gameObject.SetActive(true);
+                    _frameImage.sprite = _lockedFrameSprite;
                     break;
                 case NodeState.Hidden:
+                    _frameImage.sprite = _hiddenFrameSprite;
                     if (_questionMarkSprite != null)
+                    {
                         _nodeIcon.sprite = _questionMarkSprite;
-                    _dimOverlay.gameObject.SetActive(true);
+                        _nodeIcon.enabled = true;
+                    }
                     break;
             }
         }
