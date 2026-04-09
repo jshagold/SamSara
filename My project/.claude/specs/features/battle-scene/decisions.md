@@ -51,3 +51,13 @@ D-22 [DECISION] InfoTooltipView에 전체화면 블로커 패턴으로 닫기 �
 D-23 [DECISION] ProcessAllyTurn/ProcessEnemyTurn 시작 시 InfoTooltip.Hide() 호출 제거(D-17 롤백). D-22에서 블로커 패턴으로 플레이어가 직접 닫는 방식이 구현되었으므로 턴 시작 시 강제 Hide는 불필요. 툴팁 닫기는 블로커 터치 단일 경로로만 처리.
 
 D-24 [DECISION] 적 턴 표시 방식을 화면 중앙 DOTween 레이블에서 하단 스킬 영역 공유 패널로 전환. 신규: EnemyTurnInfoView(하단 패널, TMP_Text 1개). BattleView.ShowEnemyTurnPanel(text): HideSkillUI() + EnemyTurnInfoView.Show(). HideEnemyTurnPanel(): EnemyTurnInfoView.Hide(). ProcessEnemyTurn 재구성: (1) 스킬/타겟 먼저 결정 (2) 패널에 "적 [이름]이(가) [스킬명] 사용" 즉시 표시 (3) QTE 전환 직전 패널 숨김 (4) 턴 종료 시 HideEnemyTurnPanel(). ShowEnemyTurnLabel/ShowSkillNameLabel/ShowLabel 제거. _turnLabel/_turnLabelGroup 필드 제거. KoreanSubjectParticle() helper 추가(받침 유무로 이/가 선택). 이유: 기존 center-screen 레이블이 1.8초 blocking으로 동작 흐름 단절.
+
+D-25 [DECISION] SkillSelectionView의 스킬 버튼 배치를 HorizontalLayoutGroup 대신 코드 기반 anchoredPosition 직접 계산으로 전환. SetSkills() 완료 후 DistributeButtons() 호출: containerRect.rect.width / count = slotWidth, x = -width/2 + slotWidth*(i+0.5f). 이유: ObjectPool에서 Get한 버튼은 Instantiate 직후와 동일하게 레이아웃 시스템이 미반영된 상태(anchoredPosition=(0,0))로 반환되어 모든 버튼이 같은 위치에 겹침. D-13(FieldView DistributeUnits)과 동일한 패턴.
+
+D-26 [DECISION] QTERingView의 터치 감지를 전체 화면(`HasTouchBegan`) → `_buttonImage` 영역 한정(`HasTouchBeganOnButton`)으로 변경. `RectTransformUtility.RectangleContainsScreenPoint(_buttonImage.rectTransform, screenPoint, _canvasCamera)` 사용. Canvas 카메라는 Awake에서 캐시: ScreenSpaceOverlay → null, 그 외 → canvas.worldCamera. 이유: 기존 구현은 화면 아무 곳을 터치해도 QTE 입력이 들어가는 버그.
+
+D-27 [DECISION] QTERingView RunRing 루프 조건을 `!tween.IsComplete()` → `elapsed < qteData.Duration` (Time.deltaTime 누산)으로 교체. 이유: DOTween 기본 SetAutoKill(true)으로 tween 완료 후 객체가 재활용되며, 재활용된 tween의 IsComplete() 호출은 정의되지 않은 동작. 루프 종료 시 success=false(자동 실패) 보장되어 링 수축 완료 후 무한 대기 버그 해결.
+
+D-28 [DECISION] ProcessEnemyTurn / ProcessAllyTurn에 연출 딜레이 상수 2개 추가. EnemyTurnShowDelay(1.0f): ShowEnemyTurnPanel 직후 ~ 공격 모션 전에 삽입, 플레이어가 적 행동 텍스트를 읽을 시간 확보. PostDamageDelay(0.5f): 모든 데미지 표시 완료 직후(적 턴·아군 턴 공통), 플레이어가 결과를 확인할 시간 확보. 두 상수 모두 BattlePresenter 상단에 선언하여 밸런스 조정 용이.
+
+D-29 [DECISION] BattleScene 직접 Play 지원 추가 (에디터 전용). 기존: GlobalBootstrapper.Instance가 null이어서 NullReferenceException 발생, Bootstrap씬에서만 실행 가능. 구현: (1) BattleSceneBootstrapper에 [RuntimeInitializeOnLoadMethod(BeforeSceneLoad)] 추가 — 씬 이름="Battle"이고 GlobalBootstrapper가 없으면 IsDirectTestMode=true 설정 후 Bootstrap씬 로드. (2) GlobalBootstrapper step 6에서 IsDirectTestMode 확인 — true이면 Main 대신 Battle로 복귀. (3) BattleSceneBootstrapper 에디터 블록에서 characterRunRepo.InitializeNewRun("test_node_id", stats_test_ally) 호출 — run_save.json 값과 무관하게 테스트 아군 스탯(AGI=40, STR=15, HP=100) 보장.

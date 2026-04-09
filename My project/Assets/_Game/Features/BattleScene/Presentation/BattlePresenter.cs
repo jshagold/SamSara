@@ -44,6 +44,10 @@ namespace Samsara.Features.BattleScene.Presentation
         private Action<int> _allyLongPressHandler;
         private Action<int> _skillLongPressHandler;
 
+        // ── 전투 연출 딜레이 상수 ──
+        private const float EnemyTurnShowDelay = 1.0f;  // 적 행동 텍스트 표시 후 공격 모션 전 대기
+        private const float PostDamageDelay    = 0.5f;  // 데미지 표시 후 플레이어 결과 확인 대기
+
         public BattlePresenter(
             BattleUseCase useCase,
             BattleView view,
@@ -297,6 +301,8 @@ namespace Samsara.Features.BattleScene.Presentation
                 _view.DamagePopup.ShowHitDamage(damage, true, targetUnit.transform.position);
             }
 
+            await UniTask.Delay((int)(PostDamageDelay * 1000));
+
             if (target.IsDead)
                 targetUnit.SetDead();
 
@@ -358,6 +364,7 @@ namespace Samsara.Features.BattleScene.Presentation
                 ? _skillMasterDataRepo.GetSkill(skillId).SkillName
                 : "기본 공격";
             _view.ShowEnemyTurnPanel($"적 {actorName}{KoreanSubjectParticle(actorName)} {skillName} 사용");
+            await UniTask.Delay((int)(EnemyTurnShowDelay * 1000));
 
             // 공격 모션 (적 → 아군)
             var actorUnit  = _view.EnemyField.GetUnit(actor.Id);
@@ -413,6 +420,8 @@ namespace Samsara.Features.BattleScene.Presentation
                 int damage = _useCase.ExecuteAction(actor, skillId, target, qteRate);
                 _view.DamagePopup.ShowHitDamage(damage, true, targetUnit.transform.position);
             }
+
+            await UniTask.Delay((int)(PostDamageDelay * 1000));
 
             if (target.IsDead)
                 targetUnit.SetDead();

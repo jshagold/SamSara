@@ -94,6 +94,26 @@ namespace Samsara.Features.BattleScene.Presentation.Skill
                 _buttonBySkillId[skill.SkillId] = btn;
                 _skillDataMap[skill.SkillId] = skill;
             }
+
+            DistributeButtons();
+        }
+
+        private void DistributeButtons()
+        {
+            int count = _activeButtons.Count;
+            if (count == 0) return;
+            var containerRect = _skillContainer as RectTransform;
+            if (containerRect == null) return;
+            float containerWidth = containerRect.rect.width;
+            if (containerWidth <= 0f) return;
+            float slotWidth = containerWidth / count;
+            for (int i = 0; i < count; i++)
+            {
+                var btnRect = _activeButtons[i].GetComponent<RectTransform>();
+                if (btnRect == null) continue;
+                float x = -containerWidth / 2f + slotWidth * (i + 0.5f);
+                btnRect.anchoredPosition = new Vector2(x, 0f);
+            }
         }
 
         public void SetActive(bool active)

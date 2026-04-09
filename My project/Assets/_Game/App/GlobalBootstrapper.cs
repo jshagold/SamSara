@@ -121,7 +121,15 @@ public class GlobalBootstrapper : MonoBehaviour
 
             Debug.Log($"{_logClass} 초기화 완료.");
 
-            // Step 6 — Main 씬으로 전환
+            // Step 6 — 씬 전환 (에디터 직접 실행 시 Battle로, 정상 실행 시 Main으로)
+#if UNITY_EDITOR
+            if (Samsara.Features.BattleScene.Presentation.BattleSceneBootstrapper.IsDirectTestMode)
+            {
+                Samsara.Features.BattleScene.Presentation.BattleSceneBootstrapper.IsDirectTestMode = false;
+                await _sceneNavigator.NavigateToAsync(SceneKey.Battle);
+                return;
+            }
+#endif
             await _sceneNavigator.NavigateToAsync(SceneKey.Main);
         }
         catch (Exception e)

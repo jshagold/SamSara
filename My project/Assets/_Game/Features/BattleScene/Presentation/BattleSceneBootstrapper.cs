@@ -1,7 +1,9 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Samsara.Features.BattleScene.Domain;
+using Samsara.Features.Character.MasterData;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Samsara.Features.BattleScene.Presentation
 {
@@ -12,6 +14,24 @@ namespace Samsara.Features.BattleScene.Presentation
         [SerializeField] private BattleView _battleView;
 
         private BattlePresenter _battlePresenter;
+
+#if UNITY_EDITOR
+        // BattleScene 직접 Play 시 Bootstrap 우회용 플래그.
+        // GlobalBootstrapper step 6에서 읽어 Main 대신 Battle로 복귀.
+        public static bool IsDirectTestMode;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void RedirectToBootstrapIfNeeded()
+        {
+            if (GlobalBootstrapper.Instance != null) return;
+            if (SceneManager.GetActiveScene().name != "Battle") return;
+
+            // GlobalBootstrapper가 없는 상태에서 Battle씬이 실행됐음.
+            // Bootstrap씬을 먼저 로드해 초기화를 완료한 뒤 Battle로 돌아온다.
+            IsDirectTestMode = true;
+            SceneManager.LoadScene("Bootstrap");
+        }
+#endif
 
         private void Start()
         {
@@ -45,6 +65,14 @@ namespace Samsara.Features.BattleScene.Presentation
                 Debug.LogWarning($"{_logClass} PendingBattleContext가 null — 테스트 데이터로 대체합니다. " +
                                  $"EnemySpawns={testNode.EnemySpawns?.Length} (Editor only)");
             }
+
+            // 에디터 직접 실행 시: run_save.json 값과 무관하게 테스트 아군 스탯으로 강제 초기화.
+            // stats_test_ally.asset (HP=100, STR=15, TGH=10, AGI=40) 사용.
+            var testAllyStats = Resources.Load<CharacterStatsSO>("MasterData/stats_test_ally");
+            if (testAllyStats != null)
+                characterRunRepo.InitializeNewRun("test_node_id", testAllyStats);
+            else
+                Debug.LogWarning($"{_logClass} stats_test_ally.asset 없음 — Samsara > Dev > Create Test Battle Data를 먼저 실행하세요.");
 #else
             if (pendingContext == null)
                 throw new InvalidOperationException(

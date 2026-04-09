@@ -12,8 +12,8 @@ namespace Samsara.Features.BattleScene.Presentation.Damage
         [SerializeField] private TMP_Text _damageTextPrefab;
 
         // 히트 데미지 표시 상수
-        private const float HitSuccessFontSize = 72f;
-        private const float HitFailFontSize    = 40f;
+        private const float HitSuccessFontSize = 144f;
+        private const float HitFailFontSize    = 72f;
         private static readonly Color HitSuccessColor = new Color(1f, 0.95f, 0.2f, 1f);  // 밝은 황색
         private static readonly Color HitFailColor    = new Color(0.6f, 0.6f, 0.6f, 1f); // 회색
 

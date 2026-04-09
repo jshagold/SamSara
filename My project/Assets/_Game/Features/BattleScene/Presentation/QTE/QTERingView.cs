@@ -9,7 +9,8 @@ namespace Samsara.Features.BattleScene.Presentation.QTE
 {
     /// <summary>
     /// 개별 QTE 입력 — 링이 외곽에서 중심으로 수렴하는 클로징 링 애니메이션.
-    /// 링 스케일이 성공 범위 안에 있을 때 터치하면 성공.
+    /// 링 스케일이 성공 범위 안에 있을 때 _buttonImage 영역 내 터치하면 성공.
+    /// Duration이 경과하면 자동으로 실패 처리.
     /// </summary>
     public class QTERingView : MonoBehaviour
     {
@@ -25,9 +26,23 @@ namespace Samsara.Features.BattleScene.Presentation.QTE
         private const float SuccessRangeMin = 1.0f;
         private const float SuccessRangeMax = 1.3f;
 
+        // 부모 Canvas 카메라 — RectTransformUtility에 전달 (ScreenSpaceOverlay = null)
+        private Camera _canvasCamera;
+
+        private void Awake()
+        {
+            var canvas = GetComponentInParent<Canvas>();
+            _canvasCamera = (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                ? canvas.worldCamera
+                : null;
+
+            gameObject.SetActive(false);
+        }
+
         /// <summary>
         /// QTE 링 하나를 실행하고 성공 여부를 반환한다.
-        /// 1. 좌표에 배치 → 2. 링이 RingStartScale → 1.0으로 수렴 → 3. 터치 판정 → 4. 결과 반환
+        /// 1. 좌표에 배치 → 2. 링이 RingStartScale → 1.0으로 수렴
+        /// → 3. _buttonImage 영역 내 터치 판정 → 4. Duration 경과 시 자동 실패
         /// </summary>
         public async UniTask<bool> RunRing(QTEData qteData, CancellationToken cancellationToken = default)
         {
@@ -43,11 +58,14 @@ namespace Samsara.Features.BattleScene.Presentation.QTE
                 .SetEase(Ease.Linear);
 
             bool success = false;
+            float elapsed = 0f;
 
-            // 매 프레임 터치 감지 (DOTween 은 독립적으로 실행됨)
-            while (!tween.IsComplete() && !cancellationToken.IsCancellationRequested)
+            // Duration 타임아웃 기반 루프 — tween.IsComplete() 대신 사용
+            // 이유: DOTween SetAutoKill(true, 기본값)으로 완료 후 tween 재활용됨,
+            //       재활용된 객체의 IsComplete() 는 정의되지 않은 동작.
+            while (elapsed < qteData.Duration && !cancellationToken.IsCancellationRequested)
             {
-                if (HasTouchBegan())
+                if (HasTouchBeganOnButton())
                 {
                     float currentScale = _ringRect.localScale.x;
                     success = currentScale >= SuccessRangeMin && currentScale <= SuccessRangeMax;
@@ -55,7 +73,9 @@ namespace Samsara.Features.BattleScene.Presentation.QTE
                 }
 
                 await UniTask.Yield(cancellationToken: cancellationToken);
+                elapsed += Time.deltaTime;
             }
+            // elapsed >= duration 으로 루프 종료 시 success = false (자동 실패)
 
             tween.Kill();
             gameObject.SetActive(false);
@@ -75,11 +95,22 @@ namespace Samsara.Features.BattleScene.Presentation.QTE
             );
         }
 
-        private static bool HasTouchBegan()
+        /// <summary>
+        /// _buttonImage RectTransform 영역 내 터치/클릭 여부 반환.
+        /// RectTransformUtility.RectangleContainsScreenPoint으로 버튼 밖 입력 차단.
+        /// </summary>
+        private bool HasTouchBeganOnButton()
         {
-            if (Input.GetMouseButtonDown(0)) return true;
-            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began) return true;
-            return false;
+            Vector2 screenPoint;
+            if (Input.GetMouseButtonDown(0))
+                screenPoint = Input.mousePosition;
+            else if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+                screenPoint = Input.GetTouch(0).position;
+            else
+                return false;
+
+            return RectTransformUtility.RectangleContainsScreenPoint(
+                _buttonImage.rectTransform, screenPoint, _canvasCamera);
         }
 
         private void OnDestroy()
