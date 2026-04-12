@@ -1,4 +1,5 @@
 using System;
+using Samsara.Features.Character.MasterData;
 using UnityEngine;
 
 namespace Samsara.Features.Event.MasterData
@@ -15,6 +16,8 @@ namespace Samsara.Features.Event.MasterData
         [SerializeField] private EventDialogue[] _dialogues;
         [SerializeField] private EventResult _result;
         [SerializeField] private EventChoice[] _choices;
+        [SerializeField] private int _chainTotalSteps;  // Total steps in chained sequence. 0 for one-shot.
+        [SerializeField] private int _chainStep;        // This event's step in the chain. 0 for one-shot.
 
         public int EventId => _eventId;
         public string EventName => _eventName;
@@ -23,6 +26,8 @@ namespace Samsara.Features.Event.MasterData
         public EventDialogue[] Dialogues => _dialogues;
         public EventResult Result => _result;
         public EventChoice[] Choices => _choices;
+        public int ChainTotalSteps => _chainTotalSteps;
+        public int ChainStep => _chainStep;
     }
 
     [Serializable]
@@ -30,19 +35,26 @@ namespace Samsara.Features.Event.MasterData
     {
         [SerializeField] private string _portraitSpriteKey;  // Speaker portrait (player or NPC)
         [SerializeField] private string _dialogueText;
+        [SerializeField] private string _speakerName;
+        [SerializeField] private SpeakerPosition _speakerPosition;
 
         public string PortraitSpriteKey => _portraitSpriteKey;
         public string DialogueText => _dialogueText;
+        public string SpeakerName => _speakerName;
+        public SpeakerPosition SpeakerPosition => _speakerPosition;
     }
 
     [Serializable]
     public class EventResult
     {
         [SerializeField] private EventResultType _resultType;
-        [SerializeField] private float _value;  // Used for HpChange, StatChange
+        [SerializeField] private float _value;       // Used for HpChange, StatChange
+        [SerializeField] private bool _useStatType;  // Enable to specify which stat to change
+        [SerializeField] private StatType _statType; // Which stat to change. Only used when _useStatType is true.
 
         public EventResultType ResultType => _resultType;
         public float Value => _value;
+        public StatType? StatType => _useStatType ? _statType : (StatType?)null;
     }
 
     [Serializable]
