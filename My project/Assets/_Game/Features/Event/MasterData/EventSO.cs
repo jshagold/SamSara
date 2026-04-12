@@ -18,6 +18,7 @@ namespace Samsara.Features.Event.MasterData
         [SerializeField] private EventChoice[] _choices;
         [SerializeField] private int _chainTotalSteps;  // Total steps in chained sequence. 0 for one-shot.
         [SerializeField] private int _chainStep;        // This event's step in the chain. 0 for one-shot.
+        [SerializeField] private EventSource _eventSource;
 
         public int EventId => _eventId;
         public string EventName => _eventName;
@@ -28,6 +29,7 @@ namespace Samsara.Features.Event.MasterData
         public EventChoice[] Choices => _choices;
         public int ChainTotalSteps => _chainTotalSteps;
         public int ChainStep => _chainStep;
+        public EventSource EventSource => _eventSource;
     }
 
     [Serializable]
