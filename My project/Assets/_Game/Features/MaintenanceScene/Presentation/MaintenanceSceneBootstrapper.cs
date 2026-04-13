@@ -24,6 +24,7 @@ namespace Samsara.Features.MaintenanceScene.Presentation
             var gameContext      = GlobalBootstrapper.Instance.GameContext;
             var characterRunRepo = gameContext.CharacterRunRepo;
             var eventUseCase     = gameContext.EventUseCase;
+            var shopUseCase      = gameContext.ShopUseCase;
             var sceneNavigator   = GlobalBootstrapper.Instance.SceneNavigator;
             var popupManager     = gameContext.PopupManager;
 
@@ -34,7 +35,8 @@ namespace Samsara.Features.MaintenanceScene.Presentation
                 _maintenanceView,
                 sceneNavigator,
                 popupManager,
-                gameContext);
+                gameContext,
+                shopUseCase);
 
             _maintenancePresenter.Initialize();
 

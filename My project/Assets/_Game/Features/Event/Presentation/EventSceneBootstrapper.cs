@@ -24,6 +24,7 @@ namespace Samsara.Features.Event.Presentation
             var useCase         = gameContext.EventUseCase;
             var pendingContext  = gameContext.PendingEventContext;
             var sceneNavigator  = GlobalBootstrapper.Instance.SceneNavigator;
+            var shopUseCase     = gameContext.ShopUseCase;
 
             if (pendingContext == null)
             {
@@ -31,7 +32,7 @@ namespace Samsara.Features.Event.Presentation
                 return;
             }
 
-            _presenter = new EventPresenter(useCase, _eventView, sceneNavigator, pendingContext);
+            _presenter = new EventPresenter(useCase, _eventView, sceneNavigator, pendingContext, shopUseCase);
             _presenter.InitializeAsync().Forget();
 
             Debug.Log($"{_logClass} EventScene 초기화 완료.");

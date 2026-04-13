@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using Samsara.Core.Navigation;
 using Samsara.Features.Event.Domain;
 using Samsara.Features.Event.MasterData;
+using Samsara.Features.Shop.Domain;
 using UnityEngine;
 
 namespace Samsara.Features.Event.Presentation
@@ -14,6 +15,7 @@ namespace Samsara.Features.Event.Presentation
         private readonly EventView           _view;
         private readonly ISceneNavigator     _sceneNavigator;
         private readonly PendingEventContext _pendingEventContext;
+        private readonly ShopUseCase         _shopUseCase;
 
         private UniTaskCompletionSource _tapTcs;
 
@@ -21,12 +23,14 @@ namespace Samsara.Features.Event.Presentation
             EventUseCase        useCase,
             EventView           view,
             ISceneNavigator     sceneNavigator,
-            PendingEventContext pendingEventContext)
+            PendingEventContext pendingEventContext,
+            ShopUseCase         shopUseCase)
         {
             _useCase            = useCase;
             _view               = view;
             _sceneNavigator     = sceneNavigator;
             _pendingEventContext = pendingEventContext;
+            _shopUseCase        = shopUseCase;
         }
 
         // ──────────────────────────────────────────────
@@ -160,7 +164,7 @@ namespace Samsara.Features.Event.Presentation
                         return $"{result.StatType.Value} {(result.Value >= 0 ? "+" : "")}{(int)result.Value}";
                     return "스탯 변화";
 
-                case EventResultType.ShopEncounter: return "상인을 만났다.";
+                case EventResultType.ShopEncounter: return "정비 구역에 상인이 찾아온다.";
                 case EventResultType.Battle:        return "전투가 시작된다!";
                 case EventResultType.Death:         return "쓰러졌다...";
                 case EventResultType.None:          return "아무 일도 일어나지 않았다.";
@@ -188,8 +192,15 @@ namespace Samsara.Features.Event.Presentation
                     await _sceneNavigator.NavigateToAsync(_pendingEventContext.ReturnScene);
                     break;
 
+                case EventResultType.ShopEncounter:
+                    if (result.MerchantId.HasValue)
+                        await _shopUseCase.ActivateMerchant(result.MerchantId.Value);
+                    _pendingEventContext.IsCompleted = true;
+                    await _sceneNavigator.NavigateToAsync(_pendingEventContext.ReturnScene);
+                    break;
+
                 default:
-                    // None, HpChange, StatChange, ShopEncounter
+                    // None, HpChange, StatChange
                     _pendingEventContext.IsCompleted = true;
                     await _sceneNavigator.NavigateToAsync(_pendingEventContext.ReturnScene);
                     break;

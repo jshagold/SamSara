@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1aec98ea74e07754ead14be671a01698, type: 3}
+  m_Name: Merchant_01
+  m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Shop.MasterData.MerchantSO
+  _id: 1
+  _merchantName: "\uD3EC\uC158\uC0C1\uC778"
+  _portrait: {fileID: 0}
+  _shopSprite: {fileID: 0}
+  _stayDuration: 1
+  _saleItems:
+  - _potionId: 1
+    _stock: 3
+  - _potionId: 2
+    _stock: 3
+  - _potionId: 3
+    _stock: 3
+  _greetingDialogues:
+  - _speakerName: "\uD3EC\uC158\uC0C1\uC778"
+    _text: "\u314E\u3147\u3147"
+    _speakerPosition: 1
+  - _speakerName: "\uD3EC\uC158\uC0C1\uC778"
+    _text: "1\uC77C\uC815\uB3C4\uB9CC \uB0A8\uC544\uC788\uC74C"
+    _speakerPosition: 1
+  _farewellDialogues: []

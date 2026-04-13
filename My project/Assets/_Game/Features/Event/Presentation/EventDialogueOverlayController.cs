@@ -60,6 +60,30 @@ namespace Samsara.Features.Event.Presentation
         }
 
         /// <summary>
+        /// EventUseCase 없이 원시 대사 배열과 선택지 텍스트로 오버레이를 실행한다.
+        /// 상점 대사 등 ScriptableObject 이벤트가 없는 상황에서 재사용할 때 사용.
+        /// 선택된 선택지 인덱스를 반환한다.
+        /// </summary>
+        public async UniTask<int> RunDialoguesWithChoicesAsync(EventDialogue[] dialogues, string[] choiceTexts)
+        {
+            _dimBackground.SetActive(true);
+
+            // 대사 루프
+            if (dialogues != null && dialogues.Length > 0)
+                await RunRawDialogueLoopAsync(dialogues);
+
+            // 선택지
+            var selectionTcs = new UniTaskCompletionSource<int>();
+            _choiceListView.ShowChoices(choiceTexts, index => selectionTcs.TrySetResult(index));
+
+            int chosen = await selectionTcs.Task;
+            _choiceListView.HideChoices();
+
+            _dimBackground.SetActive(false);
+            return chosen;
+        }
+
+        /// <summary>
         /// Inspector의 Button.onClick 또는 외부 코드에서 탭 이벤트를 주입한다.
         /// </summary>
         public void OnDialogueTapped()
@@ -70,6 +94,24 @@ namespace Samsara.Features.Event.Presentation
         // ──────────────────────────────────────────────
         // Internal
         // ──────────────────────────────────────────────
+
+        private async UniTask RunRawDialogueLoopAsync(EventDialogue[] dialogues)
+        {
+            int index = 0;
+            _dialogueView.ShowDialogue(dialogues[index]);
+
+            while (true)
+            {
+                _tapTcs = new UniTaskCompletionSource();
+                await _tapTcs.Task;
+
+                index++;
+                if (index >= dialogues.Length) break;
+                _dialogueView.ShowDialogue(dialogues[index]);
+            }
+
+            _dialogueView.HideDialogue();
+        }
 
         private async UniTask RunDialogueLoopAsync()
         {

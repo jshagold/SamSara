@@ -8,6 +8,8 @@ using Samsara.Features.Character.MasterData;
 using Samsara.Features.Event.Data;
 using Samsara.Features.Event.Domain;
 using Samsara.Features.MiniGame.Domain;
+using Samsara.Features.Shop.Data;
+using Samsara.Features.Shop.Domain;
 using Samsara.Features.Skill.Data;
 using Samsara.Features.Skill.Domain;
 using Samsara.Features.Stage.Data;
@@ -32,6 +34,8 @@ public class GameContext
     private readonly ICharacterAccountRepository _characterAccountRepo;
     private readonly ISkillMasterDataRepository    _skillMasterDataRepo;
     private readonly IEventMasterDataRepository   _eventMasterDataRepo;
+    private readonly IShopMasterDataRepository    _shopMasterDataRepo;
+    private readonly IShopRepository              _shopRepo;
 
     // ──────────────────────────────────────────────
     // MasterData Cache
@@ -47,6 +51,7 @@ public class GameContext
     private readonly EventUseCase      _eventUseCase;
     private readonly MiniGameUseCase   _miniGameUseCase;
     private readonly SkillUseCase      _skillUseCase;
+    private readonly ShopUseCase       _shopUseCase;
 
     // ──────────────────────────────────────────────
     // Public Accessors — UseCase 및 Core 시스템
@@ -58,6 +63,8 @@ public class GameContext
     public IStageMasterDataRepository  StageMasterDataRepo  => _stageMasterDataRepo;
     public ISkillMasterDataRepository  SkillMasterDataRepo  => _skillMasterDataRepo;
     public IEventMasterDataRepository  EventMasterDataRepo  => _eventMasterDataRepo;
+    public IShopMasterDataRepository   ShopMasterDataRepo   => _shopMasterDataRepo;
+    public IShopRepository             ShopRepo             => _shopRepo;
     public EvolutionNodeSO[]           EvolutionNodes       => _evolutionNodes;
     public CharacterUseCase CharacterUseCase  => _characterUseCase;
     public EvolutionUseCase EvolutionUseCase  => _evolutionUseCase;
@@ -65,6 +72,7 @@ public class GameContext
     public EventUseCase     EventUseCase      => _eventUseCase;
     public MiniGameUseCase  MiniGameUseCase   => _miniGameUseCase;
     public SkillUseCase     SkillUseCase      => _skillUseCase;
+    public ShopUseCase      ShopUseCase       => _shopUseCase;
 
     /// <summary>씬 간 데이터 전달 — 훈련 대상 StatType. MiniGameScene 진입 전 설정, 진입 후 즉시 소비.</summary>
     public StatType? PendingTrainingStat { get; set; }
@@ -101,6 +109,8 @@ public class GameContext
         _characterAccountRepo = new CharacterAccountRepository();
         _skillMasterDataRepo  = new SkillMasterDataRepository();
         _eventMasterDataRepo  = new EventMasterDataRepository();
+        _shopMasterDataRepo   = new ShopMasterDataRepository();
+        _shopRepo             = new ShopRepository();
         Debug.Log($"{_logClass} [V-02] StageRepo={_stageRepo.GetType().Name} / StageMasterDataRepo={_stageMasterDataRepo.GetType().Name} 등록 확인.");
 
         // Step 2 — UseCase 생성 (Repository 주입)
@@ -110,6 +120,7 @@ public class GameContext
         _eventUseCase     = new EventUseCase(_eventMasterDataRepo, _characterRunRepo, _stageRepo);
         _miniGameUseCase  = new MiniGameUseCase(_characterRunRepo);
         _skillUseCase     = new SkillUseCase(_skillMasterDataRepo);
+        _shopUseCase      = new ShopUseCase(_shopRepo, _shopMasterDataRepo, _characterRunRepo);
 
         Debug.Log($"{_logClass} DI 조립 완료.");
     }
@@ -135,7 +146,8 @@ public class GameContext
                 _characterRepo.LoadDataAsync(),
                 _stageRepo.LoadAsync(),
                 _characterRunRepo.LoadDataAsync(),
-                _characterAccountRepo.LoadDataAsync()
+                _characterAccountRepo.LoadDataAsync(),
+                _shopRepo.LoadDataAsync()
             );
 
             Debug.Log($"{_logClass} 런타임 데이터 로드 완료.");
@@ -160,6 +172,7 @@ public class GameContext
         _stageRepo.SaveSync();
         _characterRunRepo.SaveDataSync();
         _characterAccountRepo.SaveDataSync();
+        _shopRepo.SaveDataSync();
 
         Debug.Log($"{_logClass} 긴급 동기 저장 완료.");
     }
