@@ -51,12 +51,15 @@ namespace Samsara.Features.Event.MasterData
     {
         [SerializeField] private EventResultType _resultType;
         [SerializeField] private float _value;       // Used for HpChange, StatChange
-        [SerializeField] private bool _useStatType;  // Enable to specify which stat to change
-        [SerializeField] private StatType _statType; // Which stat to change. Only used when _useStatType is true.
+        [SerializeField] private bool _useStatType;    // Enable to specify which stat to change
+        [SerializeField] private StatType _statType;   // Which stat to change. Only used when _useStatType is true.
+        [SerializeField] private bool _hasMerchantId;  // Enable to specify which merchant to activate
+        [SerializeField] private int _merchantId;      // Merchant ID. Only used when _hasMerchantId is true.
 
         public EventResultType ResultType => _resultType;
         public float Value => _value;
         public StatType? StatType => _useStatType ? _statType : (StatType?)null;
+        public int? MerchantId => _hasMerchantId ? _merchantId : (int?)null;
     }
 
     [Serializable]
