@@ -10,30 +10,27 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f2d9857914df4974a9d74f0a192b2af7, type: 3}
-  m_Name: Event_00
+  m_Name: Event_Test_OneShot
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Event.MasterData.EventSO
-  _eventId: 0
-  _eventName: 
+  _eventId: 100
+  _eventName: "\uB0AE\uC120 \uC5EC\uD589\uC790"
   _eventType: 0
   _backgroundSpriteKey: 
   _dialogues:
   - _portraitSpriteKey: 
-    _dialogueText: 
-    _speakerName: 
+    _dialogueText: "\uB0AE\uC120 \uC5EC\uD589\uC790\uAC00 \uB9D0\uC744\uAC74\uB2E4"
+    _speakerName: "\uC5EC\uD589\uC790"
+    _speakerPosition: 0
+  - _portraitSpriteKey: 
+    _dialogueText: "\uCCB4\uB825\uC744 \uD68C\uBCF5\uC2DC\uCF1C\uC8FC\uB9C8"
+    _speakerName: "\uC5EC\uD589"
     _speakerPosition: 0
   _result:
-    _resultType: 2
-    _value: 0
+    _resultType: 1
+    _value: 10
     _useStatType: 0
     _statType: 0
-  _choices:
-  - _choiceText: 
-    _result:
-      _resultType: 0
-      _value: 0
-      _useStatType: 0
-      _statType: 0
-    _nextEventId: 0
+  _choices: []
   _chainTotalSteps: 0
   _chainStep: 0
   _eventSource: 0

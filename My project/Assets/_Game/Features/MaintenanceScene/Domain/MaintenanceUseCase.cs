@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Samsara.Features.Character.Domain;
 using Samsara.Features.Character.MasterData;
+using Samsara.Features.Event.Domain;
 
 namespace Samsara.Features.MaintenanceScene.Domain
 {

@@ -5,6 +5,8 @@ using Samsara.Features.BattleScene.Domain;
 using Samsara.Features.Character.Data;
 using Samsara.Features.Character.Domain;
 using Samsara.Features.Character.MasterData;
+using Samsara.Features.Event.Data;
+using Samsara.Features.Event.Domain;
 using Samsara.Features.MiniGame.Domain;
 using Samsara.Features.Skill.Data;
 using Samsara.Features.Skill.Domain;
@@ -28,7 +30,8 @@ public class GameContext
     private readonly IStageMasterDataRepository  _stageMasterDataRepo;
     private readonly ICharacterRunRepository     _characterRunRepo;
     private readonly ICharacterAccountRepository _characterAccountRepo;
-    private readonly ISkillMasterDataRepository  _skillMasterDataRepo;
+    private readonly ISkillMasterDataRepository    _skillMasterDataRepo;
+    private readonly IEventMasterDataRepository   _eventMasterDataRepo;
 
     // ──────────────────────────────────────────────
     // MasterData Cache
@@ -54,6 +57,7 @@ public class GameContext
     public ICharacterAccountRepository CharacterAccountRepo => _characterAccountRepo;
     public IStageMasterDataRepository  StageMasterDataRepo  => _stageMasterDataRepo;
     public ISkillMasterDataRepository  SkillMasterDataRepo  => _skillMasterDataRepo;
+    public IEventMasterDataRepository  EventMasterDataRepo  => _eventMasterDataRepo;
     public EvolutionNodeSO[]           EvolutionNodes       => _evolutionNodes;
     public CharacterUseCase CharacterUseCase  => _characterUseCase;
     public EvolutionUseCase EvolutionUseCase  => _evolutionUseCase;
@@ -67,6 +71,9 @@ public class GameContext
 
     /// <summary>씬 간 데이터 전달 — 전투 진입 컨텍스트. BattleScene 진입 전 설정, 진입 후 즉시 소비.</summary>
     public PendingBattleContext PendingBattleContext { get; set; }
+
+    /// <summary>씬 간 데이터 전달 — 이벤트 진입 컨텍스트. EventScene 진입 전 설정, 진입 후 소비.</summary>
+    public PendingEventContext PendingEventContext { get; set; }
 
     /// <summary>씬 간 데이터 전달 — 마지막 전투 결과. BattleScene 종료 시 설정, StageScene에서 소비.</summary>
     public BattleResult? LastBattleResult { get; set; }
@@ -93,13 +100,14 @@ public class GameContext
         _characterRunRepo     = new CharacterRunRepository();
         _characterAccountRepo = new CharacterAccountRepository();
         _skillMasterDataRepo  = new SkillMasterDataRepository();
+        _eventMasterDataRepo  = new EventMasterDataRepository();
         Debug.Log($"{_logClass} [V-02] StageRepo={_stageRepo.GetType().Name} / StageMasterDataRepo={_stageMasterDataRepo.GetType().Name} 등록 확인.");
 
         // Step 2 — UseCase 생성 (Repository 주입)
         _characterUseCase = new CharacterUseCase(_characterRepo);
         _evolutionUseCase = new EvolutionUseCase(_characterRepo);
         _stageUseCase     = new StageUseCase(_stageRepo);
-        _eventUseCase     = new EventUseCase(_characterRepo, _stageRepo);
+        _eventUseCase     = new EventUseCase(_eventMasterDataRepo, _characterRunRepo, _stageRepo);
         _miniGameUseCase  = new MiniGameUseCase(_characterRunRepo);
         _skillUseCase     = new SkillUseCase(_skillMasterDataRepo);
 

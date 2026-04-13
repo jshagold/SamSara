@@ -8,5 +8,6 @@ namespace Samsara.Features.Stage.Data
         public int CurrentNodeIndex;
         public List<string> GeneratedNodeIds = new();
         public List<int> CompletedNodeIndices = new();
+        public int PendingChainedEventId = -1;
     }
 }

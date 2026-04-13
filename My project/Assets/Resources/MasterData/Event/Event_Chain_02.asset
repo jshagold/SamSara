@@ -10,30 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f2d9857914df4974a9d74f0a192b2af7, type: 3}
-  m_Name: Event_00
+  m_Name: Event_Chain_02
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Event.MasterData.EventSO
-  _eventId: 0
+  _eventId: 201
   _eventName: 
-  _eventType: 0
+  _eventType: 1
   _backgroundSpriteKey: 
   _dialogues:
   - _portraitSpriteKey: 
-    _dialogueText: 
+    _dialogueText: "\uACB0\uD22C \uB05D"
     _speakerName: 
     _speakerPosition: 0
   _result:
-    _resultType: 2
+    _resultType: 0
     _value: 0
     _useStatType: 0
     _statType: 0
-  _choices:
-  - _choiceText: 
-    _result:
-      _resultType: 0
-      _value: 0
-      _useStatType: 0
-      _statType: 0
-    _nextEventId: 0
-  _chainTotalSteps: 0
-  _chainStep: 0
+  _choices: []
+  _chainTotalSteps: 2
+  _chainStep: 2
   _eventSource: 0

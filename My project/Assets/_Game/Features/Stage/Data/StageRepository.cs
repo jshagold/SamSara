@@ -55,6 +55,12 @@ namespace Samsara.Features.Stage.Data
             _isDirty = true;
         }
 
+        public void SetPendingChainedEventId(int eventId)
+        {
+            _runData.PendingChainedEventId = eventId;
+            _isDirty = true;
+        }
+
         // ──────────────────────────────────────────────
         // Load
         // ──────────────────────────────────────────────

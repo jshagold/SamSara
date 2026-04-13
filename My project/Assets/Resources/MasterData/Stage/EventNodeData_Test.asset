@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a88329fd2be0ccd4db18b3feabf9c747, type: 3}
   m_Name: EventNodeData_Test
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Stage.MasterData.EventNodeDataSO
-  _eventId: 1
+  _eventId: 100

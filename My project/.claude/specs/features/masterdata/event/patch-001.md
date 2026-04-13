@@ -67,4 +67,4 @@ Create new enum file:
 - Files to create: Assets/_Game/Features/Event/MasterData/SpeakerPosition.cs
 - Files to reference: Assets/_Game/Features/Character/MasterData/StatType.cs
 - DO NOT create files outside Assets/_Game/
-- If you make any judgment calls not covered by the Patch, record them in .claude/specs/masterdata/event/decisions.md with [DECISION] tag
+- If you make any judgment calls not covered by the Patch, record them in .claude/specs/features/masterdata/event/decisions.md with [DECISION] tag

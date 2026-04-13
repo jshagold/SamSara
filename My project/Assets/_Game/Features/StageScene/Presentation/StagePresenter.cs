@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Samsara.Core.Navigation;
 using Samsara.Core.Popup;
 using Samsara.Features.BattleScene.Domain;
+using Samsara.Features.Event.Domain;
 using Samsara.Features.Stage.MasterData;
 using Samsara.Features.StageScene.Domain;
 using Samsara.Features.StageScene.Presentation.Popup;
@@ -38,6 +39,9 @@ namespace Samsara.Features.StageScene.Presentation
         {
             // Handle battle result from returning BattleScene
             HandleBattleResultIfAny().Forget();
+
+            // Handle event completion from returning EventScene
+            HandleEventResultIfAny().Forget();
 
             var vm    = _useCase.GetStageSceneViewModel();
             var nodes = _useCase.GetCurrentStageNodes();
@@ -116,8 +120,22 @@ namespace Samsara.Features.StageScene.Presentation
                 var nodeWorldPos = _view.GetNodeWorldPosition(index);
                 await _view.MoveCharacterTo(nodeWorldPos, 0.3f);
 
-                // TODO: [BACKLOG] PendingEventContext 설정
-                await _sceneNavigator.NavigateToAsync(SceneKey.ActionEvent);
+                var eventNodes = _useCase.GetCurrentStageNodes();
+                var eventData  = eventNodes[index].EventData;
+
+                if (eventData == null)
+                {
+                    Debug.LogError($"{_logClass} EventData가 null입니다. 노드 인덱스: {index}");
+                    return;
+                }
+
+                _gameContext.PendingEventContext = new PendingEventContext
+                {
+                    EventId     = eventData.EventId,
+                    ReturnScene = SceneKey.Stage
+                };
+
+                await _sceneNavigator.NavigateToAsync(SceneKey.Event);
                 return;
             }
 
@@ -143,6 +161,21 @@ namespace Samsara.Features.StageScene.Presentation
                     options.Add(new StageOptionData { StageId = stage.StageId, StageName = stage.StageName });
                 _view.ShowStageCompletePopup("Stage Complete!", options);
             }
+        }
+
+        private async UniTaskVoid HandleEventResultIfAny()
+        {
+            var ctx = _gameContext.PendingEventContext;
+            if (ctx == null || !ctx.IsCompleted) return;
+
+            _gameContext.PendingEventContext = null;  // 소비
+
+            var vm = _useCase.GetStageSceneViewModel();
+            int eventNodeIndex = vm.CurrentNodeIndex + 1;
+
+            await _useCase.MoveToNode(eventNodeIndex);
+
+            Debug.Log($"{_logClass} 이벤트 완료 — 노드 {eventNodeIndex} 완료 처리.");
         }
 
         private async UniTaskVoid HandleBattleResultIfAny()
