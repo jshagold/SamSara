@@ -16,7 +16,7 @@ MonoBehaviour:
   _merchantName: "\uD3EC\uC158\uC0C1\uC778"
   _portrait: {fileID: 0}
   _shopSprite: {fileID: 0}
-  _stayDuration: 1
+  _stayDuration: 2
   _saleItems:
   - _potionId: 1
     _stock: 3

@@ -31,6 +31,7 @@ namespace Samsara.Features.Event.Presentation
         public async UniTask<EventResult> RunEventAsync(int eventId)
         {
             _useCase.LoadEvent(eventId);
+            gameObject.SetActive(true);
             _dimBackground.SetActive(true);
 
             // 대사 루프
@@ -56,6 +57,7 @@ namespace Samsara.Features.Event.Presentation
             }
 
             _dimBackground.SetActive(false);
+            gameObject.SetActive(false);
             return result;
         }
 
@@ -66,6 +68,7 @@ namespace Samsara.Features.Event.Presentation
         /// </summary>
         public async UniTask<int> RunDialoguesWithChoicesAsync(EventDialogue[] dialogues, string[] choiceTexts)
         {
+            gameObject.SetActive(true);
             _dimBackground.SetActive(true);
 
             // 대사 루프
@@ -80,6 +83,7 @@ namespace Samsara.Features.Event.Presentation
             _choiceListView.HideChoices();
 
             _dimBackground.SetActive(false);
+            gameObject.SetActive(false);
             return chosen;
         }
 

@@ -18,11 +18,11 @@ MonoBehaviour:
   _backgroundSpriteKey: 
   _dialogues:
   - _portraitSpriteKey: 
-    _dialogueText: "\uC548\uB155\uD558"
+    _dialogueText: "\uC548\uB155\uD558\uC2DC\uC624."
     _speakerName: "\uC0C1\uC778"
     _speakerPosition: 1
   _result:
-    _resultType: 0
+    _resultType: 3
     _value: 0
     _useStatType: 0
     _statType: 0
