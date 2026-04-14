@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RunConfigSO
   _defaultEvolutionNodeId: 10000
   _initialGold: 500
-  _initialDay: 3
-  _initialActionPoints: 5
-  _initialMaxActionPoints: 5
+  _initialDay: 1
+  _initialActionPoints: 3
+  _initialMaxActionPoints: 3
   _startStageId: 1000
   _startNodeIndex: 0
   _initialMerchantAvailable: 0

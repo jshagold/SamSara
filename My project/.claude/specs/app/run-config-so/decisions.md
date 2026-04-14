@@ -71,3 +71,9 @@ D-13 [DECISION] GlobalBootstrapper — RunConfigSO ID 참조값 MasterData 존�
      → DefaultEvolutionNodeId: System.Array.Exists로 EvolutionNodes 배열에서 직접 검색. 없으면 InvalidOperationException.
      → StartStageId: StageMasterDataRepo.GetStageById() 호출 — 이미 throw하므로 catch 후 RunConfigSO 맥락 메시지로 rethrow.
      → 신규 런/기존 저장 데이터 무관하게 항상 실행. 잘못된 RunConfigSO 설정은 앱 시작 시 즉시 감지됨 (Fail Fast).
+
+D-14 [DECISION] StageSceneUseCase.MoveToNode — Day 진행 시 ActionPoints 초기화 및 MarkDirty 누락 수정
+     → 버그: MoveToNode가 Day += 1만 수행하고 ActionPoints를 MaxActionPoints로 리셋하지 않아 AP가 소모된 채로 유지됨.
+     → 부가 버그: RunData를 직접 변경 후 MarkDirty()를 호출하지 않아 SaveDataAsync()가 _isDirty==false 조건으로 저장을 건너뜀.
+        (Day가 인메모리에서는 증가하지만 실제로 파일에 저장되지 않는 숨겨진 버그)
+     → 수정: RunData.ActionPoints = RunData.MaxActionPoints 추가, MarkDirty() 추가 (MiniGameUseCase.ApplyResultAndSave와 동일한 패턴).

@@ -69,7 +69,9 @@ namespace Samsara.Features.StageScene.Domain
         public async UniTask MoveToNode(int targetIndex)
         {
             _characterRunRepo.RunData.Day += 1;
+            _characterRunRepo.RunData.ActionPoints = _characterRunRepo.RunData.MaxActionPoints;
             _stageRepo.CompleteNode(_stageRepo.RunData.CurrentNodeIndex);
+            _characterRunRepo.MarkDirty();
             await UniTask.WhenAll(
                 _stageRepo.SaveAsync(),
                 _characterRunRepo.SaveDataAsync()
