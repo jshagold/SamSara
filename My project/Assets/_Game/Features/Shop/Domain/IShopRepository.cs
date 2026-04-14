@@ -15,6 +15,7 @@ namespace Samsara.Features.Shop.Domain
         void                ClearActiveMerchant();
         Dictionary<int, int> GetRemainingStock();
         void                DecrementStock(int potionId);
+        void                InitializeNewRun(RunConfigSO config);
         void                ResetRunData();
     }
 }

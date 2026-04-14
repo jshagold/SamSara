@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Cysharp.Threading.Tasks;
 using Samsara.Features.Stage.Data;
@@ -28,6 +29,11 @@ namespace Samsara.Dev.Stage
 
             bool fileExisted = File.Exists(savePath);
             if (fileExisted) File.Move(savePath, backupPath);
+
+            var runConfig = Resources.Load<RunConfigSO>("MasterData/DefaultRunConfig");
+            if (runConfig == null)
+                throw new InvalidOperationException(
+                    $"{_logClass} DefaultRunConfig.asset이 Resources/MasterData/에 없습니다.");
 
             try
             {
@@ -68,8 +74,8 @@ namespace Samsara.Dev.Stage
                 Debug.Log($"{_logClass} --- [Case 3] Positive Control: Dirty=true → 파일 생성 ---");
 
                 var repoPositive = new StageRepository();
-                await repoPositive.LoadAsync();         // _isDirty=false
-                repoPositive.InitializeRun("v06_ctrl"); // _isDirty=true
+                await repoPositive.LoadAsync();              // _isDirty=false
+                repoPositive.InitializeNewRun(runConfig);    // _isDirty=true
                 await repoPositive.SaveAsync();
 
                 bool case3Pass = File.Exists(savePath);

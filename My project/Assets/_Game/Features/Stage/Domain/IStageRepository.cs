@@ -7,7 +7,7 @@ namespace Samsara.Features.Stage.Domain
     public interface IStageRepository
     {
         StageRunData RunData { get; }
-        void InitializeRun(string startStageId);
+        void InitializeNewRun(RunConfigSO config);
         void CompleteNode(int nodeIndex);
         void TransitionToStage(string stageId);
         void SetGeneratedNodes(List<string> nodeIds);

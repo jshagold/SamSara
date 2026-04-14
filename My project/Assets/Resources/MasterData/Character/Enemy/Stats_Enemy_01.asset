@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bde1bb42d13ddc04eb868b24537e8d5a, type: 3}
   m_Name: Stats_Enemy_01
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Character.MasterData.CharacterStatsSO
-  _hp: 0
-  _strength: 0
+  _hp: 10
+  _strength: 10
   _toughness: 0
-  _speed: 0
+  _agility: 5

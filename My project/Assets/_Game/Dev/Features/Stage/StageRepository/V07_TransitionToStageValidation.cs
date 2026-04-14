@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Cysharp.Threading.Tasks;
@@ -35,12 +36,18 @@ namespace Samsara.Dev.Stage
             bool fileExisted = File.Exists(savePath);
             if (fileExisted) File.Move(savePath, backupPath);
 
+            var runConfig = Resources.Load<RunConfigSO>("MasterData/DefaultRunConfig");
+            if (runConfig == null)
+                throw new InvalidOperationException(
+                    $"{_logClass} DefaultRunConfig.asset이 Resources/MasterData/에 없습니다.");
+
             try
             {
                 var repo = new StageRepository();
 
                 // ── Phase 1: 초기 상태 구성 ──────────────────────────────
-                repo.InitializeRun(Stage01);
+                repo.InitializeNewRun(runConfig);
+                repo.RunData.CurrentStageId = Stage01; // 테스트 전용 StageId 강제 설정
                 repo.SetGeneratedNodes(new List<string> { "node_a", "node_b", "node_c" });
                 repo.CompleteNode(0);   // CompletedNodeIndices=[0], CurrentNodeIndex=1
                 repo.CompleteNode(1);   // CompletedNodeIndices=[0,1], CurrentNodeIndex=2

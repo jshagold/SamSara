@@ -19,7 +19,7 @@ MonoBehaviour:
   _qtePatternId: 9002
   _costs:
   - _costType: 0
-    _value: 3
+    _value: 2
   - _costType: 1
     _value: 10
   _effects: []

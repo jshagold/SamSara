@@ -21,13 +21,13 @@ namespace Samsara.Features.Stage.Data
         // Mutation — Save-on-Action
         // ──────────────────────────────────────────────
 
-        public void InitializeRun(string startStageId)
+        public void InitializeNewRun(RunConfigSO config)
         {
             _runData = new StageRunData
             {
-                CurrentStageId     = startStageId,
-                CurrentNodeIndex   = 0,
-                GeneratedNodeIds   = new List<string>(),
+                CurrentStageId       = config.StartStageId.ToString(),
+                CurrentNodeIndex     = config.StartNodeIndex,
+                GeneratedNodeIds     = new List<string>(),
                 CompletedNodeIndices = new List<int>()
             };
             _isDirty = true;

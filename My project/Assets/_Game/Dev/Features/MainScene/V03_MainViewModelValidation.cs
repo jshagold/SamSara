@@ -1,6 +1,6 @@
+using System;
 using Cysharp.Threading.Tasks;
 using Samsara.Features.Character.Data;
-using Samsara.Features.Character.MasterData;
 using Samsara.Features.MainScene.Domain;
 using UnityEngine;
 
@@ -15,8 +15,6 @@ namespace Samsara.Dev.MainScene
     {
         private readonly string _logClass = $"[{nameof(V03_MainViewModelValidation)}]";
 
-        [SerializeField] private CharacterStatsSO _testStats;
-
         private const string TestNodeId = "v03_main_node";
 
         private void Start()
@@ -28,10 +26,15 @@ namespace Samsara.Dev.MainScene
         {
             Debug.Log($"{_logClass} === V-03 검증 시작: MainUseCase.GetMainViewModel() 매핑 검증 ===");
 
+            var runConfig = Resources.Load<RunConfigSO>("MasterData/DefaultRunConfig");
+            if (runConfig == null)
+                throw new InvalidOperationException(
+                    $"{_logClass} DefaultRunConfig.asset이 Resources/MasterData/에 없습니다.");
+
             // ── 테스트용 RunData 준비 ──
             var runRepo = new CharacterRunRepository();
             await runRepo.LoadDataAsync();
-            runRepo.InitializeNewRun(TestNodeId, _testStats);
+            runRepo.InitializeNewRun(runConfig);
 
             // ActionPoints 수동 설정 (InitializeNewRun에서 설정하지 않으므로)
             runRepo.RunData.ActionPoints = 3;

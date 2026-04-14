@@ -1,7 +1,6 @@
 using System.IO;
 using Cysharp.Threading.Tasks;
 using Samsara.Features.Character.Data;
-using Samsara.Features.Character.MasterData;
 using UnityEngine;
 
 namespace Samsara.Dev.Character
@@ -14,7 +13,7 @@ namespace Samsara.Dev.Character
     public class V03_DefaultValueValidation : MonoBehaviour
     {
         private readonly string _logClass = $"[{nameof(V03_DefaultValueValidation)}]";
-        [SerializeField] private CharacterStatsSO _testCharacterStats;
+
         private void Start()
         {
             RunTest().Forget();
@@ -31,7 +30,7 @@ namespace Samsara.Dev.Character
             Debug.Log($"[Test] V-03 - Gems: {accountRepo.AccountData.Gems}, UnlockedNodes: {accountRepo.AccountData.UnlockedEvolutionNodeIds.Count}");
 
             // V-04: InitializeNewRun으로 _isDirty = true 만든 후 저장
-            runRepo.InitializeNewRun("test_node_id", _testCharacterStats);
+            runRepo.InitializeNewRun(GlobalBootstrapper.Instance.GameContext.RunConfig);
             await accountRepo.SaveDataAsync();
             Debug.Log($"[Test] V-04 - SavePath: {Application.persistentDataPath}");
         }

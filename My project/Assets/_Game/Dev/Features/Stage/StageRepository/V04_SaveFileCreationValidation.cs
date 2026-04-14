@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Cysharp.Threading.Tasks;
 using Samsara.Features.Stage.Data;
@@ -29,15 +30,20 @@ namespace Samsara.Dev.Stage
             bool fileExisted = File.Exists(savePath);
             if (fileExisted) File.Move(savePath, backupPath);
 
+            var runConfig = Resources.Load<RunConfigSO>("MasterData/DefaultRunConfig");
+            if (runConfig == null)
+                throw new InvalidOperationException(
+                    $"{_logClass} DefaultRunConfig.asset이 Resources/MasterData/에 없습니다.");
+
             try
             {
                 // ── SaveAsync() 전: 파일 미존재 확인 ─────────────────────────
                 bool fileAbsentBefore = !File.Exists(savePath);
                 LogCheck("SaveAsync() 전: stage_run_save.json 없음", fileAbsentBefore);
 
-                // ── InitializeRun → 내부 SaveAsync().Forget() 경유 파일 생성 ─
+                // ── InitializeNewRun → SaveAsync() 경유 파일 생성 ─
                 var repo = new StageRepository();
-                repo.InitializeRun("v04_stage");
+                repo.InitializeNewRun(runConfig);
                 await repo.SaveAsync();
 
                 bool fileCreated = File.Exists(savePath);

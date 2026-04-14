@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c940a4430c8a56549b890eb86da8dde2, type: 3}
   m_Name: evo_test_node
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Character.MasterData.EvolutionNodeSO
-  _nodeId: test_node_id
+  _nodeId: 10000
   _characterName: Test Hero
-  _baseStats: {fileID: 11400000, guid: 193c663725568454289f2d0bfcf30ea8, type: 2}
+  _baseStats: {fileID: 11400000, guid: b53bf6e5dd4d60d4aaae34c85cdb0f05, type: 2}
   _maxActionPoints: 3
   _unlockConditions: []
   _isHidden: 0
   _nextNodes:
   - {fileID: 11400000, guid: 6775ae952597bcb4db3067bc5dc8760a, type: 2}
+  _nodeIconSprite: {fileID: 0}
   _nodeIconSpriteKey: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
   _mainStandingSpriteKey: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
   _portraitSpriteKey: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png

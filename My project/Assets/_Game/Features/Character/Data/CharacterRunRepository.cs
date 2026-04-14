@@ -2,7 +2,6 @@ using System.IO;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using Samsara.Features.Character.Domain;
-using Samsara.Features.Character.MasterData;
 using UnityEngine;
 
 namespace Samsara.Features.Character.Data
@@ -37,18 +36,18 @@ namespace Samsara.Features.Character.Data
         /// <summary>Dev 전용. 외부에서 dirty 플래그를 강제로 설정한다.</summary>
         public void MarkDirty() => _isDirty = true;
 
-        public void InitializeNewRun(string startingEvolutionNodeId, CharacterStatsSO baseStats)
+        public void InitializeNewRun(RunConfigSO config)
         {
             _runData = new CharacterRunData
             {
-                Hp = baseStats.Hp,
-                MaxHp = baseStats.Hp,
-                Strength = baseStats.Strength,
-                Toughness = baseStats.Toughness,
-                Agility = baseStats.Agility,
-                EvolutionNodeId = startingEvolutionNodeId,
-                Day = 1,
-                Gold = 500
+                EvolutionNodeId  = config.DefaultEvolutionNodeId.ToString(),
+                Day              = config.InitialDay,
+                Gold             = config.InitialGold,
+                ActionPoints     = config.InitialActionPoints,
+                MaxActionPoints  = config.InitialMaxActionPoints
+                // Hp, MaxHp, Strength, Toughness, Agility:
+                // DefaultEvolutionNodeId에 해당하는 EvolutionNodeSO.BaseStats에서 설정.
+                // GlobalBootstrapper Step 4-E 참조.
             };
             _isDirty = true;
         }

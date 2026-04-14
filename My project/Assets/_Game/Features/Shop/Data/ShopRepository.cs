@@ -95,6 +95,14 @@ namespace Samsara.Features.Shop.Data
             _isDirty = true;
         }
 
+        public void InitializeNewRun(RunConfigSO config)
+        {
+            _runData = new ShopRunData();
+            // config.InitialMerchantAvailable == false → ShopRunData 기본값(ActiveMerchantId=-1)과 일치.
+            // [SPEC-GAP] true 케이스는 초기 merchantId가 스펙에 미정의 — Phase 6에서 구체화.
+            _isDirty = true;
+        }
+
         public void ResetRunData()
         {
             _runData = new ShopRunData();

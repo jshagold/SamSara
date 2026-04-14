@@ -33,6 +33,7 @@ public class GlobalBootstrapper : MonoBehaviour
 
     [SerializeField] private FallbackErrorCanvas _fallbackCanvas;
     [SerializeField] private CommonPopupView     _popupViewPrefab;
+    [SerializeField] private RunConfigSO         _runConfig;
 
     // ──────────────────────────────────────────────
     // Public API
@@ -81,10 +82,14 @@ public class GlobalBootstrapper : MonoBehaviour
         {
             Debug.Log($"{_logClass} 초기화 시작 (시도 {_retryCount + 1})");
 
-            // Step 1 — MasterData 로드 (ThreadPool에서 I/O 처리)
+            // Step 1 — MasterData 로드 (메인 스레드에서 동기 로드)
             var masterData = Resources.LoadAll<ScriptableObject>("MasterData");
 
-            Debug.Log($"{_logClass} Step 1 완료 — MasterData {masterData.Length}개 로드");
+            if (_runConfig == null)
+                throw new InvalidOperationException(
+                    $"{_logClass} RunConfigSO가 Inspector에 연결되지 않았습니다.");
+
+            Debug.Log($"{_logClass} Step 1 완료 — MasterData {masterData.Length}개 로드, RunConfig={_runConfig.name}");
 
             // Step 2 — Core 시스템 생성
             _sceneNavigator = new SceneNavigator();
@@ -107,7 +112,7 @@ public class GlobalBootstrapper : MonoBehaviour
             Debug.Log($"{_logClass} Step 2 완료 — Core 시스템 생성");
 
             // Step 3 — GameContext 생성 및 DI 조립
-            _gameContext = new GameContext(masterData, _popupManager);
+            _gameContext = new GameContext(masterData, _popupManager, _runConfig);
 
             Debug.Log($"{_logClass} Step 3 완료 — GameContext 조립");
 
@@ -115,6 +120,55 @@ public class GlobalBootstrapper : MonoBehaviour
             await _gameContext.LoadAllDataAsync();
 
             Debug.Log($"{_logClass} Step 4 완료 — 런타임 데이터 로드");
+
+            // Step 4-A — 신규 런 자동 초기화 (저장 데이터 없을 때)
+            // TODO: Phase 6 — Move to SplashScene/ReplayScene
+            {
+                var characterRunRepo = _gameContext.CharacterRunRepo;
+                var runData          = characterRunRepo.RunData;
+
+                bool isUninitialized = runData.Day == 0 || string.IsNullOrEmpty(runData.EvolutionNodeId);
+                if (isUninitialized)
+                {
+                    characterRunRepo.InitializeNewRun(_runConfig);
+                    _gameContext.StageRepo.InitializeNewRun(_runConfig);
+                    _gameContext.ShopRepo.InitializeNewRun(_runConfig);
+
+                    // EvolutionNodeSO.BaseStats → CharacterRunData 스탯 적용
+                    var nodeId = characterRunRepo.RunData.EvolutionNodeId;
+                    foreach (var node in _gameContext.EvolutionNodes)
+                    {
+                        if (node.NodeId != nodeId || node.BaseStats == null) continue;
+                        var d       = characterRunRepo.RunData;
+                        d.Hp        = node.BaseStats.Hp;
+                        d.MaxHp     = node.BaseStats.Hp;
+                        d.Strength  = node.BaseStats.Strength;
+                        d.Toughness = node.BaseStats.Toughness;
+                        d.Agility   = node.BaseStats.Agility;
+                        break;
+                    }
+
+                    await UniTask.WhenAll(
+                        characterRunRepo.SaveDataAsync(),
+                        _gameContext.StageRepo.SaveAsync(),
+                        _gameContext.ShopRepo.SaveDataAsync()
+                    );
+
+                    Debug.Log($"{_logClass} Step 4-A 완료 — 신규 런 초기화 (RunConfig 기반).");
+                }
+            }
+
+            // Validation: RunConfigSO ID references must exist in MasterData
+            {
+                var defaultNodeId = _runConfig.DefaultEvolutionNodeId.ToString();
+                if (!System.Array.Exists(_gameContext.EvolutionNodes, n => n.NodeId == defaultNodeId))
+                    throw new InvalidOperationException(
+                        $"{_logClass} [Validation] RunConfigSO.DefaultEvolutionNodeId({_runConfig.DefaultEvolutionNodeId})에 해당하는 EvolutionNodeSO가 MasterData에 없습니다.");
+
+                try { _gameContext.StageMasterDataRepo.GetStageById(_runConfig.StartStageId.ToString()); }
+                catch { throw new InvalidOperationException(
+                    $"{_logClass} [Validation] RunConfigSO.StartStageId({_runConfig.StartStageId})에 해당하는 StageSO가 MasterData에 없습니다."); }
+            }
 
             // Step 5 — 초기화 완료 신호
             _initTcs.TrySetResult();

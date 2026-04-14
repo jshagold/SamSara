@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b21feddf04be94e83ec45135c6635a, type: 3}
+  m_Name: DefaultRunConfig
+  m_EditorClassIdentifier: Assembly-CSharp::RunConfigSO
+  _defaultEvolutionNodeId: 10000
+  _initialGold: 500
+  _initialDay: 3
+  _initialActionPoints: 5
+  _initialMaxActionPoints: 5
+  _startStageId: 1000
+  _startNodeIndex: 0
+  _initialMerchantAvailable: 0
+  _inventorySlotCount: 3

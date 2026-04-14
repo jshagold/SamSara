@@ -167,6 +167,7 @@ MonoBehaviour:
   _fallbackCanvas: {fileID: 1176828022}
   _popupViewPrefab: {fileID: 2015548959590548109, guid: 697a76934777cbc4180487bf0c1c45d2,
     type: 3}
+  _runConfig: {fileID: 11400000, guid: c4b4c5b103c30c747b667c98b4675f6b, type: 2}
 --- !u!1 &389192223
 GameObject:
   m_ObjectHideFlags: 0
@@ -328,21 +329,21 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1101874596}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b1c4653b867c0244a92c786c0bf18120, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Dev.Character.DebugRunDataEditor
-  _hp: 100
-  _maxHp: 100
-  _strength: 10
-  _toughness: 10
-  _agility: 10
-  _gold: 1000
-  _actionPoints: 3
-  _maxActionPoints: 3
-  _day: 1
-  _evolutionNodeId: test_node_id
+  _hp: 0
+  _maxHp: 0
+  _strength: 0
+  _toughness: 0
+  _agility: 0
+  _gold: 0
+  _actionPoints: 0
+  _maxActionPoints: 0
+  _day: 0
+  _evolutionNodeId: 
   _loadOnStart: 0
   _applyOnStart: 1
 --- !u!4 &1101874598
@@ -367,12 +368,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1101874596}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ad9b0411b2864d44d93a4c9bc13d0e65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Dev.Stage.DebugStageRunDataEditor
-  _currentStageId: stage_test_01
+  _currentStageId: 
   _currentNodeIndex: 0
   _generatedNodeIds: []
   _completedNodeIndices: 
@@ -1319,8 +1320,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e57280a52d334240a3839833f37b9bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Dev.V03_DefaultValueValidation
-  _testCharacterStats: {fileID: 11400000, guid: 0527ec4a310892646bbe1fa4ef58dec5,
-    type: 2}
 --- !u!4 &1812212944
 Transform:
   m_ObjectHideFlags: 0
@@ -1348,7 +1347,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4c24db57c912384995063c59cfe9bc6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Dev.V05_SaveRestoreValidation
-  _testStats: {fileID: 11400000, guid: b0b7dd43cf40d114eaae4c3ce99817bd, type: 2}
 --- !u!114 &1812212946
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1373,7 +1371,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18d3281f49501254e98fc60f7ab18d8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Dev.V08_InitializeNewRunValidation
-  _testStats: {fileID: 11400000, guid: b0b7dd43cf40d114eaae4c3ce99817bd, type: 2}
 --- !u!114 &1812212948
 MonoBehaviour:
   m_ObjectHideFlags: 0

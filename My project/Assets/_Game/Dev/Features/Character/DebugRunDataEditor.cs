@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Samsara.Features.Character.Data;
+using Samsara.Features.Character.MasterData;
 using UnityEngine;
 
 namespace Samsara.Dev.Character
@@ -17,20 +18,46 @@ namespace Samsara.Dev.Character
         private readonly string _logClass = $"[{nameof(DebugRunDataEditor)}]";
 
         [Header("적용할 값")]
-        [SerializeField] private int    _hp             = 100;
-        [SerializeField] private int    _maxHp          = 100;
-        [SerializeField] private int    _strength       = 10;
-        [SerializeField] private int    _toughness      = 10;
-        [SerializeField] private int    _agility        = 10;
+        [SerializeField] private int    _hp             = 0;
+        [SerializeField] private int    _maxHp          = 0;
+        [SerializeField] private int    _strength       = 0;
+        [SerializeField] private int    _toughness      = 0;
+        [SerializeField] private int    _agility        = 0;
         [SerializeField] private int    _gold           = 0;
-        [SerializeField] private int    _actionPoints   = 3;
-        [SerializeField] private int    _maxActionPoints = 3;
-        [SerializeField] private int    _day            = 1;
-        [SerializeField] private string _evolutionNodeId = "test_node_id";
+        [SerializeField] private int    _actionPoints   = 0;
+        [SerializeField] private int    _maxActionPoints = 0;
+        [SerializeField] private int    _day            = 0;
+        [SerializeField] private string _evolutionNodeId = "";
 
         [Header("옵션")]
         [SerializeField] private bool _loadOnStart = true;
         [SerializeField] private bool _applyOnStart = false;
+
+        /// <summary>컴포넌트 추가 또는 Inspector Reset 시 RunConfigSO 기반으로 기본값을 설정한다.</summary>
+        private void Reset()
+        {
+            var runConfig = Resources.Load<RunConfigSO>("MasterData/DefaultRunConfig");
+            if (runConfig == null) return;
+
+            _gold            = runConfig.InitialGold;
+            _actionPoints    = runConfig.InitialActionPoints;
+            _maxActionPoints = runConfig.InitialMaxActionPoints;
+            _day             = runConfig.InitialDay;
+            _evolutionNodeId = runConfig.DefaultEvolutionNodeId.ToString();
+
+            var nodeId   = _evolutionNodeId;
+            var allNodes = Resources.LoadAll<EvolutionNodeSO>("MasterData");
+            foreach (var node in allNodes)
+            {
+                if (node.NodeId != nodeId || node.BaseStats == null) continue;
+                _hp        = node.BaseStats.Hp;
+                _maxHp     = node.BaseStats.Hp;
+                _strength  = node.BaseStats.Strength;
+                _toughness = node.BaseStats.Toughness;
+                _agility   = node.BaseStats.Agility;
+                break;
+            }
+        }
 
         private void Start()
         {

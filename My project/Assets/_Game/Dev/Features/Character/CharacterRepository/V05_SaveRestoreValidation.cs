@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Cysharp.Threading.Tasks;
 using Samsara.Features.Character.Data;
-using Samsara.Features.Character.MasterData;
 using UnityEngine;
 
 namespace Samsara.Dev.Character
@@ -16,8 +15,6 @@ namespace Samsara.Dev.Character
     {
         private readonly string _logClass = $"[{nameof(V05_SaveRestoreValidation)}]";
 
-        [SerializeField] private CharacterStatsSO _testStats;
-
         // ── 검증에 사용할 고정 테스트 값 ──────────────────────────────
         private const string TestStartNodeId   = "v05_start_node";
         private const string TestUnlockedNodeId = "v05_unlocked_node";
@@ -30,8 +27,9 @@ namespace Samsara.Dev.Character
 
         private async UniTask RunValidationAsync()
         {
-            if (_testStats == null)
-                throw new InvalidOperationException($"{_logClass} _testStats가 Inspector에서 할당되지 않았습니다.");
+            var runConfig = Resources.Load<RunConfigSO>("MasterData/DefaultRunConfig");
+            if (runConfig == null)
+                throw new InvalidOperationException($"{_logClass} DefaultRunConfig.asset이 Resources/MasterData/에 없습니다.");
 
             Debug.Log($"{_logClass} === V-05 검증 시작: SaveDataAsync() 후 값 복원 ===");
 
@@ -55,10 +53,7 @@ namespace Samsara.Dev.Character
 
                 // RunRepository: InitializeNewRun → SaveDataAsync
                 var runRepoWriter = new CharacterRunRepository();
-                runRepoWriter.InitializeNewRun(TestStartNodeId, _testStats);
-                // InitializeNewRun 내부의 Forget() 저장과 경합 없이 완료를 보장.
-                // _isDirty=false 는 File.WriteAllText 완료 이후 설정되므로,
-                // early-return 했다면 파일은 이미 디스크에 존재함.
+                runRepoWriter.InitializeNewRun(runConfig);
                 await runRepoWriter.SaveDataAsync();
 
                 // AccountRepository: Load → Unlock/Codex → SaveDataAsync
@@ -93,32 +88,29 @@ namespace Samsara.Dev.Character
                 // ── CharacterRunData 검증 ────────────────────────────────
                 Debug.Log($"{_logClass} --- [CharacterRunData 복원 검증] ---");
 
+                // V-05 갱신: InitializeNewRun(RunConfigSO) 이후 stats(Hp 등)는 0.
+                // EvolutionNodeId, Day, Gold, ActionPoints, MaxActionPoints를 config 값으로 검증.
                 bool runNotNull = runData != null;
-                LogCheck("RunData != null",                      runNotNull);
-                LogCheck($"Hp == {_testStats.Hp}",               runNotNull && runData.Hp         == _testStats.Hp,
-                                                                  runNotNull ? $"실제={runData.Hp}"          : "null");
-                LogCheck($"Strength == {_testStats.Strength}",   runNotNull && runData.Strength   == _testStats.Strength,
-                                                                  runNotNull ? $"실제={runData.Strength}"    : "null");
-                LogCheck($"Toughness == {_testStats.Toughness}", runNotNull && runData.Toughness  == _testStats.Toughness,
-                                                                  runNotNull ? $"실제={runData.Toughness}"   : "null");
-                LogCheck($"Agility == {_testStats.Agility}",       runNotNull && runData.Agility      == _testStats.Agility,
-                                                                  runNotNull ? $"실제={runData.Agility}"       : "null");
-                LogCheck($"EvolutionNodeId == \"{TestStartNodeId}\"",
-                                                                  runNotNull && runData.EvolutionNodeId == TestStartNodeId,
-                                                                  runNotNull ? $"실제=\"{runData.EvolutionNodeId}\"" : "null");
-                LogCheck("Day == 1",                             runNotNull && runData.Day  == 1,
-                                                                  runNotNull ? $"실제={runData.Day}"         : "null");
-                LogCheck("Gold == 0",                            runNotNull && runData.Gold == 0,
-                                                                  runNotNull ? $"실제={runData.Gold}"        : "null");
+                string expectedNodeId = runConfig.DefaultEvolutionNodeId.ToString();
+                LogCheck("RunData != null", runNotNull);
+                LogCheck($"EvolutionNodeId == \"{expectedNodeId}\"",
+                          runNotNull && runData.EvolutionNodeId == expectedNodeId,
+                          runNotNull ? $"실제=\"{runData.EvolutionNodeId}\"" : "null");
+                LogCheck($"Day == {runConfig.InitialDay}",
+                          runNotNull && runData.Day == runConfig.InitialDay,
+                          runNotNull ? $"실제={runData.Day}" : "null");
+                LogCheck($"Gold == {runConfig.InitialGold}",
+                          runNotNull && runData.Gold == runConfig.InitialGold,
+                          runNotNull ? $"실제={runData.Gold}" : "null");
+                LogCheck($"ActionPoints == {runConfig.InitialActionPoints}",
+                          runNotNull && runData.ActionPoints == runConfig.InitialActionPoints,
+                          runNotNull ? $"실제={runData.ActionPoints}" : "null");
 
                 bool runPass = runNotNull
-                    && runData.Hp              == _testStats.Hp
-                    && runData.Strength        == _testStats.Strength
-                    && runData.Toughness       == _testStats.Toughness
-                    && runData.Agility           == _testStats.Agility
-                    && runData.EvolutionNodeId == TestStartNodeId
-                    && runData.Day             == 1
-                    && runData.Gold            == 0;
+                    && runData.EvolutionNodeId == expectedNodeId
+                    && runData.Day             == runConfig.InitialDay
+                    && runData.Gold            == runConfig.InitialGold
+                    && runData.ActionPoints    == runConfig.InitialActionPoints;
 
                 // ── CharacterAccountData 검증 ────────────────────────────
                 Debug.Log($"{_logClass} --- [CharacterAccountData 복원 검증] ---");

@@ -1,13 +1,12 @@
 using Cysharp.Threading.Tasks;
 using Samsara.Features.Character.Data;
-using Samsara.Features.Character.MasterData;
 
 namespace Samsara.Features.Character.Domain
 {
     public interface ICharacterRunRepository
     {
         CharacterRunData RunData { get; }
-        void InitializeNewRun(string startingEvolutionNodeId, CharacterStatsSO baseStats);
+        void InitializeNewRun(RunConfigSO config);
         void MarkDirty();
         UniTask SaveDataAsync();
         void SaveDataSync();

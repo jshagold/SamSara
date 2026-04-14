@@ -56,6 +56,7 @@ public class GameContext
     // ──────────────────────────────────────────────
     // Public Accessors — UseCase 및 Core 시스템
     // ──────────────────────────────────────────────
+    public RunConfigSO                  RunConfig            { get; }
     public IPopupManager               PopupManager         { get; }
     public IStageRepository            StageRepo            => _stageRepo;
     public ICharacterRunRepository     CharacterRunRepo     => _characterRunRepo;
@@ -91,8 +92,9 @@ public class GameContext
     // ──────────────────────────────────────────────
     /// <param name="masterData">GlobalBootstrapper가 로드한 MasterData 전체.</param>
     /// <param name="popupManager">GlobalBootstrapper가 생성한 IPopupManager 인스턴스.</param>
-    public GameContext(ScriptableObject[] masterData, IPopupManager popupManager)
+    public GameContext(ScriptableObject[] masterData, IPopupManager popupManager, RunConfigSO runConfig)
     {
+        RunConfig    = runConfig;
         PopupManager = popupManager;
 
         // MasterData Cache — masterData 배열에서 EvolutionNodeSO만 필터링

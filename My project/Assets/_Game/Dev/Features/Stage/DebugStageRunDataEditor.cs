@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Samsara.Features.Stage.Data;
@@ -19,14 +20,23 @@ namespace Samsara.Dev.Stage
         private readonly string _logClass = $"[{nameof(DebugStageRunDataEditor)}]";
 
         [Header("적용할 값")]
-        [SerializeField] private string _currentStageId = "stage_test_01";
+        [SerializeField] private string _currentStageId = "";
         [SerializeField] private int _currentNodeIndex;
         [SerializeField] private List<string> _generatedNodeIds = new();
         [SerializeField] private List<int> _completedNodeIndices = new();
 
         [Header("옵션")]
         [SerializeField] private bool _loadOnStart = true;
-        [SerializeField] private bool _applyOnStart = true;
+        [SerializeField] private bool _applyOnStart = false;
+
+        /// <summary>컴포넌트 추가 또는 Inspector Reset 시 RunConfigSO 기반으로 기본값을 설정한다.</summary>
+        private void Reset()
+        {
+            var runConfig = Resources.Load<RunConfigSO>("MasterData/DefaultRunConfig");
+            if (runConfig == null) return;
+
+            _currentStageId = runConfig.StartStageId.ToString();
+        }
 
         private void Start()
         {
@@ -57,9 +67,15 @@ namespace Samsara.Dev.Stage
             var repo = GetRepo();
             if (repo == null) return;
 
-            repo.InitializeRun(_currentStageId);
+            var runConfig = Resources.Load<RunConfigSO>("MasterData/DefaultRunConfig");
+            if (runConfig == null)
+                throw new InvalidOperationException(
+                    $"{_logClass} DefaultRunConfig.asset이 Resources/MasterData/에 없습니다.");
+
+            repo.InitializeNewRun(runConfig);
 
             var d = repo.RunData;
+            d.CurrentStageId = _currentStageId;
             d.CurrentNodeIndex = _currentNodeIndex;
             d.GeneratedNodeIds = new List<string>(_generatedNodeIds);
             d.CompletedNodeIndices = new List<int>(_completedNodeIndices);

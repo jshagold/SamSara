@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Cysharp.Threading.Tasks;
@@ -36,16 +37,20 @@ namespace Samsara.Dev.Stage
             bool fileExisted = File.Exists(savePath);
             if (fileExisted) File.Move(savePath, backupPath);
 
+            var runConfig = Resources.Load<RunConfigSO>("MasterData/DefaultRunConfig");
+            if (runConfig == null)
+                throw new InvalidOperationException(
+                    $"{_logClass} DefaultRunConfig.asset이 Resources/MasterData/에 없습니다.");
+
             try
             {
                 // ════════════════════════════════════════════════════════════
                 // Phase 1 — 테스트 값 기록 (저장)
-                // mutation마다 내부 SaveAsync().Forget()이 발생하므로
-                // 각 호출 후 Delay를 삽입하여 쓰기 경쟁을 방지한다.
                 // ════════════════════════════════════════════════════════════
                 var writerRepo = new StageRepository();
 
-                writerRepo.InitializeRun(TestStageId);
+                writerRepo.InitializeNewRun(runConfig);
+                writerRepo.RunData.CurrentStageId = TestStageId; // 테스트 전용 StageId 강제 설정
                 writerRepo.SetGeneratedNodes(new List<string> { TestNodeA, TestNodeB, TestNodeC });
                 writerRepo.CompleteNode(0); // CompletedNodeIndices=[0], CurrentNodeIndex=1
                 await writerRepo.SaveAsync();

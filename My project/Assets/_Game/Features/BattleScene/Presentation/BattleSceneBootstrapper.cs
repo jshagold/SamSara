@@ -1,7 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Samsara.Features.BattleScene.Domain;
-using Samsara.Features.Character.MasterData;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -53,6 +52,7 @@ namespace Samsara.Features.BattleScene.Presentation
             var pendingContext = gameContext.PendingBattleContext;
 
 #if UNITY_EDITOR
+            // PendingBattleContext가 없으면 테스트 데이터로 대체한다. (Editor only)
             if (pendingContext == null)
             {
                 var testNode = Resources.Load<Samsara.Features.Stage.MasterData.BattleNodeDataSO>("MasterData/battlenode_test_normal");
@@ -65,14 +65,6 @@ namespace Samsara.Features.BattleScene.Presentation
                 Debug.LogWarning($"{_logClass} PendingBattleContext가 null — 테스트 데이터로 대체합니다. " +
                                  $"EnemySpawns={testNode.EnemySpawns?.Length} (Editor only)");
             }
-
-            // 에디터 직접 실행 시: run_save.json 값과 무관하게 테스트 아군 스탯으로 강제 초기화.
-            // stats_test_ally.asset (HP=100, STR=15, TGH=10, AGI=40) 사용.
-            var testAllyStats = Resources.Load<CharacterStatsSO>("MasterData/stats_test_ally");
-            if (testAllyStats != null)
-                characterRunRepo.InitializeNewRun("test_node_id", testAllyStats);
-            else
-                Debug.LogWarning($"{_logClass} stats_test_ally.asset 없음 — Samsara > Dev > Create Test Battle Data를 먼저 실행하세요.");
 #else
             if (pendingContext == null)
                 throw new InvalidOperationException(

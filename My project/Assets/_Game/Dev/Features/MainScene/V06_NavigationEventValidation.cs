@@ -1,8 +1,8 @@
+using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Samsara.Core.Navigation;
 using Samsara.Features.Character.Data;
-using Samsara.Features.Character.MasterData;
 using Samsara.Features.MainScene.Domain;
 using Samsara.Features.MainScene.Presentation;
 using UnityEngine;
@@ -23,7 +23,6 @@ namespace Samsara.Dev.MainScene
         private readonly string _logClass = $"[{nameof(V06_NavigationEventValidation)}]";
 
         [SerializeField] private MainView _mainView;
-        [SerializeField] private CharacterStatsSO _testStats;
 
         [Header("실제 UI 버튼 참조 (이벤트 시뮬레이션용)")]
         [SerializeField] private Button _stageButton;
@@ -41,11 +40,16 @@ namespace Samsara.Dev.MainScene
         {
             Debug.Log($"{_logClass} === V-06 검증 시작: 네비게이션 버튼 → 애니메이션 → SceneNavigator 호출 검증 ===");
 
-            if (_mainView == null || _testStats == null)
+            if (_mainView == null)
             {
-                Debug.LogError($"{_logClass} [FAIL] _mainView 또는 _testStats가 Inspector에서 할당되지 않았습니다.");
+                Debug.LogError($"{_logClass} [FAIL] _mainView가 Inspector에서 할당되지 않았습니다.");
                 return;
             }
+
+            var runConfig = Resources.Load<RunConfigSO>("MasterData/DefaultRunConfig");
+            if (runConfig == null)
+                throw new InvalidOperationException(
+                    $"{_logClass} DefaultRunConfig.asset이 Resources/MasterData/에 없습니다.");
 
             if (_stageButton == null || _maintenanceButton == null || _characterInfoButton == null)
             {
@@ -56,7 +60,7 @@ namespace Samsara.Dev.MainScene
             // ── 테스트용 RunData 및 MockNavigator 준비 ──
             var runRepo = new CharacterRunRepository();
             await runRepo.LoadDataAsync();
-            runRepo.InitializeNewRun(TestNodeId, _testStats);
+            runRepo.InitializeNewRun(runConfig);
             runRepo.RunData.ActionPoints = 3;
             runRepo.RunData.MaxActionPoints = 5;
 
