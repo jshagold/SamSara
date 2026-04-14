@@ -23,3 +23,15 @@ D-05 [DECISION] MaintenanceView.ShowShopMode() 기존 동작을 ShowShopPanelMod
 D-06 [DECISION] MaintenancePresenter.Initialize()를 async UniTaskVoid InitializeAsync()로 변경하여 CheckAndExpireMerchant를 await.
 **Why:** CheckAndExpireMerchant는 만료 시 SaveDataAsync를 호출하는 비동기 작업. 씬 초기화 시 완료를 보장해야 ShopButton 표시 상태가 올바르게 설정됨.
 **How to apply:** Initialize()는 퍼블릭 동기 진입점을 유지하고 내부에서 Forget()으로 비동기 체인 시작.
+
+D-07 [DECISION] Patch-001: 재고 0 구매버튼 비활성화 제거 — 모든 구매 차단은 팝업(post-block) 방식으로 통일.
+**Why:** 재고 0 pre-block(버튼 비활성화)과 골드 부족 post-block(팝업)이 혼재해 UX 불일치 발생. 모든 차단 상황을 팝업으로 통일.
+**How to apply:** ShopItemSlotView.Setup()/UpdateStock()에서 SetInteractable 호출 제거. SetInteractable() 메서드도 제거.
+
+D-08 [DECISION] Patch-001: 구매 성공 시 CharacterInfoPanelView(상단 골드)도 즉시 갱신.
+**Why:** ShopPanelView 골드만 갱신하고 상단 TopBar GoldView는 갱신하지 않아 씬 재진입 전까지 표시 불일치 발생.
+**How to apply:** CharacterInfoPanelView.UpdateGold() → MaintenanceView.UpdateTopBarGold() 체인 추가. MaintenancePresenter 구매 성공 분기에서 호출.
+
+D-09 [DECISION] 구매 차단 조건(재고 없음, 골드 부족)을 구매 확인 팝업 전에 선행 체크한다.
+**Why:** 기존 흐름은 "구매 확인" 팝업 → 사용자 확인 클릭 → 차단 팝업 순서였음. 사용자 입장에서 확인 팝업이 닫히면서 아무 피드백도 없는 것처럼 보여 버그로 인식. 재고 없음/골드 부족은 구매 시도 자체가 불가능하므로 확인 팝업을 거칠 이유가 없음.
+**How to apply:** ProcessPurchaseAsync에서 GetRemainingStock(potionId) → 재고 0이면 즉시 "재고 없음" return. RunData.Gold < potion.Price이면 즉시 "골드 부족" return. 두 체크 모두 통과한 경우에만 "구매 확인" 팝업 표시.

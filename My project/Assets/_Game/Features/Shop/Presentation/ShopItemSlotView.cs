@@ -31,19 +31,11 @@ namespace Samsara.Features.Shop.Presentation
 
             _purchaseButton.onClick.RemoveAllListeners();
             _purchaseButton.onClick.AddListener(() => onPurchase(_potionId));
-
-            SetInteractable(itemInfo.RemainingStock > 0);
-        }
-
-        public void SetInteractable(bool interactable)
-        {
-            _purchaseButton.interactable = interactable;
         }
 
         public void UpdateStock(int remainingStock)
         {
             _stockText.text = $"x{remainingStock}";
-            SetInteractable(remainingStock > 0);
         }
 
         private void OnDestroy()

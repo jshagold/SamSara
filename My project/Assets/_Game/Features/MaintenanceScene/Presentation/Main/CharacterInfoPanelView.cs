@@ -23,6 +23,8 @@ namespace Samsara.Features.MaintenanceScene.Presentation.Main
             _goldView.SetGold(viewModel.Gold);
         }
 
+        public void UpdateGold(int gold) => _goldView.SetGold(gold);
+
         private void Reset()
         {
             _characterSpriteView = GetComponentInChildren<CharacterSpriteView>();

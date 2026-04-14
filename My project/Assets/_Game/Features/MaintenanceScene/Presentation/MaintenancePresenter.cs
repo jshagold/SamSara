@@ -200,7 +200,24 @@ namespace Samsara.Features.MaintenanceScene.Presentation
 
         private async UniTaskVoid ProcessPurchaseAsync(int potionId)
         {
+            // 재고 선행 체크 — 재고 없으면 구매 확인 팝업 없이 즉시 차단
+            var stock = _gameContext.ShopRepo.GetRemainingStock();
+            if (!stock.TryGetValue(potionId, out int remaining) || remaining <= 0)
+            {
+                await _popupManager.ShowConfirmAsync(
+                    new PopupRequest("재고 없음", "재고가 없습니다.", "확인"));
+                return;
+            }
+
+            // 골드 선행 체크 — 골드 부족하면 구매 확인 팝업 없이 즉시 차단
             var potion = _gameContext.ShopMasterDataRepo.GetPotion(potionId);
+            if (_gameContext.CharacterRunRepo.RunData.Gold < potion.Price)
+            {
+                await _popupManager.ShowConfirmAsync(
+                    new PopupRequest("골드 부족", "골드가 부족합니다.", "확인"));
+                return;
+            }
+
             bool confirmed = await _popupManager.ShowYesNoAsync(
                 new PopupRequest("구매 확인", $"{potion.PotionName} 을(를) {potion.Price}G에 구매하시겠습니까?", "구매", "취소"));
 
@@ -214,6 +231,7 @@ namespace Samsara.Features.MaintenanceScene.Presentation
                     // 골드 및 슬롯 갱신
                     int newGold = _gameContext.CharacterRunRepo.RunData.Gold;
                     _maintenanceView.UpdateShopGold(newGold);
+                    _maintenanceView.UpdateTopBarGold(newGold);
                     var items = _shopUseCase.GetShopItems();
                     for (int i = 0; i < items.Count; i++)
                     {
@@ -231,6 +249,7 @@ namespace Samsara.Features.MaintenanceScene.Presentation
                     break;
 
                 case PurchaseResult.OutOfStock:
+                    // 선행 체크 이후 race condition 대응 (이론상 도달 불가)
                     await _popupManager.ShowConfirmAsync(
                         new PopupRequest("재고 없음", "재고가 없습니다.", "확인"));
                     break;

@@ -96,6 +96,9 @@ namespace Samsara.Features.MaintenanceScene.Presentation
         public void UpdateShopSlot(int slotIndex, int remainingStock)
             => _shopPanelView.UpdateSlot(slotIndex, remainingStock);
 
+        public void UpdateTopBarGold(int gold)
+            => _characterInfoPanelView.UpdateGold(gold);
+
         // ── Merchant Dialogue ──
 
         /// <summary>

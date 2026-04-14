@@ -48,7 +48,7 @@ namespace Samsara.Features.Character.Data
                 Agility = baseStats.Agility,
                 EvolutionNodeId = startingEvolutionNodeId,
                 Day = 1,
-                Gold = 0
+                Gold = 500
             };
             _isDirty = true;
         }
