@@ -5,8 +5,8 @@ namespace Samsara.Features.CharacterInfoScene.Presentation.InfoScroll
 {
     public struct SkillDisplayData
     {
-        public UnityEngine.Sprite Icon;
-        public bool               HasEffect;
+        public Sprite Icon;
+        public bool   HasEffect;
     }
 
     public class SkillListView : MonoBehaviour
@@ -23,19 +23,15 @@ namespace Samsara.Features.CharacterInfoScene.Presentation.InfoScroll
                 slot.OnSkillSlotClicked += index => OnSkillSlotClicked?.Invoke(index);
         }
 
+        /// <summary>스킬 수만큼 슬롯을 활성화하고 나머지는 비활성화한다.</summary>
         public void SetSkills(SkillDisplayData[] skills)
         {
             for (int i = 0; i < _skillSlots.Length; i++)
             {
-                if (i < skills.Length)
-                {
-                    _skillSlots[i].gameObject.SetActive(true);
+                bool active = i < skills.Length;
+                _skillSlots[i].gameObject.SetActive(active);
+                if (active)
                     _skillSlots[i].Setup(i, skills[i].Icon, skills[i].HasEffect);
-                }
-                else
-                {
-                    _skillSlots[i].gameObject.SetActive(false);
-                }
             }
         }
 

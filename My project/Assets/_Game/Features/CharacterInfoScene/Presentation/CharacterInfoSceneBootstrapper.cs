@@ -12,7 +12,7 @@ namespace Samsara.Features.CharacterInfoScene.Presentation
 
         private CharacterInfoPresenter _presenter;
 
-        private void Awake()
+        private void Start()
         {
             InitializeAsync().Forget();
         }
@@ -21,34 +21,17 @@ namespace Samsara.Features.CharacterInfoScene.Presentation
         {
             await GlobalBootstrapper.Instance.InitializationTask;
 
-            var gameContext = GlobalBootstrapper.Instance.GameContext;
-
-            // Repositories from GameContext
+            var gameContext         = GlobalBootstrapper.Instance.GameContext;
             var characterRunRepo    = gameContext.CharacterRunRepo;
             var skillMasterDataRepo = gameContext.SkillMasterDataRepo;
-            var spriteLoader        = gameContext.SpriteLoader;
+            var evolutionNodes      = gameContext.EvolutionNodes;
+            var sceneNavigator      = GlobalBootstrapper.Instance.SceneNavigator;
+            var popupManager        = gameContext.PopupManager;
+            var inventoryUseCase    = gameContext.InventoryUseCase;
 
-            // EvolutionNodeSO[] — GameContext.EvolutionNodes (Patch-001 적용)
-            var evolutionNodes = gameContext.EvolutionNodes;
+            var useCase = new CharacterInfoUseCase(characterRunRepo, skillMasterDataRepo, evolutionNodes);
 
-            // UseCase
-            var useCase = new CharacterInfoUseCase(
-                characterRunRepo,
-                skillMasterDataRepo,
-                evolutionNodes);
-
-            // Navigation + Popup from GlobalBootstrapper / GameContext
-            var sceneNavigator = GlobalBootstrapper.Instance.SceneNavigator;
-            var popupManager   = gameContext.PopupManager;
-
-            // Presenter
-            _presenter = new CharacterInfoPresenter(
-                useCase,
-                _characterInfoView,
-                sceneNavigator,
-                popupManager,
-                spriteLoader);
-
+            _presenter = new CharacterInfoPresenter(useCase, inventoryUseCase, _characterInfoView, sceneNavigator, popupManager);
             _presenter.Initialize();
 
             Debug.Log($"{_logClass} CharacterInfoScene 초기화 완료.");

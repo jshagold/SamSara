@@ -21,6 +21,7 @@ namespace Samsara.Features.CharacterInfoScene.Presentation.InfoScroll
             _button.onClick.AddListener(() => OnSkillSlotClicked?.Invoke(SkillIndex));
         }
 
+        /// <summary>슬롯 초기 설정. SkillListView.SetSkills()에서 호출.</summary>
         public void Setup(int index, Sprite icon, bool hasEffect)
         {
             SkillIndex              = index;
@@ -30,9 +31,14 @@ namespace Samsara.Features.CharacterInfoScene.Presentation.InfoScroll
 
         private void Reset()
         {
-            _button          = GetComponentInChildren<Button>();
-            _skillIcon       = GetComponentInChildren<Image>();
-            _effectIndicator = transform.Find("EffectIndicator")?.gameObject;
+            _button    = GetComponentInChildren<Button>();
+            _skillIcon = GetComponentInChildren<Image>();
+            // _effectIndicator는 Inspector에서 수동 배정
+        }
+
+        private void OnDestroy()
+        {
+            _button?.onClick.RemoveAllListeners();
         }
     }
 }

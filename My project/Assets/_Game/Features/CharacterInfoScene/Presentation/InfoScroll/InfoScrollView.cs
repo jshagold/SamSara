@@ -13,10 +13,11 @@ namespace Samsara.Features.CharacterInfoScene.Presentation.InfoScroll
         [SerializeField] private SkillListView     _skillListView;
         [SerializeField] private InventoryView     _inventoryView;
 
-        public CharacterNameView CharacterNameView => _characterNameView;
-        public StatListView      StatListView      => _statListView;
-        public SkillListView     SkillListView     => _skillListView;
-        public InventoryView     InventoryView     => _inventoryView;
+        // ── Child View 프로퍼티 (Presenter 접근용) ──
+        public CharacterNameView CharacterName => _characterNameView;
+        public StatListView      StatList      => _statListView;
+        public SkillListView     SkillList     => _skillListView;
+        public InventoryView     Inventory     => _inventoryView;
 
         private void Reset()
         {

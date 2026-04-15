@@ -22,18 +22,21 @@ namespace Samsara.Features.CharacterInfoScene.Presentation.Popup
         private void Awake()
         {
             _closeButton.onClick.AddListener(() => OnCloseClicked?.Invoke());
+            _popupRoot.SetActive(false);
         }
 
+        /// <summary>팝업을 열고 스킬 정보를 표시한다.</summary>
         public void Show(Sprite icon, string skillName, string description, float damage, string effectDescription)
         {
-            _skillIconImage.sprite    = icon;
-            _skillNameText.text       = skillName;
+            _skillIconImage.sprite     = icon;
+            _skillNameText.text        = skillName;
             _skillDescriptionText.text = description;
-            _damageText.text          = $"Damage: {damage}";
-            _effectText.text          = effectDescription;
+            _damageText.text           = $"데미지: {damage:F1}";
+            _effectText.text           = effectDescription;
             _popupRoot.SetActive(true);
         }
 
+        /// <summary>팝업을 닫는다.</summary>
         public void Hide()
         {
             _popupRoot.SetActive(false);
@@ -41,10 +44,14 @@ namespace Samsara.Features.CharacterInfoScene.Presentation.Popup
 
         private void Reset()
         {
-            _popupRoot    = gameObject;
-            _skillIconImage       = GetComponentInChildren<Image>();
-            _closeButton          = GetComponentInChildren<Button>();
-            _skillNameText        = GetComponentInChildren<TMP_Text>();
+            _closeButton    = GetComponentInChildren<Button>();
+            _skillIconImage = GetComponentInChildren<Image>();
+            // TMP_Text 4개는 순서 모호성으로 Inspector에서 수동 배정
+        }
+
+        private void OnDestroy()
+        {
+            _closeButton?.onClick.RemoveAllListeners();
         }
     }
 }

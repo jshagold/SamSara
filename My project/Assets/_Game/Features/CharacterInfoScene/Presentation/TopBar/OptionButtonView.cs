@@ -21,5 +21,10 @@ namespace Samsara.Features.CharacterInfoScene.Presentation.TopBar
         {
             _button = GetComponentInChildren<Button>();
         }
+
+        private void OnDestroy()
+        {
+            _button?.onClick.RemoveAllListeners();
+        }
     }
 }

@@ -15,14 +15,12 @@ namespace Samsara.Features.CharacterInfoScene.Presentation.InfoScroll
         public void SetStats(int hp, int strength, int toughness, int agility)
         {
             _hpText.text        = $"HP: {hp}";
-            _strengthText.text  = $"Strength: {strength}";
-            _toughnessText.text = $"Toughness: {toughness}";
-            _agilityText.text   = $"Agility: {agility}";
+            _strengthText.text  = $"힘: {strength}";
+            _toughnessText.text = $"강인함: {toughness}";
+            _agilityText.text   = $"민첩: {agility}";
         }
 
-        // Reset() intentionally omitted: 4 TMP_Text children share the same type,
-        // so auto-assignment via GetComponentsInChildren<TMP_Text>() cannot guarantee
-        // HP/Strength/Toughness/Agility order. Assign each field manually in Inspector.
-        // See decisions.md D-03.
+        // Reset() 미구현 — TMP_Text 4개의 GetComponentsInChildren 순서가 계층 구성에 의존하여
+        // 잘못된 스탯 표시 버그가 발생할 수 있음. Inspector에서 수동 배정 필요. (decisions.md D-02 참조)
     }
 }

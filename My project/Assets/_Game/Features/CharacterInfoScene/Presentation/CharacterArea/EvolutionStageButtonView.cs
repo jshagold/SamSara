@@ -22,8 +22,8 @@ namespace Samsara.Features.CharacterInfoScene.Presentation.CharacterArea
 
         public void SetEvolutionInfo(Sprite icon, string name)
         {
-            _evolutionIcon.sprite    = icon;
-            _evolutionNameText.text  = name;
+            _evolutionIcon.sprite  = icon;
+            _evolutionNameText.text = name;
         }
 
         private void Reset()
@@ -31,6 +31,11 @@ namespace Samsara.Features.CharacterInfoScene.Presentation.CharacterArea
             _button            = GetComponentInChildren<Button>();
             _evolutionIcon     = GetComponentInChildren<Image>();
             _evolutionNameText = GetComponentInChildren<TMP_Text>();
+        }
+
+        private void OnDestroy()
+        {
+            _button?.onClick.RemoveAllListeners();
         }
     }
 }

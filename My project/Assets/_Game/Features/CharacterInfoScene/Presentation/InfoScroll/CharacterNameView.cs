@@ -9,9 +9,9 @@ namespace Samsara.Features.CharacterInfoScene.Presentation.InfoScroll
 
         [SerializeField] private TMP_Text _nameText;
 
-        public void SetName(string name)
+        public void SetName(string characterName)
         {
-            _nameText.text = name;
+            _nameText.text = characterName;
         }
 
         private void Reset()
