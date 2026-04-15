@@ -21,6 +21,14 @@ MonoBehaviour:
     _dialogueText: "\uC548\uB155\uD558\uC2DC\uC624."
     _speakerName: "\uC0C1\uC778"
     _speakerPosition: 1
+  - _portraitSpriteKey: test_ally
+    _dialogueText: "\uC0C1\uC778\uC774\uC624"
+    _speakerName: "\uC0C1\uC778"
+    _speakerPosition: 1
+  - _portraitSpriteKey: char_base
+    _dialogueText: "\uC8FC\uC778\uACF5"
+    _speakerName: "\uC8FC\uC778\uACF5"
+    _speakerPosition: 0
   _result:
     _resultType: 3
     _value: 0
