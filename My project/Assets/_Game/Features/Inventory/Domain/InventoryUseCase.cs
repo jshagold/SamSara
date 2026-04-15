@@ -75,11 +75,11 @@ namespace Samsara.Features.Inventory.Domain
 
                 result[i] = new InventorySlotDisplayData
                 {
-                    IsEmpty   = false,
-                    ItemName  = potion.PotionName,
-                    IconSprite = potion.Sprite,
-                    Quantity  = slot.Quantity,
-                    ItemType  = ItemType.Consumable
+                    IsEmpty      = false,
+                    ItemName     = potion.PotionName,
+                    IconSpriteKey = potion.SpriteKey,
+                    Quantity     = slot.Quantity,
+                    ItemType     = ItemType.Consumable
                 };
             }
 
@@ -102,12 +102,12 @@ namespace Samsara.Features.Inventory.Domain
 
             return new ItemDetailData
             {
-                ItemName    = potion.PotionName,
-                Description = potion.Description,
-                IconSprite  = potion.Sprite,
-                TargetStat  = potion.TargetStat,
-                EffectValue = potion.EffectValue,
-                Quantity    = slot.Quantity
+                ItemName      = potion.PotionName,
+                Description   = potion.Description,
+                IconSpriteKey = potion.SpriteKey,
+                TargetStat    = potion.TargetStat,
+                EffectValue   = potion.EffectValue,
+                Quantity      = slot.Quantity
             };
         }
 

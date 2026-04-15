@@ -32,7 +32,7 @@ namespace Samsara.Features.Event.Presentation
                 return;
             }
 
-            _presenter = new EventPresenter(useCase, _eventView, sceneNavigator, pendingContext, shopUseCase);
+            _presenter = new EventPresenter(useCase, _eventView, sceneNavigator, pendingContext, shopUseCase, gameContext.SpriteLoader);
             _presenter.InitializeAsync().Forget();
 
             Debug.Log($"{_logClass} EventScene 초기화 완료.");

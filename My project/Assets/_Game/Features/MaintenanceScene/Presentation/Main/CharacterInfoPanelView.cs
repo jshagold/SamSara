@@ -15,13 +15,12 @@ namespace Samsara.Features.MaintenanceScene.Presentation.Main
 
         public void SetCharacterInfo(MaintenanceViewModel viewModel)
         {
-            // TODO: EvolutionNodeId는 Addressables 키가 아님.
-            // EvolutionNodeSO MasterData에서 sprite addressable key를 조회하는 로직 필요.
-            // 스프라이트 시스템 구현 전까지 로드 스킵.
             _hpBarView.SetHp(viewModel.CurrentHp, viewModel.MaxHp);
             _actionPointsView.SetActionPoints(viewModel.ActionPoints, viewModel.MaxActionPoints);
             _goldView.SetGold(viewModel.Gold);
         }
+
+        public void SetCharacterSprite(Sprite sprite) => _characterSpriteView.SetSprite(sprite);
 
         public void UpdateGold(int gold) => _goldView.SetGold(gold);
 

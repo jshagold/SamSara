@@ -26,6 +26,7 @@ namespace Samsara.Features.CharacterInfoScene.Presentation
             // Repositories from GameContext
             var characterRunRepo    = gameContext.CharacterRunRepo;
             var skillMasterDataRepo = gameContext.SkillMasterDataRepo;
+            var spriteLoader        = gameContext.SpriteLoader;
 
             // EvolutionNodeSO[] — GameContext.EvolutionNodes (Patch-001 적용)
             var evolutionNodes = gameContext.EvolutionNodes;
@@ -45,7 +46,8 @@ namespace Samsara.Features.CharacterInfoScene.Presentation
                 useCase,
                 _characterInfoView,
                 sceneNavigator,
-                popupManager);
+                popupManager,
+                spriteLoader);
 
             _presenter.Initialize();
 

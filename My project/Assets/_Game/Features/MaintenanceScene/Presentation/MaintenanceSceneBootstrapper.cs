@@ -27,6 +27,15 @@ namespace Samsara.Features.MaintenanceScene.Presentation
             var shopUseCase      = gameContext.ShopUseCase;
             var sceneNavigator   = GlobalBootstrapper.Instance.SceneNavigator;
             var popupManager     = gameContext.PopupManager;
+            var spriteLoader     = gameContext.SpriteLoader;
+
+            // 현재 캐릭터 EvolutionNodeSO 조회
+            var nodeId = characterRunRepo.RunData.EvolutionNodeId;
+            Samsara.Features.Character.MasterData.EvolutionNodeSO evolutionNode = null;
+            foreach (var node in gameContext.EvolutionNodes)
+            {
+                if (node.NodeId == nodeId) { evolutionNode = node; break; }
+            }
 
             var maintenanceUseCase = new MaintenanceUseCase(characterRunRepo, eventUseCase);
 
@@ -36,7 +45,9 @@ namespace Samsara.Features.MaintenanceScene.Presentation
                 sceneNavigator,
                 popupManager,
                 gameContext,
-                shopUseCase);
+                shopUseCase,
+                spriteLoader,
+                evolutionNode);
 
             _maintenancePresenter.Initialize();
 

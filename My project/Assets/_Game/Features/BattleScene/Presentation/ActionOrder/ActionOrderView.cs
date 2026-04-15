@@ -60,6 +60,19 @@ namespace Samsara.Features.BattleScene.Presentation.ActionOrder
             }
         }
 
+        /// <summary>특정 참여자 슬롯의 초상화를 설정. BattlePresenter에서 사전 로드된 스프라이트 적용 시 사용.</summary>
+        public void SetSlotPortrait(int participantId, Sprite sprite)
+        {
+            for (int i = 0; i < _slots.Length; i++)
+            {
+                if (_slots[i] != null && _slots[i].gameObject.activeSelf
+                    && _slots[i].ParticipantId == participantId)
+                {
+                    _slots[i].SetPortrait(sprite);
+                }
+            }
+        }
+
         private void HandleSlotTouched(int participantId)
         {
             OnSlotTouched?.Invoke(participantId);

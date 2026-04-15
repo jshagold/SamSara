@@ -38,8 +38,6 @@ namespace Samsara.Features.BattleScene.Presentation.Field
             _participantId = id;
             _maxHp = maxHp;
 
-            LoadSprite(spriteKey);
-
             SetHp(maxHp, maxHp);
             SetHighlight(false);
             SetActiveHighlight(false);
@@ -52,15 +50,9 @@ namespace Samsara.Features.BattleScene.Presentation.Field
             _originalPosition = transform.position;
         }
 
-        private void LoadSprite(string spriteKey)
+        public void SetSprite(Sprite sprite)
         {
-            if (string.IsNullOrEmpty(spriteKey)) return;
-
-#if UNITY_EDITOR
-            var sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(spriteKey);
-            if (sprite != null)
-                _characterSprite.sprite = sprite;
-#endif
+            _characterSprite.sprite = sprite;
         }
 
         public void SetHp(int current, int max)

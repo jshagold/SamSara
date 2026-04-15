@@ -17,7 +17,6 @@ namespace Samsara.Features.Character.MasterData
         [SerializeField] private EvolutionNodeSO[] _nextNodes;
 
         // Sprite fields
-        [SerializeField] private Sprite _nodeIconSprite;
         [SerializeField] private string _nodeIconSpriteKey;
         [SerializeField] private string _mainStandingSpriteKey;
         [SerializeField] private string _portraitSpriteKey;
@@ -35,7 +34,6 @@ namespace Samsara.Features.Character.MasterData
         public StatCondition[] UnlockConditions => _unlockConditions;
         public bool IsHidden => _isHidden;
         public EvolutionNodeSO[] NextNodes => _nextNodes;
-        public Sprite NodeIconSprite => _nodeIconSprite;
         public string NodeIconSpriteKey => _nodeIconSpriteKey;
         public string MainStandingSpriteKey => _mainStandingSpriteKey;
         public string PortraitSpriteKey => _portraitSpriteKey;

@@ -21,6 +21,7 @@ namespace Samsara.Features.BattleScene.Presentation.Skill
     {
         public int SkillId;
         public string SpriteKey;
+        public Sprite Icon;           // Presenter에서 사전 로드된 스프라이트
         public int CooldownRemaining;
         public bool IsUsable;
         public SkillState State;  // 3-state dim 제어
@@ -82,9 +83,14 @@ namespace Samsara.Features.BattleScene.Presentation.Skill
                 btn.onClick.AddListener(() => OnSkillSelected?.Invoke(capturedId));
                 btn.interactable = skill.State == SkillState.Usable;
 
+                // 스킬 아이콘 스프라이트 적용
+                var img = btn.GetComponent<Image>();
+                if (img != null && skill.Icon != null)
+                    img.sprite = skill.Icon;
+
                 ApplyButtonLabel(btn, skill.State, skill.SkillId, skill.CooldownRemaining);
 
-                // 3-state 색상
+                // 3-state 색상 (sprite tint로 작동)
                 ApplySkillState(btn, skill.State);
 
                 // 롱프레스 이벤트 트리거 연결

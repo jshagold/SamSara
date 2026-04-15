@@ -16,6 +16,6 @@ MonoBehaviour:
   _enemyName: Boss Enemy
   _baseStats: {fileID: 11400000, guid: 8858652be395c2c409c038e3a296e2ec, type: 2}
   _skillIds: 292300002a2300002b230000
-  _battleSpriteKeyHp100: Assets/_Game/Dev/Features/Battle/Sprites/test_enemy_boss.png
-  _battleSpriteKeyHp50: Assets/_Game/Dev/Features/Battle/Sprites/test_enemy_boss.png
-  _battleSpriteKeyHp0: Assets/_Game/Dev/Features/Battle/Sprites/test_enemy_boss.png
+  _battleSpriteKeyHp100: enemy_boss
+  _battleSpriteKeyHp50: enemy_boss
+  _battleSpriteKeyHp0: enemy_boss

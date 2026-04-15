@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using Samsara.Core.AssetLoading;
 using Samsara.Core.Popup;
 using Samsara.Features.BattleScene.Domain;
 using Samsara.Features.Character.Data;
@@ -62,6 +63,7 @@ public class GameContext
     // ──────────────────────────────────────────────
     public RunConfigSO                  RunConfig            { get; }
     public IPopupManager               PopupManager         { get; }
+    public ISpriteLoader               SpriteLoader         { get; }
     public IStageRepository            StageRepo            => _stageRepo;
     public ICharacterRunRepository     CharacterRunRepo     => _characterRunRepo;
     public ICharacterAccountRepository CharacterAccountRepo => _characterAccountRepo;
@@ -98,10 +100,11 @@ public class GameContext
     // ──────────────────────────────────────────────
     /// <param name="masterData">GlobalBootstrapper가 로드한 MasterData 전체.</param>
     /// <param name="popupManager">GlobalBootstrapper가 생성한 IPopupManager 인스턴스.</param>
-    public GameContext(ScriptableObject[] masterData, IPopupManager popupManager, RunConfigSO runConfig)
+    public GameContext(ScriptableObject[] masterData, IPopupManager popupManager, RunConfigSO runConfig, ISpriteLoader spriteLoader)
     {
         RunConfig    = runConfig;
         PopupManager = popupManager;
+        SpriteLoader = spriteLoader;
 
         // MasterData Cache — masterData 배열에서 EvolutionNodeSO만 필터링
         var nodeList = new System.Collections.Generic.List<EvolutionNodeSO>();

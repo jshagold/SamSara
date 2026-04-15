@@ -15,18 +15,16 @@ MonoBehaviour:
   _nodeId: node_warrior
   _characterName: Warrior
   _baseStats: {fileID: 11400000, guid: b0b7dd43cf40d114eaae4c3ce99817bd, type: 2}
-  _maxActionPoints: 0
+  _maxActionPoints: 5
   _unlockConditions: []
   _isHidden: 0
   _nextNodes: []
-  _nodeIconSprite: {fileID: -7217552388783171287, guid: f3bc76af0524911498c9daef7d95e56b,
-    type: 3}
-  _nodeIconSpriteKey: 
-  _mainStandingSpriteKey: 
-  _portraitSpriteKey: 
-  _battleSpriteKeyHp100: 
-  _battleSpriteKeyHp50: 
-  _battleSpriteKeyHp0: 
+  _nodeIconSpriteKey: char_evo_lv4
+  _mainStandingSpriteKey: char_evo_lv4
+  _portraitSpriteKey: char_evo_lv4
+  _battleSpriteKeyHp100: char_evo_lv4
+  _battleSpriteKeyHp50: char_evo_lv4
+  _battleSpriteKeyHp0: char_evo_lv4
   _attackAnimSpriteKey: 
   _stageMoveSpriteKey: 
   _skillIds: 

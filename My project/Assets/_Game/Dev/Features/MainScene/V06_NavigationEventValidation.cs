@@ -66,7 +66,7 @@ namespace Samsara.Dev.MainScene
 
             var mockNavigator = new MockSceneNavigator();
             var useCase = new MainUseCase(runRepo);
-            var presenter = new MainPresenter(useCase, _mainView, mockNavigator);
+            var presenter = new MainPresenter(useCase, _mainView, mockNavigator, null, null);
             presenter.Initialize();
 
             // ── Stage 버튼 클릭 시뮬레이션 (애니메이션 완료 대기) ──

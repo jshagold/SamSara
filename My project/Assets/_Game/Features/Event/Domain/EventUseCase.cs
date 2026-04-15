@@ -48,6 +48,13 @@ namespace Samsara.Features.Event.Domain
         }
 
         // ──────────────────────────────────────────────
+        // Event Info
+        // ──────────────────────────────────────────────
+
+        public string GetBackgroundSpriteKey()
+            => _currentEvent?.BackgroundSpriteKey;
+
+        // ──────────────────────────────────────────────
         // Dialogue
         // ──────────────────────────────────────────────
 

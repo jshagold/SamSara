@@ -9,6 +9,11 @@ namespace Samsara.Features.MaintenanceScene.Presentation.Main
 
         [SerializeField] private Image _backgroundImage;
 
+        public void SetBackground(Sprite sprite)
+        {
+            _backgroundImage.sprite = sprite;
+        }
+
         private void Reset()
         {
             _backgroundImage = GetComponentInChildren<Image>();

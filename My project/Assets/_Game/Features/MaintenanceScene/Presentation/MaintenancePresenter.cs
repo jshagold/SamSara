@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Samsara.Core.AssetLoading;
 using Samsara.Core.Navigation;
 using Samsara.Core.Popup;
 using Samsara.Features.Character.MasterData;
@@ -21,6 +22,8 @@ namespace Samsara.Features.MaintenanceScene.Presentation
         private readonly IPopupManager      _popupManager;
         private readonly GameContext        _gameContext;
         private readonly ShopUseCase        _shopUseCase;
+        private readonly ISpriteLoader      _spriteLoader;
+        private readonly EvolutionNodeSO    _evolutionNode;
 
         // 캐시된 핸들러 — Dispose 시 정확한 구독 해제를 위해 보관
         private System.Action<StatType> _statSelectedHandler;
@@ -31,7 +34,9 @@ namespace Samsara.Features.MaintenanceScene.Presentation
             ISceneNavigator    sceneNavigator,
             IPopupManager      popupManager,
             GameContext        gameContext,
-            ShopUseCase        shopUseCase)
+            ShopUseCase        shopUseCase,
+            ISpriteLoader      spriteLoader,
+            EvolutionNodeSO    evolutionNode)
         {
             _maintenanceUseCase = maintenanceUseCase;
             _maintenanceView    = maintenanceView;
@@ -39,6 +44,8 @@ namespace Samsara.Features.MaintenanceScene.Presentation
             _popupManager       = popupManager;
             _gameContext        = gameContext;
             _shopUseCase        = shopUseCase;
+            _spriteLoader       = spriteLoader;
+            _evolutionNode      = evolutionNode;
         }
 
         public void Initialize()
@@ -48,6 +55,9 @@ namespace Samsara.Features.MaintenanceScene.Presentation
 
         private async UniTaskVoid InitializeAsync()
         {
+            // 대화 오버레이에 SpriteLoader 주입
+            _maintenanceView.InitializeDialogueOverlaySpriteLoader(_spriteLoader);
+
             // 상인 만료 확인 (비동기)
             await _shopUseCase.CheckAndExpireMerchant();
 
@@ -57,6 +67,13 @@ namespace Samsara.Features.MaintenanceScene.Presentation
             _maintenanceView.SetShopButtonVisible(_shopUseCase.IsShopAvailable());
             _maintenanceView.SetInteractable(_maintenanceUseCase.CanPerformAction());
             _maintenanceView.ShowDefaultMode();
+
+            // 캐릭터 스프라이트 로드
+            if (_evolutionNode != null)
+            {
+                var characterSprite = await _spriteLoader.LoadSpriteAsync(_evolutionNode.MainStandingSpriteKey);
+                _maintenanceView.SetCharacterSprite(characterSprite);
+            }
 
             // 이벤트 구독
             _statSelectedHandler = statType => HandleStatSelectedAsync(statType).Forget();
@@ -171,16 +188,25 @@ namespace Samsara.Features.MaintenanceScene.Presentation
             int chosen = await _maintenanceView.RunMerchantDialogueAsync(eventDialogues, choices);
 
             if (chosen == 0)
-                ShowShopPanel(merchant);
+                ShowShopPanelAsync(merchant).Forget();
             else
                 _maintenanceView.ShowDefaultMode();
         }
 
-        private void ShowShopPanel(MerchantSO merchant)
+        private async UniTaskVoid ShowShopPanelAsync(MerchantSO merchant)
         {
             var items = _shopUseCase.GetShopItems();
             int gold  = _gameContext.CharacterRunRepo.RunData.Gold;
-            _maintenanceView.ShowShopPanelMode(items, gold, merchant.ShopSprite);
+
+            var merchantSprite = await _spriteLoader.LoadSpriteAsync(merchant.ShopSpriteKey);
+            _maintenanceView.ShowShopPanelMode(items, gold, merchantSprite);
+
+            // 포션 아이콘 사전 로드 후 슬롯에 적용
+            for (int i = 0; i < items.Count; i++)
+            {
+                var potionSprite = await _spriteLoader.LoadSpriteAsync(items[i].Potion.SpriteKey);
+                _maintenanceView.SetShopSlotIcon(i, potionSprite);
+            }
         }
 
         private void HandleTrainingListClosed()

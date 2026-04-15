@@ -62,6 +62,9 @@ namespace Samsara.Features.StageScene.Presentation
             _backgroundView.FadeToBackground(sprite, duration);
 
         // ── NodeMap ─────────────────────────────────────────────────────
+        public string[] GetNodeTypeIconKeys() => _nodeMapView.NodeTypeIconKeys;
+        public void SetNodeTypeIcons(Sprite[] icons) => _nodeMapView.SetNodeTypeIcons(icons);
+
         public void RenderNodes(StageNodeSO[] nodes) => _nodeMapView.RenderNodes(nodes);
 
         public void HighlightNode(int index) => _nodeMapView.HighlightNode(index);

@@ -18,4 +18,4 @@ MonoBehaviour:
   _targetStat: 0
   _effectValue: 5
   _price: 100
-  _sprite: {fileID: 0}
+  _spriteKey: test_ally

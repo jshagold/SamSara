@@ -2,6 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using Samsara.App;
 using Samsara.App.Popup;
+using Samsara.Core.AssetLoading;
 using Samsara.Core.Navigation;
 using Samsara.Core.Popup;
 using UnityEngine;
@@ -112,7 +113,8 @@ public class GlobalBootstrapper : MonoBehaviour
             Debug.Log($"{_logClass} Step 2 완료 — Core 시스템 생성");
 
             // Step 3 — GameContext 생성 및 DI 조립
-            _gameContext = new GameContext(masterData, _popupManager, _runConfig);
+            var spriteLoader = new AddressableSpriteLoader();
+            _gameContext = new GameContext(masterData, _popupManager, _runConfig, spriteLoader);
 
             Debug.Log($"{_logClass} Step 3 완료 — GameContext 조립");
 

@@ -14,9 +14,12 @@ namespace Samsara.Features.StageScene.Presentation.Map
         [SerializeField] private Transform _nodeContainer;
         [SerializeField] private float _nodeSpacing = 150f;
         [SerializeField] private int _viewportRadius = 5;
-        [SerializeField] private Sprite[] _nodeTypeIcons;
+        [SerializeField] private string[] _nodeTypeIconKeys;
+        private Sprite[] _nodeTypeIcons;
 
         private readonly List<NodeView> _nodeViews = new();
+
+        public string[] NodeTypeIconKeys => _nodeTypeIconKeys;
 
         public event Action<int> OnNodeClicked;
 
@@ -101,6 +104,11 @@ namespace Samsara.Features.StageScene.Presentation.Map
             if (_nodeTypeIcons != null && index < _nodeTypeIcons.Length)
                 return _nodeTypeIcons[index];
             return null;
+        }
+
+        public void SetNodeTypeIcons(Sprite[] icons)
+        {
+            _nodeTypeIcons = icons;
         }
 
         private void HandleNodeClicked(int index)

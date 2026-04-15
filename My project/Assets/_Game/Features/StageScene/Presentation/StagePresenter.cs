@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Samsara.Core.AssetLoading;
 using Samsara.Core.Navigation;
 using Samsara.Core.Popup;
 using Samsara.Features.BattleScene.Domain;
@@ -16,35 +17,57 @@ namespace Samsara.Features.StageScene.Presentation
         private readonly string _logClass = $"[{nameof(StagePresenter)}]";
 
         private readonly StageSceneUseCase _useCase;
-        private readonly StageView _view;
-        private readonly ISceneNavigator _sceneNavigator;
-        private readonly IPopupManager _popupManager;
-        private readonly GameContext _gameContext;
+        private readonly StageView         _view;
+        private readonly ISceneNavigator   _sceneNavigator;
+        private readonly IPopupManager     _popupManager;
+        private readonly GameContext       _gameContext;
+        private readonly ISpriteLoader     _spriteLoader;
 
         public StagePresenter(
             StageSceneUseCase useCase,
-            StageView view,
-            ISceneNavigator sceneNavigator,
-            IPopupManager popupManager,
-            GameContext gameContext)
+            StageView         view,
+            ISceneNavigator   sceneNavigator,
+            IPopupManager     popupManager,
+            GameContext       gameContext,
+            ISpriteLoader     spriteLoader)
         {
-            _useCase       = useCase;
-            _view          = view;
+            _useCase        = useCase;
+            _view           = view;
             _sceneNavigator = sceneNavigator;
-            _popupManager  = popupManager;
+            _popupManager   = popupManager;
             _gameContext    = gameContext;
+            _spriteLoader   = spriteLoader;
         }
 
         public void Initialize()
         {
-            // Handle battle result from returning BattleScene
-            HandleBattleResultIfAny().Forget();
+            InitializeAsync().Forget();
+        }
 
-            // Handle event completion from returning EventScene
+        private async UniTaskVoid InitializeAsync()
+        {
+            // Handle battle/event results from returning scenes
+            HandleBattleResultIfAny().Forget();
             HandleEventResultIfAny().Forget();
 
             var vm    = _useCase.GetStageSceneViewModel();
             var nodes = _useCase.GetCurrentStageNodes();
+
+            // Load background sprite
+            Sprite bgSprite = null;
+            if (!string.IsNullOrEmpty(vm.BiomeSpriteKey))
+                bgSprite = await _spriteLoader.LoadSpriteAsync(vm.BiomeSpriteKey);
+            _view.SetBackground(bgSprite);
+
+            // Load node type icon sprites before rendering nodes
+            var iconKeys = _view.GetNodeTypeIconKeys();
+            if (iconKeys != null && iconKeys.Length > 0)
+            {
+                var iconSprites = new Sprite[iconKeys.Length];
+                for (int i = 0; i < iconKeys.Length; i++)
+                    iconSprites[i] = await _spriteLoader.LoadSpriteAsync(iconKeys[i]);
+                _view.SetNodeTypeIcons(iconSprites);
+            }
 
             _view.RenderNodes(nodes);
 
@@ -54,17 +77,13 @@ namespace Samsara.Features.StageScene.Presentation
             _view.HighlightNode(vm.CurrentNodeIndex);
             _view.FocusOnNode(vm.CurrentNodeIndex);
             _view.SetCharacterPosition(_view.GetNodeWorldPosition(vm.CurrentNodeIndex));
-
-            // TODO: [BACKLOG] Load background Sprite from BiomeSpriteKey via Addressables.
-            _view.SetBackground(null);
-
             _view.SetDay(vm.Day);
             _view.SetBackButtonInteractable(vm.CanReturnToMain);
 
-            _view.OnNodeClicked       += HandleNodeClicked;
-            _view.OnBackClicked       += HandleBackClicked;
-            _view.OnOptionClicked     += HandleOptionClicked;
-            _view.OnStageSelected     += HandleStageSelected;
+            _view.OnNodeClicked         += HandleNodeClicked;
+            _view.OnBackClicked         += HandleBackClicked;
+            _view.OnOptionClicked       += HandleOptionClicked;
+            _view.OnStageSelected       += HandleStageSelected;
             _view.OnReturnToMainClicked += HandleReturnToMain;
 
             Debug.Log($"{_logClass} Initialize 완료. CurrentNode={vm.CurrentNodeIndex}, Day={vm.Day}");
@@ -222,7 +241,16 @@ namespace Samsara.Features.StageScene.Presentation
             _view.SetCharacterPosition(_view.GetNodeWorldPosition(vm.CurrentNodeIndex));
             _view.SetBackButtonInteractable(vm.CanReturnToMain);
 
-            // TODO: [BACKLOG] Update background sprite for new stage biome
+            // 새 스테이지 바이옴 배경 스프라이트 갱신
+            if (!string.IsNullOrEmpty(vm.BiomeSpriteKey))
+            {
+                var newBg = await _spriteLoader.LoadSpriteAsync(vm.BiomeSpriteKey);
+                _view.SetBackground(newBg);
+            }
+            else
+            {
+                _view.SetBackground(null);
+            }
         }
 
         private async UniTaskVoid HandleReturnToMainAsync()

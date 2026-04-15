@@ -15,20 +15,22 @@ namespace Samsara.Features.Event.Presentation
         [SerializeField] private TMP_Text     _dialogueText;
         [SerializeField] private GameObject   _dialoguePanel;
 
-        public void ShowDialogue(EventDialogue dialogue)
+        /// <summary>
+        /// 대화를 표시한다. portrait는 사전 로드된 Sprite (없으면 null).
+        /// </summary>
+        public void ShowDialogue(EventDialogue dialogue, Sprite portrait)
         {
             _dialoguePanel.SetActive(true);
             _speakerNameText.text = dialogue.SpeakerName;
             _dialogueText.text    = dialogue.DialogueText;
 
-            bool hasPortrait = !string.IsNullOrEmpty(dialogue.PortraitSpriteKey);
+            bool hasPortrait = portrait != null;
 
             if (dialogue.SpeakerPosition == SpeakerPosition.Left)
             {
                 if (hasPortrait)
                 {
-                    var sprite = UnityEngine.Resources.Load<Sprite>(dialogue.PortraitSpriteKey);
-                    _leftPortrait.SetPortrait(sprite);
+                    _leftPortrait.SetPortrait(portrait);
                     _leftPortrait.Show();
                     _leftPortrait.SetHighlight(true);
                 }
@@ -42,8 +44,7 @@ namespace Samsara.Features.Event.Presentation
             {
                 if (hasPortrait)
                 {
-                    var sprite = UnityEngine.Resources.Load<Sprite>(dialogue.PortraitSpriteKey);
-                    _rightPortrait.SetPortrait(sprite);
+                    _rightPortrait.SetPortrait(portrait);
                     _rightPortrait.Show();
                     _rightPortrait.SetHighlight(true);
                 }

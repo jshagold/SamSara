@@ -2229,6 +2229,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.EvolutionTreeScene.Presentation.EvolutionTreeSceneBootstrapper
   _evolutionTreeView: {fileID: 1539830571}
+  _currentFrameKey: node_frame_current
+  _evolvableFrameKey: node_frame_evolvable
+  _reachableFrameKey: node_frame_reachable
+  _lockedFrameKey: node_frame_locked
+  _hiddenFrameKey: node_frame_hidden
+  _questionMarkKey: 
 --- !u!1 &1580710217
 GameObject:
   m_ObjectHideFlags: 0

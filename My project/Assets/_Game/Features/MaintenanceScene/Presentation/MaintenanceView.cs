@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Samsara.Core.AssetLoading;
 using Samsara.Features.Character.MasterData;
 using Samsara.Features.Event.MasterData;
 using Samsara.Features.MaintenanceScene.Presentation.Main;
@@ -88,6 +89,14 @@ namespace Samsara.Features.MaintenanceScene.Presentation
             _shopPanelView.Show(items, gold);
         }
 
+        // ── Background / Character Sprite ──
+
+        public void SetCharacterSprite(Sprite sprite)
+            => _characterInfoPanelView.SetCharacterSprite(sprite);
+
+        public void SetBackground(Sprite sprite)
+            => _backgroundView.SetBackground(sprite);
+
         // ── Shop Panel updates ──
 
         public void UpdateShopGold(int gold)
@@ -99,7 +108,14 @@ namespace Samsara.Features.MaintenanceScene.Presentation
         public void UpdateTopBarGold(int gold)
             => _characterInfoPanelView.UpdateGold(gold);
 
+        public void SetShopSlotIcon(int slotIndex, Sprite sprite)
+            => _shopPanelView.SetSlotIcon(slotIndex, sprite);
+
         // ── Merchant Dialogue ──
+
+        /// <summary>대화 오버레이에 SpriteLoader를 주입한다. MaintenancePresenter 초기화 시 호출.</summary>
+        public void InitializeDialogueOverlaySpriteLoader(ISpriteLoader spriteLoader)
+            => _dialogueOverlay.SetSpriteLoader(spriteLoader);
 
         /// <summary>
         /// 상인 대화 오버레이를 실행하고 선택된 인덱스를 반환한다.

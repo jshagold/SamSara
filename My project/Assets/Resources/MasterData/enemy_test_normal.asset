@@ -16,6 +16,6 @@ MonoBehaviour:
   _enemyName: Normal Enemy
   _baseStats: {fileID: 11400000, guid: 4e84acb28ba513442afa2f06908713e1, type: 2}
   _skillIds: 292300002a230000
-  _battleSpriteKeyHp100: Assets/_Game/Dev/Features/Battle/Sprites/test_enemy_normal.png
-  _battleSpriteKeyHp50: Assets/_Game/Dev/Features/Battle/Sprites/test_enemy_normal.png
-  _battleSpriteKeyHp0: Assets/_Game/Dev/Features/Battle/Sprites/test_enemy_normal.png
+  _battleSpriteKeyHp100: enemy_normal
+  _battleSpriteKeyHp50: enemy_normal
+  _battleSpriteKeyHp0: enemy_normal

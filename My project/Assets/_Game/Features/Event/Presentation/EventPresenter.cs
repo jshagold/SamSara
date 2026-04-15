@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Samsara.Core.AssetLoading;
 using Samsara.Core.Navigation;
 using Samsara.Features.Event.Domain;
 using Samsara.Features.Event.MasterData;
@@ -16,6 +17,7 @@ namespace Samsara.Features.Event.Presentation
         private readonly ISceneNavigator     _sceneNavigator;
         private readonly PendingEventContext _pendingEventContext;
         private readonly ShopUseCase         _shopUseCase;
+        private readonly ISpriteLoader       _spriteLoader;
 
         private UniTaskCompletionSource _tapTcs;
 
@@ -24,13 +26,15 @@ namespace Samsara.Features.Event.Presentation
             EventView           view,
             ISceneNavigator     sceneNavigator,
             PendingEventContext pendingEventContext,
-            ShopUseCase         shopUseCase)
+            ShopUseCase         shopUseCase,
+            ISpriteLoader       spriteLoader)
         {
             _useCase            = useCase;
             _view               = view;
             _sceneNavigator     = sceneNavigator;
             _pendingEventContext = pendingEventContext;
             _shopUseCase        = shopUseCase;
+            _spriteLoader       = spriteLoader;
         }
 
         // ──────────────────────────────────────────────
@@ -41,10 +45,14 @@ namespace Samsara.Features.Event.Presentation
         {
             _useCase.LoadEvent(_pendingEventContext.EventId);
 
-            // 배경 설정
-            if (!string.IsNullOrEmpty(_pendingEventContext.BackgroundSpriteKey))
+            // 배경 설정 — EventSO 키 우선, 없으면 PendingEventContext 키 사용
+            var bgKey = _useCase.GetBackgroundSpriteKey();
+            if (string.IsNullOrEmpty(bgKey))
+                bgKey = _pendingEventContext.BackgroundSpriteKey;
+
+            if (!string.IsNullOrEmpty(bgKey))
             {
-                var bg = Resources.Load<Sprite>(_pendingEventContext.BackgroundSpriteKey);
+                var bg = await _spriteLoader.LoadSpriteAsync(bgKey);
                 _view.BackgroundView.SetBackground(bg);
             }
 
@@ -82,7 +90,7 @@ namespace Samsara.Features.Event.Presentation
         {
             _view.OnScreenTapped += HandleScreenTap;
 
-            ShowCurrentDialogue();
+            await ShowCurrentDialogueAsync();
 
             while (true)
             {
@@ -91,7 +99,7 @@ namespace Samsara.Features.Event.Presentation
 
                 bool hasNext = _useCase.AdvanceDialogue();
                 if (!hasNext) break;
-                ShowCurrentDialogue();
+                await ShowCurrentDialogueAsync();
             }
 
             _view.OnScreenTapped -= HandleScreenTap;
@@ -105,11 +113,16 @@ namespace Samsara.Features.Event.Presentation
             _tapTcs?.TrySetResult();
         }
 
-        private void ShowCurrentDialogue()
+        private async UniTask ShowCurrentDialogueAsync()
         {
             var dialogue = _useCase.GetCurrentDialogue();
-            if (dialogue != null)
-                _view.DialogueView.ShowDialogue(dialogue);
+            if (dialogue == null) return;
+
+            Sprite portrait = null;
+            if (!string.IsNullOrEmpty(dialogue.PortraitSpriteKey))
+                portrait = await _spriteLoader.LoadSpriteAsync(dialogue.PortraitSpriteKey);
+
+            _view.DialogueView.ShowDialogue(dialogue, portrait);
         }
 
         // ──────────────────────────────────────────────

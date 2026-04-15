@@ -14,7 +14,7 @@ namespace Samsara.Features.Shop.MasterData
         [SerializeField] private StatType _targetStat;
         [SerializeField] private int     _effectValue;
         [SerializeField] private int     _price;
-        [SerializeField] private Sprite  _sprite;
+        [SerializeField] private string  _spriteKey;
 
         public int      Id          => _id;
         public string   PotionName  => _potionName;
@@ -22,6 +22,6 @@ namespace Samsara.Features.Shop.MasterData
         public StatType TargetStat  => _targetStat;
         public int      EffectValue => _effectValue;
         public int      Price       => _price;
-        public Sprite   Sprite      => _sprite;
+        public string   SpriteKey   => _spriteKey;
     }
 }

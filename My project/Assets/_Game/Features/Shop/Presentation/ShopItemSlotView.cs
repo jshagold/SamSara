@@ -22,15 +22,17 @@ namespace Samsara.Features.Shop.Presentation
         {
             _potionId = itemInfo.Potion.Id;
 
-            if (itemInfo.Potion.Sprite != null)
-                _potionIcon.sprite = itemInfo.Potion.Sprite;
-
             _potionNameText.text = itemInfo.Potion.PotionName;
             _priceText.text      = $"{itemInfo.Price} G";
             _stockText.text      = $"x{itemInfo.RemainingStock}";
 
             _purchaseButton.onClick.RemoveAllListeners();
             _purchaseButton.onClick.AddListener(() => onPurchase(_potionId));
+        }
+
+        public void SetIcon(Sprite sprite)
+        {
+            _potionIcon.sprite = sprite;
         }
 
         public void UpdateStock(int remainingStock)

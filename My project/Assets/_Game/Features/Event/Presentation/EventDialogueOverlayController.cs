@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Samsara.Core.AssetLoading;
 using Samsara.Features.Event.Domain;
 using Samsara.Features.Event.MasterData;
 using UnityEngine;
@@ -18,11 +19,19 @@ namespace Samsara.Features.Event.Presentation
         [SerializeField] private GameObject    _dimBackground;
 
         private EventUseCase              _useCase;
+        private ISpriteLoader             _spriteLoader;
         private UniTaskCompletionSource   _tapTcs;
 
-        public void Initialize(EventUseCase useCase)
+        public void Initialize(EventUseCase useCase, ISpriteLoader spriteLoader = null)
         {
-            _useCase = useCase;
+            _useCase      = useCase;
+            if (spriteLoader != null) _spriteLoader = spriteLoader;
+        }
+
+        /// <summary>EventUseCase 없이 오버레이만 사용할 때 SpriteLoader를 주입한다 (상인 대화 등).</summary>
+        public void SetSpriteLoader(ISpriteLoader spriteLoader)
+        {
+            _spriteLoader = spriteLoader;
         }
 
         /// <summary>
@@ -102,7 +111,8 @@ namespace Samsara.Features.Event.Presentation
         private async UniTask RunRawDialogueLoopAsync(EventDialogue[] dialogues)
         {
             int index = 0;
-            _dialogueView.ShowDialogue(dialogues[index]);
+            var portrait = await LoadPortraitAsync(dialogues[index].PortraitSpriteKey);
+            _dialogueView.ShowDialogue(dialogues[index], portrait);
 
             while (true)
             {
@@ -111,7 +121,8 @@ namespace Samsara.Features.Event.Presentation
 
                 index++;
                 if (index >= dialogues.Length) break;
-                _dialogueView.ShowDialogue(dialogues[index]);
+                portrait = await LoadPortraitAsync(dialogues[index].PortraitSpriteKey);
+                _dialogueView.ShowDialogue(dialogues[index], portrait);
             }
 
             _dialogueView.HideDialogue();
@@ -119,7 +130,7 @@ namespace Samsara.Features.Event.Presentation
 
         private async UniTask RunDialogueLoopAsync()
         {
-            ShowCurrentDialogue();
+            await ShowCurrentDialogueAsync();
 
             while (true)
             {
@@ -128,17 +139,24 @@ namespace Samsara.Features.Event.Presentation
 
                 bool hasNext = _useCase.AdvanceDialogue();
                 if (!hasNext) break;
-                ShowCurrentDialogue();
+                await ShowCurrentDialogueAsync();
             }
 
             _dialogueView.HideDialogue();
         }
 
-        private void ShowCurrentDialogue()
+        private async UniTask ShowCurrentDialogueAsync()
         {
             var dialogue = _useCase.GetCurrentDialogue();
-            if (dialogue != null)
-                _dialogueView.ShowDialogue(dialogue);
+            if (dialogue == null) return;
+            var portrait = await LoadPortraitAsync(dialogue.PortraitSpriteKey);
+            _dialogueView.ShowDialogue(dialogue, portrait);
+        }
+
+        private async UniTask<Sprite> LoadPortraitAsync(string key)
+        {
+            if (_spriteLoader == null || string.IsNullOrEmpty(key)) return null;
+            return await _spriteLoader.LoadSpriteAsync(key);
         }
 
         private void OnDestroy()

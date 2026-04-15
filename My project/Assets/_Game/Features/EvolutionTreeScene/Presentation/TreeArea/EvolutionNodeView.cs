@@ -13,13 +13,13 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation.TreeArea
         [SerializeField] private Image _nodeIcon;
         [SerializeField] private Image _frameImage;
 
-        [SerializeField] private Sprite _currentFrameSprite;
-        [SerializeField] private Sprite _evolvableFrameSprite;
-        [SerializeField] private Sprite _reachableFrameSprite;
-        [SerializeField] private Sprite _lockedFrameSprite;
-        [SerializeField] private Sprite _hiddenFrameSprite;
+        private Sprite _currentFrameSprite;
+        private Sprite _evolvableFrameSprite;
+        private Sprite _reachableFrameSprite;
+        private Sprite _lockedFrameSprite;
+        private Sprite _hiddenFrameSprite;
 
-        [SerializeField] private Sprite _questionMarkSprite;
+        private Sprite _questionMarkSprite;
 
         private string _nodeId;
         private Sprite _originalIcon;
@@ -27,6 +27,19 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation.TreeArea
         public string NodeId => _nodeId;
 
         public event Action<string> OnNodeClicked;
+
+        /// <summary>UI 스프라이트 외부 주입. EvolutionTreeSceneBootstrapper에서 호출.</summary>
+        public void SetUISprites(
+            Sprite current, Sprite evolvable, Sprite reachable,
+            Sprite locked, Sprite hidden, Sprite questionMark)
+        {
+            _currentFrameSprite   = current;
+            _evolvableFrameSprite = evolvable;
+            _reachableFrameSprite = reachable;
+            _lockedFrameSprite    = locked;
+            _hiddenFrameSprite    = hidden;
+            _questionMarkSprite   = questionMark;
+        }
 
         public void Setup(string nodeId, Sprite icon)
         {

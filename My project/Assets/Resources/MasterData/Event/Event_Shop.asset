@@ -15,9 +15,9 @@ MonoBehaviour:
   _eventId: 300
   _eventName: "\uC0C1"
   _eventType: 0
-  _backgroundSpriteKey: 
+  _backgroundSpriteKey: bg_main
   _dialogues:
-  - _portraitSpriteKey: 
+  - _portraitSpriteKey: test_ally
     _dialogueText: "\uC548\uB155\uD558\uC2DC\uC624."
     _speakerName: "\uC0C1\uC778"
     _speakerPosition: 1

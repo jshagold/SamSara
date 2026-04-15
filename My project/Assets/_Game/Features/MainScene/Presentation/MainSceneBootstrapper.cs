@@ -21,13 +21,22 @@ namespace Samsara.Features.MainScene.Presentation
         {
             await GlobalBootstrapper.Instance.InitializationTask;
 
-            var gameContext = GlobalBootstrapper.Instance.GameContext;
+            var gameContext      = GlobalBootstrapper.Instance.GameContext;
             var characterRunRepo = gameContext.CharacterRunRepo;
-            var sceneNavigator = GlobalBootstrapper.Instance.SceneNavigator;
+            var sceneNavigator   = GlobalBootstrapper.Instance.SceneNavigator;
+            var spriteLoader     = gameContext.SpriteLoader;
+
+            // 현재 캐릭터 EvolutionNodeSO 조회
+            var nodeId = characterRunRepo.RunData.EvolutionNodeId;
+            Samsara.Features.Character.MasterData.EvolutionNodeSO evolutionNode = null;
+            foreach (var node in gameContext.EvolutionNodes)
+            {
+                if (node.NodeId == nodeId) { evolutionNode = node; break; }
+            }
 
             var mainUseCase = new MainUseCase(characterRunRepo);
 
-            _mainPresenter = new MainPresenter(mainUseCase, _mainView, sceneNavigator);
+            _mainPresenter = new MainPresenter(mainUseCase, _mainView, sceneNavigator, spriteLoader, evolutionNode);
             _mainPresenter.Initialize();
 
             Debug.Log($"{_logClass} MainScene 초기화 완료.");

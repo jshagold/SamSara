@@ -1,0 +1,103 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Sprites
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Sprites
+  m_GUID: 4374b4ca8c4a85949974a109e20f3d4d
+  m_SerializeEntries:
+  - m_GUID: 0086ea954d6bca747b2b43fd9aeeafdb
+    m_Address: node_frame_locked
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 18a46f5ceb6fac14ead0c621d2643d28
+    m_Address: bg_stage_field
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 30c371a36dae72442b6c9ccc56d0a19d
+    m_Address: bg_battle_field
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4152054ef4e330e428f9f07f8608dee1
+    m_Address: node_frame_hidden
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9349b4c279f0dd54c8dfb72792c0aa5a
+    m_Address: node_frame_evolvable
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9acfebee62006de4a8ae24a74a7fc537
+    m_Address: btn_back
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a796faf9b38a516488973f65ea27588b
+    m_Address: enemy_normal
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a991d7bd9ade5fc43b1022af00c3459e
+    m_Address: char_base
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aa8bb978610a3134dbbc5627ea9f2738
+    m_Address: char_evo_lv2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cca41474cf5e0684ab98c1d38d2b3c62
+    m_Address: icon_skill_attack
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ce533d5909e31bf49bca4d3d89adedb2
+    m_Address: char_evo_lv3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d0680011d6e68c24e8e624a0cc6a6144
+    m_Address: enemy_boss
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d4cdcac946b69c843a43e7c880048a2a
+    m_Address: node_frame_reachable
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: eea61980cf6357c4ba9eff8a385b879c
+    m_Address: node_frame_current
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f2ea047ee54b2054fbb5a2638abc56e9
+    m_Address: bg_main
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f3bc76af0524911498c9daef7d95e56b
+    m_Address: char_evo_lv4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 7e65b7ddda3577f4ea50afcd9d7bc941, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 1539541c86c889e48adf875624e10192, type: 2}
+    - {fileID: 11400000, guid: cb2e6de2b8d44fc47a9f995a7e46cf67, type: 2}

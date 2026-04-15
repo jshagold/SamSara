@@ -16,6 +16,6 @@ MonoBehaviour:
   _enemyName: Weak Enemy
   _baseStats: {fileID: 11400000, guid: 6ea9098ab16abed478d0df5dc737002d, type: 2}
   _skillIds: 29230000
-  _battleSpriteKeyHp100: Assets/_Game/Dev/Features/Battle/Sprites/test_enemy_weak.png
-  _battleSpriteKeyHp50: Assets/_Game/Dev/Features/Battle/Sprites/test_enemy_weak.png
-  _battleSpriteKeyHp0: Assets/_Game/Dev/Features/Battle/Sprites/test_enemy_weak.png
+  _battleSpriteKeyHp100: test_enemy_weak
+  _battleSpriteKeyHp50: test_enemy_weak
+  _battleSpriteKeyHp0: test_enemy_weak

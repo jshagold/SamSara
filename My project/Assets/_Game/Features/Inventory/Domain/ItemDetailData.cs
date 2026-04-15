@@ -1,5 +1,4 @@
 using Samsara.Features.Character.MasterData;
-using UnityEngine;
 
 namespace Samsara.Features.Inventory.Domain
 {
@@ -8,7 +7,7 @@ namespace Samsara.Features.Inventory.Domain
     {
         public string   ItemName;
         public string   Description;
-        public Sprite   IconSprite;
+        public string   IconSpriteKey;
         public StatType TargetStat;
         public int      EffectValue;
         public int      Quantity;

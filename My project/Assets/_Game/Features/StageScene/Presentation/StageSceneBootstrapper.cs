@@ -30,7 +30,7 @@ namespace Samsara.Features.StageScene.Presentation
 
             var stageSceneUseCase = new StageSceneUseCase(stageRepo, stageMasterDataRepo, characterRunRepo);
 
-            _stagePresenter = new StagePresenter(stageSceneUseCase, _stageView, sceneNavigator, popupManager, gameContext);
+            _stagePresenter = new StagePresenter(stageSceneUseCase, _stageView, sceneNavigator, popupManager, gameContext, gameContext.SpriteLoader);
             _stagePresenter.Initialize();
 
             Debug.Log($"{_logClass} StageScene 초기화 완료.");

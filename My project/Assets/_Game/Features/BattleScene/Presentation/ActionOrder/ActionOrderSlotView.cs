@@ -49,7 +49,6 @@ namespace Samsara.Features.BattleScene.Presentation.ActionOrder
             _nameText.text = name;
             _borderImage.color = isAlly ? _allyBorderColor : _enemyBorderColor;
 
-            LoadPortrait(portraitKey);
             SetHighlight(false);
         }
 
@@ -64,19 +63,9 @@ namespace Samsara.Features.BattleScene.Presentation.ActionOrder
             OnSlotTouched?.Invoke(ParticipantId);
         }
 
-        private void LoadPortrait(string portraitKey)
+        public void SetPortrait(Sprite sprite)
         {
-            if (string.IsNullOrEmpty(portraitKey))
-            {
-                _portraitImage.sprite = null;
-                return;
-            }
-
-#if UNITY_EDITOR
-            var sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(portraitKey);
-            if (sprite != null)
-                _portraitImage.sprite = sprite;
-#endif
+            _portraitImage.sprite = sprite;
         }
 
         private void OnDestroy()

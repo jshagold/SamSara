@@ -53,6 +53,13 @@ namespace Samsara.Features.Shop.Presentation
             _goldText.text = $"{gold} G";
         }
 
+        /// <summary>특정 슬롯의 포션 아이콘을 설정한다. SpriteLoader로 사전 로드 후 호출.</summary>
+        public void SetSlotIcon(int slotIndex, Sprite sprite)
+        {
+            if (slotIndex < 0 || slotIndex >= _slotViews.Count) return;
+            _slotViews[slotIndex].SetIcon(sprite);
+        }
+
         /// <summary>특정 슬롯의 재고 수를 갱신한다. slotIndex는 items 리스트 순서와 동일.</summary>
         public void UpdateSlot(int slotIndex, int remainingStock)
         {

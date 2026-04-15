@@ -17,6 +17,7 @@ namespace Samsara.Core.MasterData
         [SerializeField] private string _battleSpriteKeyHp100;
         [SerializeField] private string _battleSpriteKeyHp50;
         [SerializeField] private string _battleSpriteKeyHp0;
+        [SerializeField] private string _portraitSpriteKey;
 
         public int EnemyId => _enemyId;
         public string EnemyName => _enemyName;
@@ -25,5 +26,6 @@ namespace Samsara.Core.MasterData
         public string BattleSpriteKeyHp100 => _battleSpriteKeyHp100;
         public string BattleSpriteKeyHp50 => _battleSpriteKeyHp50;
         public string BattleSpriteKeyHp0 => _battleSpriteKeyHp0;
+        public string PortraitSpriteKey => _portraitSpriteKey;
     }
 }

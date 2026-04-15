@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Samsara.Core.AssetLoading;
 using Samsara.Core.MasterData;
 using Samsara.Core.Navigation;
 using Samsara.Core.Popup;
@@ -16,13 +17,17 @@ namespace Samsara.Features.BattleScene.Presentation
     {
         private readonly string _logClass = $"[{nameof(BattlePresenter)}]";
 
-        private readonly BattleUseCase _useCase;
-        private readonly BattleView _view;
-        private readonly ISceneNavigator _sceneNavigator;
-        private readonly IPopupManager _popupManager;
+        private readonly BattleUseCase              _useCase;
+        private readonly BattleView                 _view;
+        private readonly ISceneNavigator            _sceneNavigator;
+        private readonly IPopupManager              _popupManager;
         private readonly ISkillMasterDataRepository _skillMasterDataRepo;
-        private readonly GameContext _gameContext;
-        private readonly BattleEventHookRunner _hookRunner;
+        private readonly GameContext                _gameContext;
+        private readonly BattleEventHookRunner      _hookRunner;
+        private readonly ISpriteLoader              _spriteLoader;
+
+        // 초상화 캐시 — participantId → Sprite
+        private readonly Dictionary<int, Sprite> _portraitCache = new Dictionary<int, Sprite>();
 
         // ── 통합 아군 입력 TCS ──
         private enum AllyInputType { Skill, Target, Wait, Confirm }
@@ -49,21 +54,23 @@ namespace Samsara.Features.BattleScene.Presentation
         private const float PostDamageDelay    = 0.5f;  // 데미지 표시 후 플레이어 결과 확인 대기
 
         public BattlePresenter(
-            BattleUseCase useCase,
-            BattleView view,
-            ISceneNavigator sceneNavigator,
-            IPopupManager popupManager,
+            BattleUseCase              useCase,
+            BattleView                 view,
+            ISceneNavigator            sceneNavigator,
+            IPopupManager              popupManager,
             ISkillMasterDataRepository skillMasterDataRepo,
-            GameContext gameContext,
-            BattleEventHookRunner hookRunner)
+            GameContext                gameContext,
+            BattleEventHookRunner      hookRunner,
+            ISpriteLoader              spriteLoader)
         {
-            _useCase = useCase;
-            _view = view;
-            _sceneNavigator = sceneNavigator;
-            _popupManager = popupManager;
+            _useCase             = useCase;
+            _view                = view;
+            _sceneNavigator      = sceneNavigator;
+            _popupManager        = popupManager;
             _skillMasterDataRepo = skillMasterDataRepo;
-            _gameContext = gameContext;
-            _hookRunner = hookRunner;
+            _gameContext         = gameContext;
+            _hookRunner          = hookRunner;
+            _spriteLoader        = spriteLoader;
         }
 
         public void Initialize(PendingBattleContext context)
@@ -106,7 +113,7 @@ namespace Samsara.Features.BattleScene.Presentation
             _view.AllyField.OnLongPress  += _allyLongPressHandler;
             _view.OnSkillLongPress    += _skillLongPressHandler;
 
-            // 배틀 루프 시작
+            // 배틀 루프 시작 (스프라이트 로드 포함)
             RunBattleLoopAsync().Forget();
 
             Debug.Log($"{_logClass} Initialize 완료.");
@@ -132,11 +139,55 @@ namespace Samsara.Features.BattleScene.Presentation
         }
 
         // ──────────────────────────────────────────────
+        // Sprite Preload
+        // ──────────────────────────────────────────────
+
+        private async UniTask PreloadSpritesAsync()
+        {
+            var runtimeData = _useCase.RuntimeData;
+            if (runtimeData == null) return;
+
+            // 아군 스프라이트 + 초상화
+            foreach (var ally in runtimeData.Allies)
+            {
+                var unitSprite = await _spriteLoader.LoadSpriteAsync(ally.SpriteKey);
+                _view.AllyField.GetUnit(ally.Id).SetSprite(unitSprite);
+
+                var portrait = await _spriteLoader.LoadSpriteAsync(ally.PortraitSpriteKey);
+                _portraitCache[ally.Id] = portrait;
+            }
+
+            // 적 스프라이트 + 초상화
+            foreach (var enemy in runtimeData.Enemies)
+            {
+                var unitSprite = await _spriteLoader.LoadSpriteAsync(enemy.SpriteKey);
+                _view.EnemyField.GetUnit(enemy.Id).SetSprite(unitSprite);
+
+                var portrait = await _spriteLoader.LoadSpriteAsync(enemy.PortraitSpriteKey);
+                _portraitCache[enemy.Id] = portrait;
+            }
+
+            // 행동 순서 초상화 적용
+            ApplyPortraitsToActionOrder();
+        }
+
+        private void ApplyPortraitsToActionOrder()
+        {
+            foreach (var kvp in _portraitCache)
+            {
+                _view.ActionOrder.SetSlotPortrait(kvp.Key, kvp.Value);
+            }
+        }
+
+        // ──────────────────────────────────────────────
         // Battle Loop (Plan §6-2)
         // ──────────────────────────────────────────────
 
         private async UniTaskVoid RunBattleLoopAsync()
         {
+            // 스프라이트 사전 로드
+            await PreloadSpritesAsync();
+
             // PreBattle 훅 + 시작 연출
             await _hookRunner.CheckHook(BattleHookType.PreBattle, _useCase.RuntimeData);
             await _view.BattleStart.PlayStartPresentation();
@@ -211,7 +262,7 @@ namespace Samsara.Features.BattleScene.Presentation
         {
             // 스킬 데이터 구성 및 스킬 UI 표시
             var usableSkills = _useCase.GetUsableSkills(actor);
-            var skillDisplays = BuildSkillDisplayData(actor, usableSkills);
+            var skillDisplays = await BuildSkillDisplayDataAsync(actor, usableSkills);
             _view.SkillSelection.SetSkills(skillDisplays);
             _view.ShowSkillUI();
             _view.Confirm.SetInteractable(false);
@@ -627,9 +678,12 @@ namespace Samsara.Features.BattleScene.Presentation
             _view.ActionOrder.SetOrder(ordered);
             if (currentActor != null)
                 _view.ActionOrder.HighlightCurrent(currentActor.Id);
+
+            // 캐시된 초상화 적용
+            ApplyPortraitsToActionOrder();
         }
 
-        private SkillDisplayData[] BuildSkillDisplayData(BattleParticipant actor, List<int> usableSkillIds)
+        private async UniTask<SkillDisplayData[]> BuildSkillDisplayDataAsync(BattleParticipant actor, List<int> usableSkillIds)
         {
             var displays = new SkillDisplayData[actor.SkillIds.Length];
             var usableSet = new HashSet<int>(usableSkillIds);
@@ -648,10 +702,15 @@ namespace Samsara.Features.BattleScene.Presentation
                 else
                     state = SkillState.Usable;
 
+                Sprite icon = null;
+                if (!string.IsNullOrEmpty(skillSO.IconSpriteKey))
+                    icon = await _spriteLoader.LoadSpriteAsync(skillSO.IconSpriteKey);
+
                 displays[i] = new SkillDisplayData
                 {
                     SkillId = skillId,
                     SpriteKey = skillSO.IconSpriteKey,
+                    Icon = icon,
                     CooldownRemaining = cooldown,
                     IsUsable = state == SkillState.Usable,
                     State = state

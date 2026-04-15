@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Stage.MasterData.StageSO
   _stageId: 1000
   _stageName: Test Stage 01
-  _backgroundSpriteKey: bg_forest
+  _backgroundSpriteKey: bg_stage_field
   _backgroundMusicKey: bgm_forest
   _isFixed: 1
   _fixedNodes:

@@ -23,5 +23,5 @@ MonoBehaviour:
   - _costType: 1
     _value: 10
   _effects: []
-  _iconSpriteKey: Assets/_Game/Dev/Features/Battle/Sprites/test_skill_drain.png
+  _iconSpriteKey: test_skill_drain
   _effectSpriteKey: 

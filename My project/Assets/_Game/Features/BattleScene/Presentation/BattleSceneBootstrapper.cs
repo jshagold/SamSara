@@ -90,7 +90,8 @@ namespace Samsara.Features.BattleScene.Presentation
                 popupManager,
                 skillMasterDataRepo,
                 gameContext,
-                hookRunner
+                hookRunner,
+                gameContext.SpriteLoader
             );
 
             _battlePresenter.Initialize(pendingContext);

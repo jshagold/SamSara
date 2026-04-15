@@ -1,9 +1,11 @@
 using Cysharp.Threading.Tasks;
+using Samsara.Core.AssetLoading;
 using Samsara.Core.MasterData;
 using Samsara.Core.Navigation;
 using Samsara.Core.Popup;
 using Samsara.Features.CharacterInfoScene.Domain;
 using Samsara.Features.CharacterInfoScene.Presentation.InfoScroll;
+using UnityEngine;
 
 namespace Samsara.Features.CharacterInfoScene.Presentation
 {
@@ -15,30 +17,41 @@ namespace Samsara.Features.CharacterInfoScene.Presentation
         private readonly CharacterInfoView    _view;
         private readonly ISceneNavigator      _sceneNavigator;
         private readonly IPopupManager        _popupManager;
+        private readonly ISpriteLoader        _spriteLoader;
 
-        private SkillSO[] _skillSoCache;
+        private SkillSO[]  _skillSoCache;
+        private Sprite[]   _skillIconCache;
 
         public CharacterInfoPresenter(
             CharacterInfoUseCase useCase,
             CharacterInfoView    view,
             ISceneNavigator      sceneNavigator,
-            IPopupManager        popupManager)
+            IPopupManager        popupManager,
+            ISpriteLoader        spriteLoader)
         {
             _useCase        = useCase;
             _view           = view;
             _sceneNavigator = sceneNavigator;
             _popupManager   = popupManager;
+            _spriteLoader   = spriteLoader;
         }
 
         public void Initialize()
         {
+            InitializeAsync().Forget();
+        }
+
+        private async UniTaskVoid InitializeAsync()
+        {
             var evolutionNode = _useCase.GetCurrentEvolutionNode();
 
-            // Character sprite — Phase 1 placeholder (no Addressables loading yet)
-            _view.CharacterSpriteView.SetSprite(null);
+            // Character sprite — SpriteLoader로 로드
+            var characterSprite = await _spriteLoader.LoadSpriteAsync(evolutionNode.MainStandingSpriteKey);
+            _view.CharacterSpriteView.SetSprite(characterSprite);
 
-            // Evolution stage button
-            _view.EvolutionStageButtonView.SetEvolutionInfo(null, evolutionNode.CharacterName);
+            // Evolution stage button — 노드 아이콘 스프라이트 로드
+            var evolutionNodeIcon = await _spriteLoader.LoadSpriteAsync(evolutionNode.NodeIconSpriteKey);
+            _view.EvolutionStageButtonView.SetEvolutionInfo(evolutionNodeIcon, evolutionNode.CharacterName);
 
             // Stats
             var stats = _useCase.GetCurrentStats();
@@ -48,14 +61,17 @@ namespace Samsara.Features.CharacterInfoScene.Presentation
             // Character name
             _view.InfoScrollView.CharacterNameView.SetName(evolutionNode.CharacterName);
 
-            // Skills
-            _skillSoCache = _useCase.GetSkills();
+            // Skills — 아이콘 스프라이트를 캐시에 보관 (팝업에서 재사용)
+            _skillSoCache   = _useCase.GetSkills();
+            _skillIconCache = new Sprite[_skillSoCache.Length];
             var skillDisplayData = new SkillDisplayData[_skillSoCache.Length];
             for (int i = 0; i < _skillSoCache.Length; i++)
             {
+                var iconSprite      = await _spriteLoader.LoadSpriteAsync(_skillSoCache[i].IconSpriteKey);
+                _skillIconCache[i]  = iconSprite;
                 skillDisplayData[i] = new SkillDisplayData
                 {
-                    Icon      = null, // Phase 1 placeholder
+                    Icon      = iconSprite,
                     HasEffect = _skillSoCache[i].Effects != null && _skillSoCache[i].Effects.Length > 0
                 };
             }
@@ -90,8 +106,9 @@ namespace Samsara.Features.CharacterInfoScene.Presentation
 
             var skill = _skillSoCache[index];
             var effectDescription = BuildEffectDescription(skill);
+            var icon = _skillIconCache != null && index < _skillIconCache.Length ? _skillIconCache[index] : null;
             _view.SkillDescriptionPopupView.Show(
-                null,
+                icon,
                 skill.SkillName,
                 skill.Description,
                 skill.Damage,

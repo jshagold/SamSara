@@ -10,6 +10,15 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation
 
         [SerializeField] private EvolutionTreeView _evolutionTreeView;
 
+        // Node state frame sprites — Addressable keys (set in Inspector)
+        // Order matches SetUISprites: current, evolvable, reachable, locked, hidden, questionMark
+        [SerializeField] private string _currentFrameKey;
+        [SerializeField] private string _evolvableFrameKey;
+        [SerializeField] private string _reachableFrameKey;
+        [SerializeField] private string _lockedFrameKey;
+        [SerializeField] private string _hiddenFrameKey;
+        [SerializeField] private string _questionMarkKey;
+
         private EvolutionTreePresenter _presenter;
 
         private void Awake()
@@ -24,8 +33,9 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation
             var gameContext = GlobalBootstrapper.Instance.GameContext;
 
             // Repositories from GameContext
-            var characterRunRepo = gameContext.CharacterRunRepo;
+            var characterRunRepo    = gameContext.CharacterRunRepo;
             var skillMasterDataRepo = gameContext.SkillMasterDataRepo;
+            var spriteLoader        = gameContext.SpriteLoader;
 
             // MasterData cache
             var evolutionNodes = gameContext.EvolutionNodes;
@@ -39,7 +49,17 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation
 
             // Navigation + Popup
             var sceneNavigator = GlobalBootstrapper.Instance.SceneNavigator;
-            var popupManager = gameContext.PopupManager;
+            var popupManager   = gameContext.PopupManager;
+
+            var uiSpriteKeys = new[]
+            {
+                _currentFrameKey,
+                _evolvableFrameKey,
+                _reachableFrameKey,
+                _lockedFrameKey,
+                _hiddenFrameKey,
+                _questionMarkKey
+            };
 
             // Presenter
             _presenter = new EvolutionTreePresenter(
@@ -47,7 +67,9 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation
                 layoutCalculator,
                 _evolutionTreeView,
                 sceneNavigator,
-                popupManager);
+                popupManager,
+                spriteLoader,
+                uiSpriteKeys);
 
             _presenter.Initialize();
 

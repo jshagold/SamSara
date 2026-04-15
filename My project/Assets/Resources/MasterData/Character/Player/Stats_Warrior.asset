@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Stats_Warrior
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Character.MasterData.CharacterStatsSO
   _hp: 150
-  _strength: 15
+  _strength: 150
   _toughness: 10
-  _agility: 5
+  _agility: 20

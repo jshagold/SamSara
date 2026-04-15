@@ -20,13 +20,12 @@ MonoBehaviour:
   _isHidden: 0
   _nextNodes:
   - {fileID: 11400000, guid: 6775ae952597bcb4db3067bc5dc8760a, type: 2}
-  _nodeIconSprite: {fileID: 0}
-  _nodeIconSpriteKey: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
-  _mainStandingSpriteKey: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
-  _portraitSpriteKey: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
-  _battleSpriteKeyHp100: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
-  _battleSpriteKeyHp50: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
-  _battleSpriteKeyHp0: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
-  _attackAnimSpriteKey: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
-  _stageMoveSpriteKey: Assets/_Game/Dev/Features/Battle/Sprites/test_ally.png
+  _nodeIconSpriteKey: char_base
+  _mainStandingSpriteKey: char_base
+  _portraitSpriteKey: char_base
+  _battleSpriteKeyHp100: char_base
+  _battleSpriteKeyHp50: char_base
+  _battleSpriteKeyHp0: char_base
+  _attackAnimSpriteKey: 
+  _stageMoveSpriteKey: 
   _skillIds: 292300002a2300002b230000

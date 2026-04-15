@@ -19,5 +19,5 @@ MonoBehaviour:
   _qtePatternId: 0
   _costs: []
   _effects: []
-  _iconSpriteKey: Assets/_Game/Dev/Features/Battle/Sprites/test_skill_basic.png
+  _iconSpriteKey: icon_skill_attack
   _effectSpriteKey: 

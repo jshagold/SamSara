@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Shop.MasterData.MerchantSO
   _id: 1
   _merchantName: "\uD3EC\uC158\uC0C1\uC778"
-  _portrait: {fileID: 0}
-  _shopSprite: {fileID: 0}
+  _portraitKey: test_enemy_boss
+  _shopSpriteKey: test_enemy_normal
   _stayDuration: 2
   _saleItems:
   - _potionId: 1
