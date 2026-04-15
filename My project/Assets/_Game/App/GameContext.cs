@@ -132,8 +132,8 @@ public class GameContext
         _eventUseCase     = new EventUseCase(_eventMasterDataRepo, _characterRunRepo, _stageRepo);
         _miniGameUseCase  = new MiniGameUseCase(_characterRunRepo);
         _skillUseCase     = new SkillUseCase(_skillMasterDataRepo);
-        _shopUseCase      = new ShopUseCase(_shopRepo, _shopMasterDataRepo, _characterRunRepo);
         _inventoryUseCase = new InventoryUseCase(_inventoryRepo, _characterRunRepo, _shopMasterDataRepo);
+        _shopUseCase      = new ShopUseCase(_shopRepo, _shopMasterDataRepo, _characterRunRepo, _inventoryUseCase);
 
         Debug.Log($"{_logClass} DI 조립 완료.");
     }

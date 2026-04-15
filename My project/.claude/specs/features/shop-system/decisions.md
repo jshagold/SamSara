@@ -35,3 +35,30 @@ D-08 [DECISION] Patch-001: 구매 성공 시 CharacterInfoPanelView(상단 골�
 D-09 [DECISION] 구매 차단 조건(재고 없음, 골드 부족)을 구매 확인 팝업 전에 선행 체크한다.
 **Why:** 기존 흐름은 "구매 확인" 팝업 → 사용자 확인 클릭 → 차단 팝업 순서였음. 사용자 입장에서 확인 팝업이 닫히면서 아무 피드백도 없는 것처럼 보여 버그로 인식. 재고 없음/골드 부족은 구매 시도 자체가 불가능하므로 확인 팝업을 거칠 이유가 없음.
 **How to apply:** ProcessPurchaseAsync에서 GetRemainingStock(potionId) → 재고 0이면 즉시 "재고 없음" return. RunData.Gold < potion.Price이면 즉시 "골드 부족" return. 두 체크 모두 통과한 경우에만 "구매 확인" 팝업 표시.
+
+---
+
+## v2.0.0
+
+D-10 [SPEC-GAP] Tasks v2.0.0 Task 5에서 ShopUseCase DI 변경 대상 파일을 MaintenanceSceneBootstrapper.cs로 명시했으나, 실제 ShopUseCase 생성 위치는 GameContext.cs.
+**Why:** MaintenanceSceneBootstrapper는 gameContext.ShopUseCase를 프로퍼티로 가져올 뿐이며 직접 new ShopUseCase(...)를 하지 않음. 스펙 작성 시 파일 명이 잘못 기재된 것으로 판단.
+**How to apply:** 수정 대상은 GameContext.cs (Step 2 UseCase 생성 블록). _inventoryUseCase 생성을 _shopUseCase 생성보다 앞으로 이동하고, ShopUseCase 생성자에 _inventoryUseCase를 4번째 인자로 추가.
+
+D-11 [DECISION] PotionSO의 IItemData 구현은 명시적 인터페이스 구현(explicit interface implementation)을 사용한다 (ItemName, ItemType, IconSpriteKey).
+**Why:** PotionSO 고유 API(PotionName, SpriteKey)와 IItemData API(ItemName, IconSpriteKey)가 의미상 중복이지만 이름이 다름. 암시적 구현으로 새 프로퍼티를 추가하면 PotionSO 외부 사용자에게 혼란스러운 중복 API가 노출됨. 명시적 구현으로 IItemData 캐스팅 시에만 접근 가능하게 분리.
+**How to apply:** IItemData를 파라미터로 받는 코드에서는 IItemData 인터페이스를 통해 접근. PotionSO 직접 참조 코드는 기존 PotionName/SpriteKey 사용 유지.
+
+D-12 [DECISION] ShopUseCase.PurchasePotion에서 InventoryFull 체크를 재고/골드 체크보다 먼저 수행한다.
+**Why:** Tasks v2.0.0 명세 준수. 인벤토리가 꽉 찬 상태에서 골드 차감 후 AddItem 실패 시 골드 손실이 발생하는 버그를 방지하기 위해 가장 먼저 체크.
+**How to apply:** CanAddItem → OutOfStock → InsufficientGold 순서 유지. AddItem 실패(race condition 등)는 방어적으로 InventoryFull을 반환.
+
+D-13 [DECISION] 인벤토리 가득 참 체크를 ProcessPurchaseAsync의 선행 체크 블록으로 이동했다 (D-09 패턴 적용).
+**Why:** switch-case에서 InventoryFull 팝업을 띄우는 방식은 "구매 확인" 팝업이 닫히는 프레임과 새 팝업이 열리는 프레임이 겹칠 때 PopupManager 내부 상태 미초기화로 두 번째 ShowConfirmAsync 호출이 무시되는 타이밍 버그 발생. 재고 없음/골드 부족과 동일하게 "구매 확인" 팝업 이전에 선행 체크하는 것이 올바른 패턴.
+**How to apply:** ProcessPurchaseAsync에서 _gameContext.InventoryUseCase.CanAddItem(potionId) 체크를 재고·골드 체크 직후, ShowYesNoAsync 이전에 추가. switch의 InventoryFull case는 race condition 방어용으로 유지.
+
+D-14 [DECISION] MerchantDialogue 클래스와 MerchantDialogueAdapter를 삭제하고, MerchantSO의 대사 필드를 EventDialogue[]로 통일했다.
+**Why:** MerchantDialogue는 EventDialogue의 subset(portrait 키 없음)으로, 어댑터 변환 계층이 불필요한 indirection이었음. EventDialogue[]를 MerchantSO에서 직접 사용하면 Inspector에서 portrait 키도 직접 설정 가능하고, 기획 변경 시 EventDialogue 하나만 수정하면 됨.
+**How to apply:** MerchantSO.GreetingDialogues/FarewellDialogues는 EventDialogue[] 반환. ShopUseCase.GetGreetingDialogues()도 EventDialogue[] 반환. MaintenancePresenter에서 변환 없이 직결.
+**주의:** MerchantSO .asset 파일의 기존 대사 데이터(_text → _dialogueText 필드명 불일치)는 직렬화 초기화됨 — Unity Editor에서 재입력 필요.
+**Why:** Tasks v2.0.0 명세 준수. 인벤토리가 꽉 찬 상태에서 골드 차감 후 AddItem 실패 시 골드 손실이 발생하는 버그를 방지하기 위해 가장 먼저 체크.
+**How to apply:** CanAddItem → OutOfStock → InsufficientGold 순서 유지. AddItem 실패(race condition 등)는 방어적으로 InventoryFull을 반환.

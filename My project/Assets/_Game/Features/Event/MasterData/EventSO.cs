@@ -45,7 +45,7 @@ namespace Samsara.Features.Event.MasterData
         public string SpeakerName => _speakerName;
         public SpeakerPosition SpeakerPosition => _speakerPosition;
 
-        /// <summary>코드에서 직접 생성할 때 사용하는 생성자 (MerchantDialogueAdapter 등).</summary>
+        /// <summary>코드에서 직접 생성할 때 사용하는 생성자.</summary>
         public EventDialogue(string portraitSpriteKey, string dialogueText, string speakerName, SpeakerPosition speakerPosition)
         {
             _portraitSpriteKey = portraitSpriteKey;

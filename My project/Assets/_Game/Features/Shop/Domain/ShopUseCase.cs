@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Samsara.Features.Character.Data;
 using Samsara.Features.Character.Domain;
-using Samsara.Features.Character.MasterData;
+using Samsara.Features.Event.MasterData;
+using Samsara.Features.Inventory.Domain;
 using Samsara.Features.Shop.MasterData;
 using UnityEngine;
 
@@ -19,15 +20,18 @@ namespace Samsara.Features.Shop.Domain
         private readonly IShopRepository            _shopRepo;
         private readonly IShopMasterDataRepository  _masterDataRepo;
         private readonly ICharacterRunRepository    _characterRunRepo;
+        private readonly InventoryUseCase           _inventoryUseCase;
 
         public ShopUseCase(
             IShopRepository           shopRepo,
             IShopMasterDataRepository masterDataRepo,
-            ICharacterRunRepository   characterRunRepo)
+            ICharacterRunRepository   characterRunRepo,
+            InventoryUseCase          inventoryUseCase)
         {
             _shopRepo         = shopRepo;
             _masterDataRepo   = masterDataRepo;
             _characterRunRepo = characterRunRepo;
+            _inventoryUseCase = inventoryUseCase;
         }
 
         // ──────────────────────────────────────────────
@@ -112,9 +116,16 @@ namespace Samsara.Features.Shop.Domain
         // Purchase
         // ──────────────────────────────────────────────
 
-        /// <summary>포션을 구매한다. 재고 확인 → 골드 확인 → 골드 차감 + 스탯 적용 + 재고 감소 → 저장.</summary>
+        /// <summary>포션을 구매한다. 인벤토리 확인 → 재고 확인 → 골드 확인 → 골드 차감 + 인벤토리 추가 + 재고 감소 → 저장.</summary>
         public async UniTask<PurchaseResult> PurchasePotion(int potionId)
         {
+            // 인벤토리 수용 가능 여부 선행 확인
+            if (!_inventoryUseCase.CanAddItem(potionId))
+            {
+                Debug.Log($"{_logClass} 구매 실패: 인벤토리 가득 참 potionId={potionId}");
+                return PurchaseResult.InventoryFull;
+            }
+
             var stock = _shopRepo.GetRemainingStock();
             if (!stock.TryGetValue(potionId, out int remaining) || remaining <= 0)
             {
@@ -122,8 +133,8 @@ namespace Samsara.Features.Shop.Domain
                 return PurchaseResult.OutOfStock;
             }
 
-            var potion   = _masterDataRepo.GetPotion(potionId);
-            var runData  = _characterRunRepo.RunData;
+            var potion  = _masterDataRepo.GetPotion(potionId);
+            var runData = _characterRunRepo.RunData;
 
             if (runData.Gold < potion.Price)
             {
@@ -133,16 +144,21 @@ namespace Samsara.Features.Shop.Domain
 
             // 골드 차감
             runData.Gold -= potion.Price;
-
-            // 스탯 적용
-            ApplyPotionEffect(potion, runData);
-
             _characterRunRepo.MarkDirty();
+
+            // 인벤토리에 아이템 추가 (인벤토리 저장은 AddItem 내부에서 처리)
+            var addResult = await _inventoryUseCase.AddItem(potionId);
+            if (addResult != AddItemResult.Success)
+            {
+                // CanAddItem 통과 후 race condition 등 예기치 않은 실패 — 방어적 처리
+                Debug.LogWarning($"{_logClass} AddItem 예기치 않은 실패: potionId={potionId}, result={addResult}");
+                return PurchaseResult.InventoryFull;
+            }
 
             // 재고 감소
             _shopRepo.DecrementStock(potionId);
 
-            // 저장 (fire-and-forget style — 두 저장 동시 실행)
+            // 저장 (골드 변경 + 재고 변경)
             await UniTask.WhenAll(
                 _characterRunRepo.SaveDataAsync(),
                 _shopRepo.SaveDataAsync()
@@ -157,10 +173,10 @@ namespace Samsara.Features.Shop.Domain
         // ──────────────────────────────────────────────
 
         /// <summary>현재 활성 상인의 인사 대사를 반환한다.</summary>
-        public MerchantDialogue[] GetGreetingDialogues()
+        public EventDialogue[] GetGreetingDialogues()
         {
             var merchant = GetActiveMerchantData();
-            return merchant?.GreetingDialogues ?? new MerchantDialogue[0];
+            return merchant?.GreetingDialogues ?? new EventDialogue[0];
         }
 
         // ──────────────────────────────────────────────
@@ -170,30 +186,5 @@ namespace Samsara.Features.Shop.Domain
         /// <summary>환생 시 상점 런 데이터를 초기화한다.</summary>
         public void ResetRunData() => _shopRepo.ResetRunData();
 
-        // ──────────────────────────────────────────────
-        // Internal
-        // ──────────────────────────────────────────────
-
-        private void ApplyPotionEffect(PotionSO potion, CharacterRunData runData)
-        {
-            switch (potion.TargetStat)
-            {
-                case StatType.Hp:
-                    runData.Hp = Mathf.Min(runData.Hp + potion.EffectValue, runData.MaxHp);
-                    break;
-                case StatType.Strength:
-                    runData.Strength += potion.EffectValue;
-                    break;
-                case StatType.Toughness:
-                    runData.Toughness += potion.EffectValue;
-                    break;
-                case StatType.Agility:
-                    runData.Agility += potion.EffectValue;
-                    break;
-                default:
-                    Debug.LogWarning($"{_logClass} ApplyPotionEffect: 알 수 없는 StatType={potion.TargetStat}");
-                    break;
-            }
-        }
     }
 }

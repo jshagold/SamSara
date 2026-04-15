@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Shop.MasterData.MerchantSO
   _id: 1
   _merchantName: "\uD3EC\uC158\uC0C1\uC778"
-  _portraitKey: test_enemy_boss
   _shopSpriteKey: test_enemy_normal
   _stayDuration: 2
   _saleItems:
@@ -24,11 +23,15 @@ MonoBehaviour:
     _stock: 3
   - _potionId: 3
     _stock: 3
+  - _potionId: 4
+    _stock: 3
   _greetingDialogues:
-  - _speakerName: "\uD3EC\uC158\uC0C1\uC778"
-    _text: "\u314E\u3147\u3147"
+  - _portraitSpriteKey: test_ally
+    _dialogueText: "\u314E\u3147\u3147"
+    _speakerName: "\uD3EC\uC158\uC0C1\uC778"
     _speakerPosition: 1
-  - _speakerName: "\uD3EC\uC158\uC0C1\uC778"
-    _text: "1\uC77C\uC815\uB3C4\uB9CC \uB0A8\uC544\uC788\uC74C"
+  - _portraitSpriteKey: test_ally
+    _dialogueText: "1\uC77C\uC815\uB3C4 \uBA38\uBB3C\uB4EF"
+    _speakerName: "\uD3EC\uC158\uC0C1\uC778"
     _speakerPosition: 1
   _farewellDialogues: []

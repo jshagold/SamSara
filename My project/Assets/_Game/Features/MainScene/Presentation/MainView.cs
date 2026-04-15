@@ -46,8 +46,8 @@ namespace Samsara.Features.MainScene.Presentation
         public void SetHp(int current, int max) => _characterStatusView.SetHp(current, max);
         public void SetActionPoints(int current, int max) => _characterStatusView.SetActionPoints(current, max);
         public void SetCharacterSprite(Sprite sprite) => _characterSpriteView.SetSprite(sprite);
-    public void SetBackground(Sprite sprite) => _backgroundView.SetBackground(sprite);
-    public void SetPortrait(Sprite sprite) => _characterStatusView.SetPortrait(sprite);
+        public void SetBackground(Sprite sprite) => _backgroundView.SetBackground(sprite);
+        public void SetPortrait(Sprite sprite) => _characterStatusView.SetPortrait(sprite);
         public void ShowHud() => _hudView.ShowHud();
         public void HideHud() => _hudView.HideHud();
     }

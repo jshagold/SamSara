@@ -4,6 +4,7 @@ namespace Samsara.Features.Shop.Domain
     {
         Success,
         InsufficientGold,
-        OutOfStock
+        OutOfStock,
+        InventoryFull
     }
 }
