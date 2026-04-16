@@ -1,7 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Samsara.Core.AssetLoading;
-using Samsara.Core.Navigation;
+using Samsara.Features.Ending.Domain;
 using Samsara.Features.Ending.MasterData;
 using Samsara.Features.Event.Domain;
 using Samsara.Features.Event.MasterData;
@@ -178,49 +178,50 @@ namespace Samsara.Features.Event.Presentation
 
                 case EventResultType.ShopEncounter: return "정비 구역에 상인이 찾아온다.";
                 case EventResultType.Battle:        return "전투가 시작된다!";
-                case EventResultType.Ending:        return "쓰러졌다...";
                 case EventResultType.None:          return "아무 일도 일어나지 않았다.";
                 default:                            return string.Empty;
             }
         }
 
         // ──────────────────────────────────────────────
-        // Post-Result Scene Transition
+        // Post-Result 처리
         // ──────────────────────────────────────────────
 
         private async UniTask HandlePostResultAsync(EventResult result)
         {
+            // 1. 결과 타입별 데이터 처리 (씬 전환 없음)
             switch (result.ResultType)
             {
-                case EventResultType.Ending:
-                    if (!result.EndingType.HasValue)
-                        throw new InvalidOperationException(
-                            $"{_logClass} EventResultType.Ending인데 EndingType이 null입니다. MasterData를 확인하세요.");
-                    await _gameContext.EndingEntryService.EnterEndingAsync(result.EndingType.Value);
-                    // IsCompleted 미설정 — 런 종료, ReturnScene 복귀 불필요
+                case EventResultType.ShopEncounter:
+                    if (result.MerchantId.HasValue)
+                        await _shopUseCase.ActivateMerchant(result.MerchantId.Value);
                     break;
 
                 case EventResultType.Battle:
                     // [SPEC-GAP] 이벤트 전투용 BattleNodeData 정의 미비 — ReturnScene으로 복귀 (Stub)
-                    // 추후 Patch에서 PendingBattleContext 조립 로직 추가 필요
-                    Debug.LogWarning($"{_logClass} Battle result stub: BattleNodeData 미정의. ReturnScene으로 이동.");
-                    _gameContext.PendingEventContext.IsCompleted = true;
-                    await _gameContext.SceneNavigator.NavigateToAsync(_gameContext.PendingEventContext.ReturnScene);
+                    Debug.LogWarning($"{_logClass} Battle result stub: BattleNodeData 미정의.");
                     break;
 
-                case EventResultType.ShopEncounter:
-                    if (result.MerchantId.HasValue)
-                        await _shopUseCase.ActivateMerchant(result.MerchantId.Value);
-                    _gameContext.PendingEventContext.IsCompleted = true;
-                    await _gameContext.SceneNavigator.NavigateToAsync(_gameContext.PendingEventContext.ReturnScene);
-                    break;
-
-                default:
-                    // None, HpChange, StatChange
-                    _gameContext.PendingEventContext.IsCompleted = true;
-                    await _gameContext.SceneNavigator.NavigateToAsync(_gameContext.PendingEventContext.ReturnScene);
-                    break;
+                // None, HpChange, StatChange: UseCase에서 이미 데이터 적용 완료
             }
+
+            // 2. 엔딩 매칭 시도 (MasterData 기반)
+            var ctx = _gameContext.PendingEventContext;
+            var endingContext = new EndingContext
+            {
+                EventId         = ctx.EventId,
+                EventResultType = result.ResultType,
+                IsStageEndNode  = ctx.IsStageEndNode
+            };
+
+            bool endingEntered = await _gameContext.EndingEntryService
+                .TryEnterEndingAsync(EndingTriggerKind.EventResult, endingContext);
+
+            if (endingEntered) return;  // 런 종료 — ReturnScene 복귀 불필요
+
+            // 3. 엔딩 없음 → ReturnScene 복귀 (StagePresenter가 노드 완료 처리)
+            ctx.IsCompleted = true;
+            await _gameContext.SceneNavigator.NavigateToAsync(ctx.ReturnScene);
         }
 
         // ──────────────────────────────────────────────

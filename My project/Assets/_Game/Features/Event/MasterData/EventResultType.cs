@@ -6,7 +6,6 @@ namespace Samsara.Features.Event.MasterData
         HpChange,
         StatChange,
         ShopEncounter,
-        Battle,
-        Ending
+        Battle
     }
 }

@@ -92,12 +92,15 @@ namespace Samsara.Features.StageScene.Domain
             return nodes[currentIndex].CanReturnToMain;
         }
 
+        /// <summary>
+        /// 해당 nodeIndex가 스테이지 끝 노드인지 여부를 반환한다.
+        /// 끝 노드 = 노드 배열의 마지막 인덱스 (nodeIndex >= nodes.Length - 1).
+        /// </summary>
         public bool IsStageComplete(int nodeIndex)
         {
             var nodes = GetCurrentStageNodes();
-            if (nodeIndex < 0 || nodeIndex >= nodes.Length) return false;
-            var node = nodes[nodeIndex];
-            return node.BattleData != null && node.BattleData.IsBoss;
+            if (nodes.Length == 0 || nodeIndex < 0) return false;
+            return nodeIndex >= nodes.Length - 1;
         }
 
         public List<StageSO> GetNextStageOptions()

@@ -3,14 +3,14 @@ using Samsara.Features.Ending.MasterData;
 namespace Samsara.Features.Ending.Domain
 {
     /// <summary>
-    /// 현재 플레이어 상태에 따라 EndingType에 해당하는 EndingSO Id를 결정하는 서비스.
+    /// 트리거 시점 + EndingContext 기반으로 매칭 EndingSO Id를 결정하는 서비스.
     /// </summary>
     public interface IEndingResolver
     {
         /// <summary>
-        /// 주어진 EndingType에서 현재 플레이어 상태와 일치하는 EndingSO의 Id를 반환한다.
-        /// 일치하는 항목이 없으면 InvalidOperationException (Fail Fast).
+        /// 주어진 TriggerKind + EndingContext에서 조건을 만족하는 최고 우선순위 EndingSO Id를 반환한다.
+        /// 매칭 없으면 null 반환 (런 계속 진행).
         /// </summary>
-        int Resolve(EndingType type);
+        int? TryResolve(EndingTriggerKind trigger, EndingContext context);
     }
 }

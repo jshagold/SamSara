@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2d9857914df4974a9d74f0a192b2af7, type: 3}
   m_Name: Event_Test_Ending_Death
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Event.MasterData.EventSO
-  _eventId: 0
+  _eventId: 1000
   _eventName: 
   _eventType: 0
   _backgroundSpriteKey: 

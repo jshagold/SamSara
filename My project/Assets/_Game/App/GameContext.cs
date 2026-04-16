@@ -60,6 +60,7 @@ public class GameContext
     private readonly EndingUseCase        _endingUseCase;
     private readonly EndingResolver       _endingResolver;
     private readonly EndingEntryService   _endingEntryService;
+    private readonly StageProgressService _stageProgressService;
     private readonly MiniGameUseCase      _miniGameUseCase;
     private readonly SkillUseCase      _skillUseCase;
     private readonly ShopUseCase       _shopUseCase;
@@ -89,7 +90,8 @@ public class GameContext
     public EventUseCase     EventUseCase      => _eventUseCase;
     public EndingUseCase       EndingUseCase       => _endingUseCase;
     public IEndingResolver     EndingResolver      => _endingResolver;
-    public IEndingEntryService EndingEntryService  => _endingEntryService;
+    public IEndingEntryService  EndingEntryService   => _endingEntryService;
+    public IStageProgressService StageProgressService => _stageProgressService;
     public MiniGameUseCase     MiniGameUseCase     => _miniGameUseCase;
     public SkillUseCase     SkillUseCase      => _skillUseCase;
     public ShopUseCase      ShopUseCase       => _shopUseCase;
@@ -149,7 +151,8 @@ public class GameContext
         _eventUseCase     = new EventUseCase(_eventMasterDataRepo, _characterRunRepo, _stageRepo);
         _endingUseCase      = new EndingUseCase(_endingMasterDataRepo, _characterAccountRepo);
         _endingResolver     = new EndingResolver(_endingMasterDataRepo, _characterRunRepo, _characterAccountRepo);
-        _endingEntryService = new EndingEntryService(_endingResolver, _characterRunRepo, _stageRepo, _evolutionNodes, sceneNavigator, this);
+        _endingEntryService   = new EndingEntryService(_endingResolver, _characterRunRepo, _stageRepo, _evolutionNodes, sceneNavigator, this);
+        _stageProgressService = new StageProgressService(_stageRepo, _characterRunRepo);
         _miniGameUseCase    = new MiniGameUseCase(_characterRunRepo);
         _skillUseCase     = new SkillUseCase(_skillMasterDataRepo);
         _inventoryUseCase = new InventoryUseCase(_inventoryRepo, _characterRunRepo, _shopMasterDataRepo);

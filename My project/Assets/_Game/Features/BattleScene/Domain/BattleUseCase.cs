@@ -103,8 +103,7 @@ namespace Samsara.Features.BattleScene.Domain
 
             // --- Enemy setup ---
             var enemySpawns = context.BattleNodeData.EnemySpawns;
-            Debug.Log($"{_logClass} [DEBUG] BattleNodeData.IsBoss={context.BattleNodeData.IsBoss}, " +
-                      $"EnemySpawns={(enemySpawns == null ? "null" : enemySpawns.Length.ToString())}");
+            Debug.Log($"{_logClass} [DEBUG] EnemySpawns={(enemySpawns == null ? "null" : enemySpawns.Length.ToString())}");
             if (enemySpawns != null)
             {
                 for (int d = 0; d < enemySpawns.Length; d++)

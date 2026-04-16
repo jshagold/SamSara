@@ -10,19 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1e6e4d1c59c8d7e4396fc7957e4aa598, type: 3}
-  m_Name: Ending_BossVictory_SpecialEvolution
+  m_Name: Ending_Battle_Defeat_001
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Ending.MasterData.EndingSO
-  _id: 20
-  _endingType: 2
-  _isGameOver: 0
-  _title: "\uC9C4\uD654\uC870\uAC74 \uBCF4\uC2A4\uC2B9"
-  _dialogues: []
+  _id: 0
+  _triggerKind: 1
+  _categories: 2
+  _isGameOver: 1
+  _title: "\uC804\uD22C\uD328\uBC30\uC5D4\uB529"
+  _dialogues:
+  - _speakerName: 
+    _speakerPortraitKey: 
+    _text: "\uD328\uBC30\uD588\uB2E4."
+    _backgroundIndex: 0
   _backgroundSpriteKeys: []
-  _resultText: "\uC9C4\uD654\uC870\uAC74\uC2B9\uB9AC"
+  _resultText: "\uC804\uD22C\uD328\uBC30\uC5D4\uB529"
   _unlocksMainBgKey: 
   _unlocksMainBgmKey: 
-  _conditions:
-  - _type: 1
-    _intValue: 0
-    _stringValue: node_warrior
-  _priority: 10
+  _conditions: []
+  _priority: 0

@@ -9,9 +9,9 @@ using UnityEngine;
 namespace Samsara.Features.Ending.Domain
 {
     /// <summary>
-    /// 엔딩 진입 공통 서비스. EndingResolver로 EndingId를 결정하고,
-    /// RunSummaryData를 구성한 뒤 PendingEndingContext를 설정하고 EndingScene으로 전환한다.
-    /// BattleScene(Patch-003), EventScene(Patch-002) 등 런 종료 시점에서 공통으로 호출된다.
+    /// 엔딩 진입 공통 서비스. TryResolve로 EndingId를 결정하고,
+    /// 매칭 시 RunSummaryData를 구성한 뒤 PendingEndingContext를 설정하고 EndingScene으로 전환한다.
+    /// 매칭 없으면 false를 반환해 호출자가 런을 계속 처리하도록 한다.
     /// Pure C# class. Constructor DI.
     /// </summary>
     public class EndingEntryService : IEndingEntryService
@@ -45,12 +45,12 @@ namespace Samsara.Features.Ending.Domain
         // IEndingEntryService
         // ──────────────────────────────────────────────
 
-        public async UniTask EnterEndingAsync(EndingType endingType)
+        public async UniTask<bool> TryEnterEndingAsync(EndingTriggerKind trigger, EndingContext context)
         {
-            // EndingResolver로 EndingId 결정
-            int endingId = _endingResolver.Resolve(endingType);
+            int? endingId = _endingResolver.TryResolve(trigger, context);
+            if (!endingId.HasValue)
+                return false;
 
-            // RunSummary 구성
             var runData = _characterRunRepo.RunData;
             var summary = new RunSummaryData
             {
@@ -60,22 +60,21 @@ namespace Samsara.Features.Ending.Domain
                 FinalGold          = runData.Gold
             };
 
-            // PendingEndingContext 설정
             _gameContext.PendingEndingContext = new PendingEndingContext
             {
-                EndingId   = endingId,
+                EndingId   = endingId.Value,
                 RunSummary = summary
             };
 
-            Debug.Log($"{_logClass} EnterEndingAsync: type={endingType}, endingId={endingId}");
+            Debug.Log($"{_logClass} TryEnterEndingAsync: trigger={trigger}, endingId={endingId.Value}");
             await _sceneNavigator.NavigateToAsync(SceneKey.Ending);
+            return true;
         }
 
         // ──────────────────────────────────────────────
         // Helpers
         // ──────────────────────────────────────────────
 
-        /// <summary>EvolutionNodeId로 CharacterName을 조회한다. 미매칭 시 "Unknown" 반환.</summary>
         private string FindEvolutionName(string evolutionNodeId)
         {
             foreach (var node in _evolutionNodes)

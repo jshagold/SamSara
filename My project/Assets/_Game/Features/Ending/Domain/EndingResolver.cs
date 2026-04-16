@@ -1,4 +1,3 @@
-using System;
 using Samsara.Features.Character.Domain;
 using Samsara.Features.Ending.MasterData;
 using UnityEngine;
@@ -6,7 +5,7 @@ using UnityEngine;
 namespace Samsara.Features.Ending.Domain
 {
     /// <summary>
-    /// 현재 플레이어 상태에 따라 EndingType에 해당하는 EndingSO를 결정한다.
+    /// TriggerKind 필터 + EndingContext 기반 Condition 평가로 최고 우선순위 EndingSO Id를 결정한다.
     /// Pure C# class. Constructor DI.
     /// </summary>
     public class EndingResolver : IEndingResolver
@@ -28,17 +27,16 @@ namespace Samsara.Features.Ending.Domain
         }
 
         // ──────────────────────────────────────────────
-        // Resolve
+        // TryResolve
         // ──────────────────────────────────────────────
 
         /// <summary>
-        /// 주어진 EndingType 중 현재 플레이어 상태와 일치하는 최고 우선순위 EndingSO의 Id를 반환.
-        /// 일치하는 항목 없음 → InvalidOperationException (Fail Fast).
-        /// 폴백 EndingSO(Conditions 빈 배열, Priority=0)가 항상 존재해야 한다.
+        /// 주어진 TriggerKind의 EndingSO 중 EndingContext 조건을 만족하는
+        /// 최고 우선순위 Id를 반환. 매칭 없으면 null.
         /// </summary>
-        public int Resolve(EndingType type)
+        public int? TryResolve(EndingTriggerKind trigger, EndingContext context)
         {
-            var candidates = _endingMasterDataRepo.GetEndingByType(type);
+            var candidates = _endingMasterDataRepo.GetEndingsByTriggerKind(trigger);
 
             EndingSO best         = null;
             int      bestPriority = int.MinValue;
@@ -46,7 +44,7 @@ namespace Samsara.Features.Ending.Domain
             // LINQ 금지 — foreach + 직접 비교 (CLAUDE.md §8)
             foreach (var so in candidates)
             {
-                if (!EvaluateAll(so.Conditions)) continue;
+                if (!EvaluateAll(so.Conditions, context)) continue;
 
                 if (so.Priority > bestPriority)
                 {
@@ -56,11 +54,12 @@ namespace Samsara.Features.Ending.Domain
             }
 
             if (best == null)
-                throw new InvalidOperationException(
-                    $"{_logClass} type={type}에 매칭되는 EndingSO가 없습니다. " +
-                    $"Conditions=빈 배열, Priority=0 인 폴백 EndingSO가 반드시 존재해야 합니다.");
+            {
+                Debug.Log($"{_logClass} TryResolve: trigger={trigger} — 매칭 EndingSO 없음. 런 계속.");
+                return null;
+            }
 
-            Debug.Log($"{_logClass} Resolve 완료: type={type} → id={best.Id}, title={best.Title}, priority={best.Priority}");
+            Debug.Log($"{_logClass} TryResolve: trigger={trigger} → id={best.Id}, title={best.Title}, priority={best.Priority}");
             return best.Id;
         }
 
@@ -68,19 +67,18 @@ namespace Samsara.Features.Ending.Domain
         // Condition Evaluation
         // ──────────────────────────────────────────────
 
-        /// <summary>EndingSO의 Conditions 전체를 AND 평가한다.</summary>
-        private bool EvaluateAll(EndingCondition[] conditions)
+        private bool EvaluateAll(EndingCondition[] conditions, in EndingContext context)
         {
             if (conditions == null || conditions.Length == 0) return true;  // 폴백 후보
 
             foreach (var condition in conditions)
             {
-                if (!EvaluateOne(condition)) return false;
+                if (!EvaluateOne(condition, in context)) return false;
             }
             return true;
         }
 
-        private bool EvaluateOne(EndingCondition condition)
+        private bool EvaluateOne(EndingCondition condition, in EndingContext context)
         {
             switch (condition.Type)
             {
@@ -88,8 +86,17 @@ namespace Samsara.Features.Ending.Domain
                     return true;
 
                 case EndingConditionType.EvolutionId:
-                    // CharacterRunData.EvolutionNodeId는 string → StringValue와 비교
                     return _characterRunRepo.RunData.EvolutionNodeId == condition.StringValue;
+
+                case EndingConditionType.EventId:
+                    return context.EventId.HasValue && context.EventId.Value == condition.IntValue;
+
+                case EndingConditionType.EventResultType:
+                    return context.EventResultType.HasValue
+                        && (int)context.EventResultType.Value == condition.IntValue;
+
+                case EndingConditionType.StageCompleteFlag:
+                    return context.IsStageEndNode;
 
                 default:
                     Debug.LogWarning($"{_logClass} 미처리 EndingConditionType: {condition.Type} — true 반환 (안전 기본값)");

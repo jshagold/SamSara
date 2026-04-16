@@ -8,10 +8,8 @@ namespace Samsara.Features.Stage.MasterData
     {
         private readonly string _logClass = $"[{nameof(BattleNodeDataSO)}]";
 
-        [SerializeField] private bool _isBoss;
         [SerializeField] private EnemySpawn[] _enemySpawns;
 
-        public bool IsBoss => _isBoss;
         public EnemySpawn[] EnemySpawns => _enemySpawns;
     }
 

@@ -4,8 +4,10 @@ using Samsara.Core.AssetLoading;
 using Samsara.Core.Navigation;
 using Samsara.Core.Popup;
 using Samsara.Features.BattleScene.Domain;
+using Samsara.Features.Ending.Domain;
 using Samsara.Features.Ending.MasterData;
 using Samsara.Features.Event.Domain;
+using Samsara.Features.Stage.Domain;
 using Samsara.Features.Stage.MasterData;
 using Samsara.Features.StageScene.Domain;
 using Samsara.Features.StageScene.Presentation.Popup;
@@ -120,8 +122,7 @@ namespace Samsara.Features.StageScene.Presentation
 
             var nodeType = _useCase.GetNodeType(index);
 
-            // Battle/Event 노드: 씬 전환 전에 노드 완료 처리하지 않음
-            // 전투 결과 확인 후 StageScene 복귀 시 처리
+            // Battle/Boss 노드: 씬 전환 전에 노드 완료 처리하지 않음
             if (nodeType == NodeType.Battle || nodeType == NodeType.Boss)
             {
                 var nodeWorldPos = _view.GetNodeWorldPosition(index);
@@ -151,8 +152,10 @@ namespace Samsara.Features.StageScene.Presentation
 
                 _gameContext.PendingEventContext = new PendingEventContext
                 {
-                    EventId     = eventData.EventId,
-                    ReturnScene = SceneKey.Stage
+                    EventId        = eventData.EventId,
+                    ReturnScene    = SceneKey.Stage,
+                    Origin         = EventOriginKind.StageNode,
+                    IsStageEndNode = _useCase.IsStageComplete(index)
                 };
 
                 await _sceneNavigator.NavigateToAsync(SceneKey.Event);
@@ -183,20 +186,7 @@ namespace Samsara.Features.StageScene.Presentation
             }
         }
 
-        private async UniTaskVoid HandleEventResultIfAny()
-        {
-            var ctx = _gameContext.PendingEventContext;
-            if (ctx == null || !ctx.IsCompleted) return;
-
-            _gameContext.PendingEventContext = null;  // 소비
-
-            var vm = _useCase.GetStageSceneViewModel();
-            int eventNodeIndex = vm.CurrentNodeIndex + 1;
-
-            await _useCase.MoveToNode(eventNodeIndex);
-
-            Debug.Log($"{_logClass} 이벤트 완료 — 노드 {eventNodeIndex} 완료 처리.");
-        }
+        // ── Battle Result ────────────────────────────────────────────────
 
         private async UniTaskVoid HandleBattleResultIfAny()
         {
@@ -205,32 +195,103 @@ namespace Samsara.Features.StageScene.Presentation
 
             _gameContext.LastBattleResult = null;
 
+            var vm             = _useCase.GetStageSceneViewModel();
+            int battleNodeIndex = vm.CurrentNodeIndex + 1;
+            bool isEndNode     = _useCase.IsStageComplete(battleNodeIndex);
+
             if (result.Value == BattleResult.Victory)
             {
-                var vm = _useCase.GetStageSceneViewModel();
-                int battleNodeIndex = vm.CurrentNodeIndex + 1;
-
-                if (_useCase.IsStageComplete(battleNodeIndex))
+                // 엔딩 매칭 시도 (BattleVictory 트리거)
+                var endingContext = new EndingContext
                 {
-                    // 보스 전투 승리 → ClearedStageCount 증가 후 EndingScene 진입
-                    Debug.Log($"{_logClass} 보스 전투 승리 — EndingScene 진입.");
-                    await _useCase.IncrementClearedStageCount();
-                    await _gameContext.EndingEntryService.EnterEndingAsync(EndingType.BossVictory);
+                    BattleResult   = BattleResult.Victory,
+                    IsStageEndNode = isEndNode
+                };
+
+                bool endingEntered = await _gameContext.EndingEntryService
+                    .TryEnterEndingAsync(EndingTriggerKind.BattleVictory, endingContext);
+
+                if (endingEntered) return;
+
+                // 엔딩 없음 → 노드 완료 처리
+                var completionCtx = new NodeCompletionContext
+                {
+                    NodeIndex      = battleNodeIndex,
+                    NodeType       = NodeType.Battle,
+                    IsStageEndNode = isEndNode
+                };
+                await _gameContext.StageProgressService.CompleteNodeAsync(completionCtx);
+
+                if (isEndNode)
+                {
+                    var nextStages = _useCase.GetNextStageOptions();
+                    var options = new List<StageOptionData>(nextStages.Count);
+                    foreach (var stage in nextStages)
+                        options.Add(new StageOptionData { StageId = stage.StageId, StageName = stage.StageName });
+                    _view.ShowStageCompletePopup("Stage Complete!", options);
                 }
                 else
                 {
-                    // 일반 전투 승리 → 기존 노드 완료 처리
-                    await _useCase.MoveToNode(battleNodeIndex);
                     Debug.Log($"{_logClass} 전투 승리 — 노드 {battleNodeIndex} 완료 처리.");
                 }
             }
             else
             {
-                // 전투 패배 → EndingScene 진입
-                Debug.Log($"{_logClass} 전투 패배 — EndingScene 진입.");
-                await _gameContext.EndingEntryService.EnterEndingAsync(EndingType.BattleDefeat);
+                // 전투 패배 — 엔딩 매칭 시도 (BattleDefeat 트리거)
+                var endingContext = new EndingContext
+                {
+                    BattleResult   = BattleResult.Defeat,
+                    IsStageEndNode = false
+                };
+
+                bool endingEntered = await _gameContext.EndingEntryService
+                    .TryEnterEndingAsync(EndingTriggerKind.BattleDefeat, endingContext);
+
+                if (!endingEntered)
+                {
+                    // 폴백 EndingSO가 반드시 존재해야 함. Manual Work 확인 필요.
+                    Debug.LogWarning($"{_logClass} 전투 패배 — 엔딩 매칭 없음. 폴백 EndingSO(TriggerKind=BattleDefeat, Conditions=empty)를 확인하세요.");
+                }
             }
         }
+
+        // ── Event Result ─────────────────────────────────────────────────
+
+        private async UniTaskVoid HandleEventResultIfAny()
+        {
+            var ctx = _gameContext.PendingEventContext;
+            if (ctx == null || !ctx.IsCompleted)                    return;
+            if (ctx.Origin != EventOriginKind.StageNode)            return;  // Stage 노드 이벤트만 처리
+
+            _gameContext.PendingEventContext = null;
+
+            var vm            = _useCase.GetStageSceneViewModel();
+            int eventNodeIndex = vm.CurrentNodeIndex + 1;
+            bool isEndNode    = _useCase.IsStageComplete(eventNodeIndex);
+
+            var completionCtx = new NodeCompletionContext
+            {
+                NodeIndex      = eventNodeIndex,
+                NodeType       = NodeType.Event,
+                IsStageEndNode = isEndNode
+            };
+            await _gameContext.StageProgressService.CompleteNodeAsync(completionCtx);
+
+            if (isEndNode)
+            {
+                var nextStages = _useCase.GetNextStageOptions();
+                var options = new List<StageOptionData>(nextStages.Count);
+                foreach (var stage in nextStages)
+                    options.Add(new StageOptionData { StageId = stage.StageId, StageName = stage.StageName });
+                _view.ShowStageCompletePopup("Stage Complete!", options);
+            }
+            else
+            {
+                Debug.Log($"{_logClass} 이벤트 완료 — 노드 {eventNodeIndex} 완료 처리.");
+            }
+        }
+
+        // ── Stage Navigation ─────────────────────────────────────────────
 
         private async UniTaskVoid HandleBackClickedAsync()
         {
@@ -253,7 +314,6 @@ namespace Samsara.Features.StageScene.Presentation
             _view.SetCharacterPosition(_view.GetNodeWorldPosition(vm.CurrentNodeIndex));
             _view.SetBackButtonInteractable(vm.CanReturnToMain);
 
-            // 새 스테이지 바이옴 배경 스프라이트 갱신
             if (!string.IsNullOrEmpty(vm.BiomeSpriteKey))
             {
                 var newBg = await _spriteLoader.LoadSpriteAsync(vm.BiomeSpriteKey);

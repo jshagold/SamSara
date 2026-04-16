@@ -117,3 +117,72 @@ D-16 [DECISION] EventResultType.Death 제거 시 enum ordinal 연속성 유지
   - Death(5) 제거 후 Ending(5)이 동일 ordinal을 점유.
   - 기존 .asset들이 _resultType 5를 사용하지 않으므로 역직렬화 오염 없음 (D-13 근거).
   - 새 Ending 에셋은 _resultType 5 + _hasEndingType + _endingType 조합으로 설정.
+
+--- Patch-004 ---
+
+D-17 [DECISION] StageSceneUseCase.IsStageComplete() — IsBoss 기반 → 마지막 인덱스 기반으로 교체
+  - 기존: node.BattleData.IsBoss 확인 (BattleNodeDataSO._isBoss 사용).
+  - Patch-004에서 _isBoss 필드 제거 → 판단 기준 필요.
+  - 새 구현: nodeIndex >= nodes.Length - 1 (노드 배열 마지막 = 끝 노드).
+  - 스테이지는 선형 배열 기준 1st dev에서 동작. 다중 끝 노드가 필요하면
+    StageNodeSO에 IsEndNode flag 추가 필요 (미래 확장 대상).
+
+D-18 [DECISION] StageProgressService를 GameContext에서 Repo 직접 주입으로 생성
+  - 스펙 "IStageSceneUseCase or related UseCase" 언급 있었으나,
+    StageSceneUseCase는 씬별 생성 (StageSceneBootstrapper) — GameContext에서 보유 불가.
+  - StageProgressService는 IStageRepository + ICharacterRunRepository만으로 충분.
+  - GameContext에서 직접 `new StageProgressService(_stageRepo, _characterRunRepo)` 생성.
+  - 씬 생명주기 커플링 없음.
+
+D-19 [DECISION] BattleNodeDataSO._isBoss 제거 cascade — BattleUseCase / Dev 파일 수정
+  - 제거 대상 확인 결과 IsBoss 참조 위치:
+    * BattleUseCase.cs:106 — Debug.Log에서만 참조 (기능 로직 아님) → 로그 라인 수정.
+    * StageSceneUseCase.cs — IsStageComplete()에서 참조 → D-17 방식으로 교체.
+    * Dev/BattleDataLoadTest.cs — IsBoss 프로퍼티 직접 접근 → 로그 라인 수정.
+    * Dev/StageSceneTestDataGenerator.cs — Reflection string "_isBoss" 사용 → 런타임 무시, 수정 불필요.
+    * Dev/BattleTestDataCreator.cs — JSON string literal → 역직렬화 미사용 필드, 수정 불필요.
+  - Patch-004 "DO NOT Modify BattleScene Feature" 원칙 하에 Debug.Log 제거는
+    기능 수정이 아닌 컴파일 오류 해소이므로 허용.
+
+D-20 [DECISION] StageSceneUseCase.IncrementClearedStageCount() 유지 (호출자 변경만)
+  - Patch-003 D-12: StageSceneUseCase에 IncrementClearedStageCount() 추가.
+  - Patch-004: StageProgressService가 IStageRepository.IncrementClearedStageCount()를 직접 호출.
+  - StageSceneUseCase.IncrementClearedStageCount()는 미호출 상태로 유지 (제거 시 불필요한 위험).
+  - StagePresenter에서 직접 호출 제거됨 (StageProgressService 위임).
+
+D-21 [BACKLOG] MaintenancePresenter 탐색 이벤트 — PendingEventContext Origin 설정
+  - MaintenancePresenter.cs 미구현 (파일 없음).
+  - 탐색 이벤트 구현 시: Origin=MaintenanceExploration, IsStageEndNode=false 설정 필요.
+  - StageProgressService 호출 금지 (Feature 경계 위반 — EventPresenter도 동일 원칙 적용).
+
+D-22 [DECISION] EndingMasterDataRepository에서 LINQ 완전 제거
+  - 기존 GetEndingByType() 구현이 LINQ를 import하고 있었음.
+  - Patch-004에서 GetEndingsByTriggerKind()로 교체 + using System.Linq 제거.
+  - foreach + List<T> 패턴으로 구현 (CLAUDE.md §8 준수).
+
+D-23 [DECISION] Patch-002 테스트 EventSO 에셋 — Patch-004 이후 상태
+  - Event_Test_Ending_Death.asset (_resultType: 0 = None으로 생성됨),
+    Event_Test_Ending_EventEnding.asset (미생성 확인) —
+    Patch-002에서 _resultType 5 (Ending)으로 설정하기 위해 생성 예정이었으나
+    Patch-004에서 EventResultType.Ending이 제거됨.
+  - 기존 EventSO .asset 전수 확인 결과 _resultType 5 사용 에셋 없음 → 마이그레이션 불필요.
+  - Event_Test_Ending_Death.asset은 현재 _resultType 0이므로 그대로 유지 가능.
+
+D-24 [SPEC-GAP] 기존 EndingSO .asset 6개 — Patch-004 이후 전면 재설정 필요 (Manual Work)
+  - 기존 .asset들은 _endingType 필드 기반 (구 EndingType: BattleDefeat/EventDeath/BossVictory/EventEnding).
+  - Patch-004에서 EndingType이 [Flags] Good/Bad로 재정의, _endingType → _categories로 rename,
+    _triggerKind 신규 추가됨.
+  - Inspector에서 TriggerKind + Categories + Conditions 전면 재설정 필요.
+  - 대상 에셋 목록:
+    * Ending_BattleDefeat_Fallback.asset     → TriggerKind=BattleDefeat, Conditions=empty, Priority=0, Categories=Bad
+    * Ending_BattleDefeat_SpecialEvolution.asset → TriggerKind=BattleDefeat, Conditions=[EvolutionId=node_warrior], Priority=10, Categories=Bad
+    * Ending_BossVictory_Fallback.asset      → TriggerKind=BattleVictory, Conditions=[StageCompleteFlag], Priority=0, Categories=Good
+    * Ending_BossVictory_SpecialEvolution.asset → TriggerKind=BattleVictory, Conditions=[StageCompleteFlag + EvolutionId=node_warrior], Priority=10, Categories=Good
+    * Ending_EventDeath_Fallback.asset       → TriggerKind=EventResult, Conditions=empty, Priority=0, Categories=Bad
+    * Ending_EventEnding_Fallback.asset      → TriggerKind=EventResult, Conditions=empty, Priority=0, Categories=Good
+  - ※ Ending_BossVictory_Fallback.asset _id=0 는 D-24 이후에도 유지 (기능 이상 없으면 허용).
+
+D-25 [DECISION] EndingEntryService 시그니처 변경 — IEndingEntryService accessor 중복 수정
+  - GameContext의 기존 `public IEndingEntryService EndingEntryService` accessor 줄이
+    Patch-002 당시 한 줄에 선언됐으나 Patch-004에서 StageProgressService accessor 추가 시
+    인접 줄로 정렬. 기능 변경 없음.
