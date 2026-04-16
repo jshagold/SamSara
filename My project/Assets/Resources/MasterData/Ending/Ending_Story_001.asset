@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e6e4d1c59c8d7e4396fc7957e4aa598, type: 3}
+  m_Name: Ending_Story_001
+  m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Ending.MasterData.EndingSO
+  _id: 2
+  _endingType: 2
+  _isGameOver: 0
+  _title: TRUE ENDING
+  _dialogues:
+  - _speakerName: 
+    _speakerPortraitKey: 
+    _text: "\uC2B9\uB9AC\uD588\uB2E4."
+    _backgroundIndex: 0
+  _backgroundSpriteKeys:
+  - node_frame_evolvable
+  _resultText: "[[[\uC2B9\uB9AC]]]"
+  _unlocksMainBgKey: 
+  _unlocksMainBgmKey: 

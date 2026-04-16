@@ -32,6 +32,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Game/Scenes/Event.unity
     guid: 03516ebd3bae45d4b85c7ecf691c2012
+  - enabled: 1
+    path: Assets/_Game/Scenes/Ending.unity
+    guid: 0fe02f8d66c7f444eb69dd052b314839
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 702a1a7cfa6f21f4d8a8b213dec1a3ba,
       type: 2}

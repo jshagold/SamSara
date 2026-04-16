@@ -47,6 +47,11 @@ namespace Samsara.Features.Character.Data
             _isDirty = true;
         }
 
+        public void MarkDirty()
+        {
+            _isDirty = true;
+        }
+
         public async UniTask SaveDataAsync()
         {
             if (!_isDirty) return;

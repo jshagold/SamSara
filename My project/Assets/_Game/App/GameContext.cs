@@ -6,6 +6,8 @@ using Samsara.Features.BattleScene.Domain;
 using Samsara.Features.Character.Data;
 using Samsara.Features.Character.Domain;
 using Samsara.Features.Character.MasterData;
+using Samsara.Features.Ending.Data;
+using Samsara.Features.Ending.Domain;
 using Samsara.Features.Event.Data;
 using Samsara.Features.Event.Domain;
 using Samsara.Features.Inventory.Data;
@@ -37,6 +39,7 @@ public class GameContext
     private readonly ICharacterAccountRepository _characterAccountRepo;
     private readonly ISkillMasterDataRepository    _skillMasterDataRepo;
     private readonly IEventMasterDataRepository   _eventMasterDataRepo;
+    private readonly IEndingMasterDataRepository  _endingMasterDataRepo;
     private readonly IShopMasterDataRepository    _shopMasterDataRepo;
     private readonly IShopRepository              _shopRepo;
     private readonly InventoryRepository          _inventoryRepo;
@@ -53,6 +56,7 @@ public class GameContext
     private readonly EvolutionUseCase  _evolutionUseCase;
     private readonly StageUseCase      _stageUseCase;
     private readonly EventUseCase      _eventUseCase;
+    private readonly EndingUseCase     _endingUseCase;
     private readonly MiniGameUseCase   _miniGameUseCase;
     private readonly SkillUseCase      _skillUseCase;
     private readonly ShopUseCase       _shopUseCase;
@@ -69,8 +73,9 @@ public class GameContext
     public ICharacterAccountRepository CharacterAccountRepo => _characterAccountRepo;
     public IStageMasterDataRepository  StageMasterDataRepo  => _stageMasterDataRepo;
     public ISkillMasterDataRepository  SkillMasterDataRepo  => _skillMasterDataRepo;
-    public IEventMasterDataRepository  EventMasterDataRepo  => _eventMasterDataRepo;
-    public IShopMasterDataRepository   ShopMasterDataRepo   => _shopMasterDataRepo;
+    public IEventMasterDataRepository   EventMasterDataRepo   => _eventMasterDataRepo;
+    public IEndingMasterDataRepository  EndingMasterDataRepo  => _endingMasterDataRepo;
+    public IShopMasterDataRepository    ShopMasterDataRepo    => _shopMasterDataRepo;
     public IShopRepository             ShopRepo             => _shopRepo;
     public IInventoryRepository        InventoryRepo        => _inventoryRepo;
     public EvolutionNodeSO[]           EvolutionNodes       => _evolutionNodes;
@@ -78,6 +83,7 @@ public class GameContext
     public EvolutionUseCase EvolutionUseCase  => _evolutionUseCase;
     public StageUseCase     StageUseCase      => _stageUseCase;
     public EventUseCase     EventUseCase      => _eventUseCase;
+    public EndingUseCase    EndingUseCase     => _endingUseCase;
     public MiniGameUseCase  MiniGameUseCase   => _miniGameUseCase;
     public SkillUseCase     SkillUseCase      => _skillUseCase;
     public ShopUseCase      ShopUseCase       => _shopUseCase;
@@ -91,6 +97,9 @@ public class GameContext
 
     /// <summary>씬 간 데이터 전달 — 이벤트 진입 컨텍스트. EventScene 진입 전 설정, 진입 후 소비.</summary>
     public PendingEventContext PendingEventContext { get; set; }
+
+    /// <summary>씬 간 데이터 전달 — 엔딩 진입 컨텍스트. EndingScene 진입 전 설정, 진입 후 즉시 소비.</summary>
+    public PendingEndingContext PendingEndingContext { get; set; }
 
     /// <summary>씬 간 데이터 전달 — 마지막 전투 결과. BattleScene 종료 시 설정, StageScene에서 소비.</summary>
     public BattleResult? LastBattleResult { get; set; }
@@ -120,6 +129,7 @@ public class GameContext
         _characterAccountRepo = new CharacterAccountRepository();
         _skillMasterDataRepo  = new SkillMasterDataRepository();
         _eventMasterDataRepo  = new EventMasterDataRepository();
+        _endingMasterDataRepo = new EndingMasterDataRepository();
         _shopMasterDataRepo   = new ShopMasterDataRepository();
         _shopRepo             = new ShopRepository();
         _inventoryRepo        = new InventoryRepository();
@@ -130,6 +140,7 @@ public class GameContext
         _evolutionUseCase = new EvolutionUseCase(_characterRepo);
         _stageUseCase     = new StageUseCase(_stageRepo);
         _eventUseCase     = new EventUseCase(_eventMasterDataRepo, _characterRunRepo, _stageRepo);
+        _endingUseCase    = new EndingUseCase(_endingMasterDataRepo, _characterAccountRepo);
         _miniGameUseCase  = new MiniGameUseCase(_characterRunRepo);
         _skillUseCase     = new SkillUseCase(_skillMasterDataRepo);
         _inventoryUseCase = new InventoryUseCase(_inventoryRepo, _characterRunRepo, _shopMasterDataRepo);
