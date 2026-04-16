@@ -123,6 +123,13 @@ namespace Samsara.Features.StageScene.Domain
             await _stageRepo.SaveAsync();
         }
 
+        /// <summary>보스 전투 승리 시 클리어 스테이지 수를 1 증가하고 저장한다.</summary>
+        public async UniTask IncrementClearedStageCount()
+        {
+            _stageRepo.IncrementClearedStageCount();
+            await _stageRepo.SaveAsync();
+        }
+
         public string GetBiomeBackground()
         {
             var stageSO = _stageMasterDataRepo.GetStageById(_stageRepo.RunData.CurrentStageId);

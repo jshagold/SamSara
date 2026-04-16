@@ -1,5 +1,6 @@
 using System;
 using Samsara.Features.Character.MasterData;
+using Samsara.Features.Ending.MasterData;
 using UnityEngine;
 
 namespace Samsara.Features.Event.MasterData
@@ -64,11 +65,15 @@ namespace Samsara.Features.Event.MasterData
         [SerializeField] private StatType _statType;   // Which stat to change. Only used when _useStatType is true.
         [SerializeField] private bool _hasMerchantId;  // Enable to specify which merchant to activate
         [SerializeField] private int _merchantId;      // Merchant ID. Only used when _hasMerchantId is true.
+        [SerializeField] private bool _hasEndingType;  // Enable to specify ending type. Only used when ResultType == Ending.
+        [SerializeField] private EndingType _endingType; // Ending type. Only used when _hasEndingType is true.
 
         public EventResultType ResultType => _resultType;
         public float Value => _value;
         public StatType? StatType => _useStatType ? _statType : (StatType?)null;
         public int? MerchantId => _hasMerchantId ? _merchantId : (int?)null;
+        /// <summary>ResultType == Ending일 때 유효. 어떤 엔딩 타입을 발동할지 지정.</summary>
+        public EndingType? EndingType => _hasEndingType ? _endingType : (EndingType?)null;
     }
 
     [Serializable]

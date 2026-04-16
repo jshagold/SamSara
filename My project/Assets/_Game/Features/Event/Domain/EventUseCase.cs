@@ -169,7 +169,7 @@ namespace Samsara.Features.Event.Domain
                 case EventResultType.None:
                 case EventResultType.ShopEncounter:
                 case EventResultType.Battle:
-                case EventResultType.Death:
+                case EventResultType.Ending:
                     // 데이터 변경 없음 — Presenter가 씬 전환 처리
                     break;
             }

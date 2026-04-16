@@ -7,6 +7,6 @@ namespace Samsara.Features.Event.MasterData
         StatChange,
         ShopEncounter,
         Battle,
-        Death
+        Ending
     }
 }

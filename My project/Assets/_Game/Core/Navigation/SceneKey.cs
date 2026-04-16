@@ -14,7 +14,6 @@ namespace Samsara.Core.Navigation
         Event,
         MiniGame,
         Ending,
-        Replay,
-        GameOver
+        Replay
     }
 }

@@ -48,3 +48,72 @@ D-07 [DECISION] EndingResolver.Resolve()에서 List 없이 직접 최댓값 추�
     LINQ 금지 + 정렬용 List 할당을 피하기 위해
     foreach 단일 순회 중 최고 Priority를 직접 추적하는 방식으로 구현.
     결과는 동일하며 할당이 없음.
+
+--- Patch-003 ---
+
+D-08 [SPEC-GAP] StageRunData에 ClearedStageCount 필드 추가
+  - RunSummaryData.StagesCleared 값을 런타임에 추적하려면 영속 필드가 필요했으나
+    StageRunData에 정의되어 있지 않았음.
+  - int ClearedStageCount (기본값 0) 추가.
+    Newtonsoft.Json 역직렬화 시 기존 세이브파일에 필드가 없어도 0으로 초기화됨
+    → 기존 세이브 호환성 유지.
+  - IStageRepository에 IncrementClearedStageCount() 추가,
+    StageRepository에서 _isDirty 설정과 함께 구현.
+
+D-09 [DECISION] BossVictory 경로에서 MoveToNode 미호출
+  - 보스 승리 후 EndingScene 전환 시 MoveToNode(Day++, ActionPoints 리셋, CurrentNodeIndex++)를
+    호출하지 않음.
+  - 런이 종료되므로 Day/CurrentNodeIndex 갱신은 의미 없음.
+  - ClearedStageCount 증가 + 저장만 수행 후 EndingScene 전환.
+
+D-10 [DECISION] EvolutionName 조회를 GameContext.EvolutionNodes foreach로 수행
+  - StagePresenter는 CharacterRepository 직접 접근 없이
+    GameContext.EvolutionNodes(EvolutionNodeSO[])를 foreach로 순회해 CharacterName을 조회.
+  - 매칭 없으면 "Unknown" 반환 (Fail Fast 미적용 — 진화 미선택 상태 런 허용).
+
+D-11 [DECISION] StagePresenter Bootstrapper 수정 불필요
+  - StagePresenter는 이미 GameContext 전체를 보유하고 있으므로
+    EndingResolver, CharacterRunRepo, StageRepo, EvolutionNodes 모두
+    _gameContext를 통해 접근 가능.
+  - StageSceneBootstrapper DI 변경 없음.
+
+D-12 [DECISION] IncrementClearedStageCount를 StageUseCase가 아닌 StageSceneUseCase에 추가
+  - Patch-003 스펙은 "StageUseCase.cs 수정 검토"를 언급했으나,
+    Assets/_Game/Features/Stage/Domain/StageUseCase.cs는 생성자만 있는 stub 상태이며
+    실제 스테이지 씬 로직은 StageSceneUseCase.cs에 집중되어 있음.
+  - StagePresenter가 직접 사용하는 StageSceneUseCase에 IncrementClearedStageCount()를 추가.
+  - StageUseCase stub는 미변경 (현재 기능 없음).
+
+--- Patch-002 ---
+
+D-13 [DECISION] 기존 EventSO .asset 중 Death result 사용 없음 — MasterData 마이그레이션 불필요
+  - Assets/Resources/MasterData/Event/ 내 5개 EventSO .asset 전수 확인 결과:
+    Event_00.asset: _resultType 2 (StatChange)
+    Event_Chain_01.asset: _resultType 0 (None), choices: _resultType 2 (StatChange)
+    Event_Chain_02.asset: _resultType 0 (None)
+    Event_Shop.asset: _resultType 3 (ShopEncounter)
+    Event_Test_OneShot.asset: _resultType 1 (HpChange)
+  - 모두 _resultType 5 (Death) 없음. Death → Ending 교체 후 기존 에셋 재직렬화 불필요.
+  - Patch-002 Manual Work: Ending result 테스트 에셋 신규 생성만 필요.
+
+D-14 [SPEC-GAP] ISceneNavigator를 GameContext 생성자에 추가
+  - EndingEntryService가 ISceneNavigator를 필요로 하나, GameContext 생성자에
+    ISceneNavigator 파라미터가 없었음.
+  - GameContext 생성자에 ISceneNavigator sceneNavigator 파라미터 추가 +
+    SceneNavigator public accessor 노출.
+  - GlobalBootstrapper에서 _sceneNavigator를 GameContext 생성 시 함께 전달하도록 수정.
+
+D-15 [DECISION] EventPresenter ISceneNavigator도 GameContext.SceneNavigator로 통합
+  - Patch-002 스펙은 "ISceneNavigator, PendingEventContext accessed via GameContext"를 명시.
+  - D-14에서 GameContext.SceneNavigator accessor가 추가됨에 따라
+    EventPresenter 생성자에서 ISceneNavigator 파라미터도 제거하고
+    _gameContext.SceneNavigator로 모든 내비게이션 접근.
+  - EventSceneBootstrapper에서 sceneNavigator 변수 및 전달 불필요.
+  - 다른 Presenter들(Stage, Battle, Maintenance, Ending)은 ISceneNavigator를
+    여전히 개별 파라미터로 받고 있어 완전 통일은 아님 —
+    향후 DI 라이브러리 도입 시 일괄 정리 예정 (D-04 BACKLOG 연장선).
+
+D-16 [DECISION] EventResultType.Death 제거 시 enum ordinal 연속성 유지
+  - Death(5) 제거 후 Ending(5)이 동일 ordinal을 점유.
+  - 기존 .asset들이 _resultType 5를 사용하지 않으므로 역직렬화 오염 없음 (D-13 근거).
+  - 새 Ending 에셋은 _resultType 5 + _hasEndingType + _endingType 조합으로 설정.

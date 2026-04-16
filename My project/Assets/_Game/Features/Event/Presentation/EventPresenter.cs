@@ -1,6 +1,8 @@
+using System;
 using Cysharp.Threading.Tasks;
 using Samsara.Core.AssetLoading;
 using Samsara.Core.Navigation;
+using Samsara.Features.Ending.MasterData;
 using Samsara.Features.Event.Domain;
 using Samsara.Features.Event.MasterData;
 using Samsara.Features.Shop.Domain;
@@ -12,29 +14,26 @@ namespace Samsara.Features.Event.Presentation
     {
         private readonly string _logClass = $"[{nameof(EventPresenter)}]";
 
-        private readonly EventUseCase        _useCase;
-        private readonly EventView           _view;
-        private readonly ISceneNavigator     _sceneNavigator;
-        private readonly PendingEventContext _pendingEventContext;
-        private readonly ShopUseCase         _shopUseCase;
-        private readonly ISpriteLoader       _spriteLoader;
+        private readonly EventUseCase  _useCase;
+        private readonly EventView     _view;
+        private readonly GameContext   _gameContext;
+        private readonly ShopUseCase   _shopUseCase;
+        private readonly ISpriteLoader _spriteLoader;
 
         private UniTaskCompletionSource _tapTcs;
 
         public EventPresenter(
-            EventUseCase        useCase,
-            EventView           view,
-            ISceneNavigator     sceneNavigator,
-            PendingEventContext pendingEventContext,
-            ShopUseCase         shopUseCase,
-            ISpriteLoader       spriteLoader)
+            EventUseCase  useCase,
+            EventView     view,
+            GameContext   gameContext,
+            ShopUseCase   shopUseCase,
+            ISpriteLoader spriteLoader)
         {
-            _useCase            = useCase;
-            _view               = view;
-            _sceneNavigator     = sceneNavigator;
-            _pendingEventContext = pendingEventContext;
-            _shopUseCase        = shopUseCase;
-            _spriteLoader       = spriteLoader;
+            _useCase      = useCase;
+            _view         = view;
+            _gameContext  = gameContext;
+            _shopUseCase  = shopUseCase;
+            _spriteLoader = spriteLoader;
         }
 
         // ──────────────────────────────────────────────
@@ -43,12 +42,12 @@ namespace Samsara.Features.Event.Presentation
 
         public async UniTask InitializeAsync()
         {
-            _useCase.LoadEvent(_pendingEventContext.EventId);
+            _useCase.LoadEvent(_gameContext.PendingEventContext.EventId);
 
             // 배경 설정 — EventSO 키 우선, 없으면 PendingEventContext 키 사용
             var bgKey = _useCase.GetBackgroundSpriteKey();
             if (string.IsNullOrEmpty(bgKey))
-                bgKey = _pendingEventContext.BackgroundSpriteKey;
+                bgKey = _gameContext.PendingEventContext.BackgroundSpriteKey;
 
             if (!string.IsNullOrEmpty(bgKey))
             {
@@ -64,14 +63,14 @@ namespace Samsara.Features.Event.Presentation
                 _view.ChainStageIndicatorView.Hide();
 
             // 전투 복귀 시 — 결과 팝업만 표시
-            if (_pendingEventContext.IsReturningFromBattle)
+            if (_gameContext.PendingEventContext.IsReturningFromBattle)
             {
-                _pendingEventContext.IsReturningFromBattle = false;
+                _gameContext.PendingEventContext.IsReturningFromBattle = false;
                 var applied = _useCase.GetAppliedResult();
                 if (applied != null)
                     await ShowResultPopupAsync(applied);
                 else
-                    await _sceneNavigator.NavigateToAsync(_pendingEventContext.ReturnScene);
+                    await _gameContext.SceneNavigator.NavigateToAsync(_gameContext.PendingEventContext.ReturnScene);
                 return;
             }
 
@@ -179,7 +178,7 @@ namespace Samsara.Features.Event.Presentation
 
                 case EventResultType.ShopEncounter: return "정비 구역에 상인이 찾아온다.";
                 case EventResultType.Battle:        return "전투가 시작된다!";
-                case EventResultType.Death:         return "쓰러졌다...";
+                case EventResultType.Ending:        return "쓰러졌다...";
                 case EventResultType.None:          return "아무 일도 일어나지 않았다.";
                 default:                            return string.Empty;
             }
@@ -193,29 +192,33 @@ namespace Samsara.Features.Event.Presentation
         {
             switch (result.ResultType)
             {
-                case EventResultType.Death:
-                    await _sceneNavigator.NavigateToAsync(SceneKey.GameOver);
+                case EventResultType.Ending:
+                    if (!result.EndingType.HasValue)
+                        throw new InvalidOperationException(
+                            $"{_logClass} EventResultType.Ending인데 EndingType이 null입니다. MasterData를 확인하세요.");
+                    await _gameContext.EndingEntryService.EnterEndingAsync(result.EndingType.Value);
+                    // IsCompleted 미설정 — 런 종료, ReturnScene 복귀 불필요
                     break;
 
                 case EventResultType.Battle:
                     // [SPEC-GAP] 이벤트 전투용 BattleNodeData 정의 미비 — ReturnScene으로 복귀 (Stub)
                     // 추후 Patch에서 PendingBattleContext 조립 로직 추가 필요
                     Debug.LogWarning($"{_logClass} Battle result stub: BattleNodeData 미정의. ReturnScene으로 이동.");
-                    _pendingEventContext.IsCompleted = true;
-                    await _sceneNavigator.NavigateToAsync(_pendingEventContext.ReturnScene);
+                    _gameContext.PendingEventContext.IsCompleted = true;
+                    await _gameContext.SceneNavigator.NavigateToAsync(_gameContext.PendingEventContext.ReturnScene);
                     break;
 
                 case EventResultType.ShopEncounter:
                     if (result.MerchantId.HasValue)
                         await _shopUseCase.ActivateMerchant(result.MerchantId.Value);
-                    _pendingEventContext.IsCompleted = true;
-                    await _sceneNavigator.NavigateToAsync(_pendingEventContext.ReturnScene);
+                    _gameContext.PendingEventContext.IsCompleted = true;
+                    await _gameContext.SceneNavigator.NavigateToAsync(_gameContext.PendingEventContext.ReturnScene);
                     break;
 
                 default:
                     // None, HpChange, StatChange
-                    _pendingEventContext.IsCompleted = true;
-                    await _sceneNavigator.NavigateToAsync(_pendingEventContext.ReturnScene);
+                    _gameContext.PendingEventContext.IsCompleted = true;
+                    await _gameContext.SceneNavigator.NavigateToAsync(_gameContext.PendingEventContext.ReturnScene);
                     break;
             }
         }

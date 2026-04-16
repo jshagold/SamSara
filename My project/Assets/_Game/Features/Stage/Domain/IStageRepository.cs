@@ -12,6 +12,7 @@ namespace Samsara.Features.Stage.Domain
         void TransitionToStage(string stageId);
         void SetGeneratedNodes(List<string> nodeIds);
         void SetPendingChainedEventId(int eventId);
+        void IncrementClearedStageCount();
         UniTask SaveAsync();
         void SaveSync();
         UniTask LoadAsync();

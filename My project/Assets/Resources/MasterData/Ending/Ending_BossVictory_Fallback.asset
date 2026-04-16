@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e6e4d1c59c8d7e4396fc7957e4aa598, type: 3}
   m_Name: Ending_BossVictory_Fallback
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Ending.MasterData.EndingSO
-  _id: 0
+  _id: 11
   _endingType: 2
   _isGameOver: 0
   _title: "\uBCF4\uC2A4 \uCEF7 "

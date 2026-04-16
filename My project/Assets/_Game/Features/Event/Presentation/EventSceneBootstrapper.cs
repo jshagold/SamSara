@@ -20,19 +20,17 @@ namespace Samsara.Features.Event.Presentation
         {
             await GlobalBootstrapper.Instance.InitializationTask;
 
-            var gameContext     = GlobalBootstrapper.Instance.GameContext;
-            var useCase         = gameContext.EventUseCase;
-            var pendingContext  = gameContext.PendingEventContext;
-            var sceneNavigator  = GlobalBootstrapper.Instance.SceneNavigator;
-            var shopUseCase     = gameContext.ShopUseCase;
+            var gameContext = GlobalBootstrapper.Instance.GameContext;
+            var useCase     = gameContext.EventUseCase;
+            var shopUseCase = gameContext.ShopUseCase;
 
-            if (pendingContext == null)
+            if (gameContext.PendingEventContext == null)
             {
                 Debug.LogError($"{_logClass} PendingEventContext가 null입니다. EventScene 진입 전 설정 필요.");
                 return;
             }
 
-            _presenter = new EventPresenter(useCase, _eventView, sceneNavigator, pendingContext, shopUseCase, gameContext.SpriteLoader);
+            _presenter = new EventPresenter(useCase, _eventView, gameContext, shopUseCase, gameContext.SpriteLoader);
             _presenter.InitializeAsync().Forget();
 
             Debug.Log($"{_logClass} EventScene 초기화 완료.");

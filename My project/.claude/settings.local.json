@@ -19,7 +19,8 @@
       "Bash(rm -rf \"C:\\\\Users\\\\admin\\\\Documents\\\\SamSara\\\\My project\\\\Assets\\\\_Game\\\\Features\\\\Battle\\\\Domain\")",
       "Bash(rm -f \"C:\\\\Users\\\\admin\\\\Documents\\\\SamSara\\\\My project\\\\Assets\\\\_Game\\\\Features\\\\Battle\\\\Domain.meta\")",
       "Bash(rmdir \"C:\\\\Users\\\\admin\\\\Documents\\\\SamSara\\\\My project\\\\Assets\\\\_Game\\\\Features\\\\Battle\")",
-      "Bash(rm -f \"C:\\\\Users\\\\admin\\\\Documents\\\\SamSara\\\\My project\\\\Assets\\\\_Game\\\\Features\\\\Battle.meta\")"
+      "Bash(rm -f \"C:\\\\Users\\\\admin\\\\Documents\\\\SamSara\\\\My project\\\\Assets\\\\_Game\\\\Features\\\\Battle.meta\")",
+      "Bash(grep *)"
     ]
   }
 }

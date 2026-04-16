@@ -114,7 +114,7 @@ public class GlobalBootstrapper : MonoBehaviour
 
             // Step 3 — GameContext 생성 및 DI 조립
             var spriteLoader = new AddressableSpriteLoader();
-            _gameContext = new GameContext(masterData, _popupManager, _runConfig, spriteLoader);
+            _gameContext = new GameContext(masterData, _popupManager, _runConfig, spriteLoader, _sceneNavigator);
 
             Debug.Log($"{_logClass} Step 3 완료 — GameContext 조립");
 

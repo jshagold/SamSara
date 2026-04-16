@@ -4,6 +4,7 @@ using Samsara.Core.AssetLoading;
 using Samsara.Core.Navigation;
 using Samsara.Core.Popup;
 using Samsara.Features.BattleScene.Domain;
+using Samsara.Features.Ending.MasterData;
 using Samsara.Features.Event.Domain;
 using Samsara.Features.Stage.MasterData;
 using Samsara.Features.StageScene.Domain;
@@ -209,14 +210,25 @@ namespace Samsara.Features.StageScene.Presentation
                 var vm = _useCase.GetStageSceneViewModel();
                 int battleNodeIndex = vm.CurrentNodeIndex + 1;
 
-                await _useCase.MoveToNode(battleNodeIndex);
-
-                Debug.Log($"{_logClass} 전투 승리 — 노드 {battleNodeIndex} 완료 처리.");
+                if (_useCase.IsStageComplete(battleNodeIndex))
+                {
+                    // 보스 전투 승리 → ClearedStageCount 증가 후 EndingScene 진입
+                    Debug.Log($"{_logClass} 보스 전투 승리 — EndingScene 진입.");
+                    await _useCase.IncrementClearedStageCount();
+                    await _gameContext.EndingEntryService.EnterEndingAsync(EndingType.BossVictory);
+                }
+                else
+                {
+                    // 일반 전투 승리 → 기존 노드 완료 처리
+                    await _useCase.MoveToNode(battleNodeIndex);
+                    Debug.Log($"{_logClass} 전투 승리 — 노드 {battleNodeIndex} 완료 처리.");
+                }
             }
             else
             {
-                // Defeat: 노드 완료하지 않음 — 현재 위치 유지
-                Debug.Log($"{_logClass} 전투 패배 — 노드 미완료, 현재 위치 유지.");
+                // 전투 패배 → EndingScene 진입
+                Debug.Log($"{_logClass} 전투 패배 — EndingScene 진입.");
+                await _gameContext.EndingEntryService.EnterEndingAsync(EndingType.BattleDefeat);
             }
         }
 

@@ -1,6 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Samsara.Core.AssetLoading;
+using Samsara.Core.Navigation;
 using Samsara.Core.Popup;
 using Samsara.Features.BattleScene.Domain;
 using Samsara.Features.Character.Data;
@@ -56,9 +57,10 @@ public class GameContext
     private readonly EvolutionUseCase  _evolutionUseCase;
     private readonly StageUseCase      _stageUseCase;
     private readonly EventUseCase      _eventUseCase;
-    private readonly EndingUseCase     _endingUseCase;
-    private readonly EndingResolver    _endingResolver;
-    private readonly MiniGameUseCase   _miniGameUseCase;
+    private readonly EndingUseCase        _endingUseCase;
+    private readonly EndingResolver       _endingResolver;
+    private readonly EndingEntryService   _endingEntryService;
+    private readonly MiniGameUseCase      _miniGameUseCase;
     private readonly SkillUseCase      _skillUseCase;
     private readonly ShopUseCase       _shopUseCase;
     private readonly InventoryUseCase  _inventoryUseCase;
@@ -69,6 +71,7 @@ public class GameContext
     public RunConfigSO                  RunConfig            { get; }
     public IPopupManager               PopupManager         { get; }
     public ISpriteLoader               SpriteLoader         { get; }
+    public ISceneNavigator             SceneNavigator       { get; }
     public IStageRepository            StageRepo            => _stageRepo;
     public ICharacterRunRepository     CharacterRunRepo     => _characterRunRepo;
     public ICharacterAccountRepository CharacterAccountRepo => _characterAccountRepo;
@@ -84,9 +87,10 @@ public class GameContext
     public EvolutionUseCase EvolutionUseCase  => _evolutionUseCase;
     public StageUseCase     StageUseCase      => _stageUseCase;
     public EventUseCase     EventUseCase      => _eventUseCase;
-    public EndingUseCase    EndingUseCase     => _endingUseCase;
-    public IEndingResolver  EndingResolver    => _endingResolver;
-    public MiniGameUseCase  MiniGameUseCase   => _miniGameUseCase;
+    public EndingUseCase       EndingUseCase       => _endingUseCase;
+    public IEndingResolver     EndingResolver      => _endingResolver;
+    public IEndingEntryService EndingEntryService  => _endingEntryService;
+    public MiniGameUseCase     MiniGameUseCase     => _miniGameUseCase;
     public SkillUseCase     SkillUseCase      => _skillUseCase;
     public ShopUseCase      ShopUseCase       => _shopUseCase;
     public InventoryUseCase InventoryUseCase  => _inventoryUseCase;
@@ -111,11 +115,12 @@ public class GameContext
     // ──────────────────────────────────────────────
     /// <param name="masterData">GlobalBootstrapper가 로드한 MasterData 전체.</param>
     /// <param name="popupManager">GlobalBootstrapper가 생성한 IPopupManager 인스턴스.</param>
-    public GameContext(ScriptableObject[] masterData, IPopupManager popupManager, RunConfigSO runConfig, ISpriteLoader spriteLoader)
+    public GameContext(ScriptableObject[] masterData, IPopupManager popupManager, RunConfigSO runConfig, ISpriteLoader spriteLoader, ISceneNavigator sceneNavigator)
     {
-        RunConfig    = runConfig;
-        PopupManager = popupManager;
-        SpriteLoader = spriteLoader;
+        RunConfig      = runConfig;
+        PopupManager   = popupManager;
+        SpriteLoader   = spriteLoader;
+        SceneNavigator = sceneNavigator;
 
         // MasterData Cache — masterData 배열에서 EvolutionNodeSO만 필터링
         var nodeList = new System.Collections.Generic.List<EvolutionNodeSO>();
@@ -142,9 +147,10 @@ public class GameContext
         _evolutionUseCase = new EvolutionUseCase(_characterRepo);
         _stageUseCase     = new StageUseCase(_stageRepo);
         _eventUseCase     = new EventUseCase(_eventMasterDataRepo, _characterRunRepo, _stageRepo);
-        _endingUseCase    = new EndingUseCase(_endingMasterDataRepo, _characterAccountRepo);
-        _endingResolver   = new EndingResolver(_endingMasterDataRepo, _characterRunRepo, _characterAccountRepo);
-        _miniGameUseCase  = new MiniGameUseCase(_characterRunRepo);
+        _endingUseCase      = new EndingUseCase(_endingMasterDataRepo, _characterAccountRepo);
+        _endingResolver     = new EndingResolver(_endingMasterDataRepo, _characterRunRepo, _characterAccountRepo);
+        _endingEntryService = new EndingEntryService(_endingResolver, _characterRunRepo, _stageRepo, _evolutionNodes, sceneNavigator, this);
+        _miniGameUseCase    = new MiniGameUseCase(_characterRunRepo);
         _skillUseCase     = new SkillUseCase(_skillMasterDataRepo);
         _inventoryUseCase = new InventoryUseCase(_inventoryRepo, _characterRunRepo, _shopMasterDataRepo);
         _shopUseCase      = new ShopUseCase(_shopRepo, _shopMasterDataRepo, _characterRunRepo, _inventoryUseCase);

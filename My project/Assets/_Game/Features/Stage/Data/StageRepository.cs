@@ -61,6 +61,12 @@ namespace Samsara.Features.Stage.Data
             _isDirty = true;
         }
 
+        public void IncrementClearedStageCount()
+        {
+            _runData.ClearedStageCount++;
+            _isDirty = true;
+        }
+
         // ──────────────────────────────────────────────
         // Load
         // ──────────────────────────────────────────────
