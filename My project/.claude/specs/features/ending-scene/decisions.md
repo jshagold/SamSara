@@ -32,3 +32,19 @@ D-05 [DECISION] EndingDialogueView.Reset()에서 _dialoguePanel을 gameObject로
     다른 컴포넌트(_portraitImage, _speakerNameText, _dialogueText)는
     복잡한 레이아웃으로 인해 GetComponentInChildren으로 자동 구분 불가,
     Inspector에서 수동 연결 필요(M-04 항목).
+
+--- Patch-001 ---
+
+D-06 [SPEC-GAP] EndingCondition에 StringValue 추가 — Patch-001 IntValue 불일치
+  - Patch-001 스펙은 EvolutionId 조건에 IntValue(int)를 사용하도록 명시했으나,
+    CharacterRunData.EvolutionNodeId의 실제 타입이 string이므로
+    IntValue만으로는 비교 불가.
+    EndingCondition에 StringValue(string) 필드를 추가하고,
+    EndingConditionType.EvolutionId 조건 평가 시 StringValue와 비교하도록 구현.
+    IntValue는 스펙 명세 유지 + 미래 정수 조건(StatRange 등)에 재사용.
+
+D-07 [DECISION] EndingResolver.Resolve()에서 List 없이 직접 최댓값 추적
+  - Patch 스펙은 "matched 목록을 Priority 내림차순 정렬 후 top 선택"을 명시했으나,
+    LINQ 금지 + 정렬용 List 할당을 피하기 위해
+    foreach 단일 순회 중 최고 Priority를 직접 추적하는 방식으로 구현.
+    결과는 동일하며 할당이 없음.

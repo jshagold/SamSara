@@ -57,6 +57,7 @@ public class GameContext
     private readonly StageUseCase      _stageUseCase;
     private readonly EventUseCase      _eventUseCase;
     private readonly EndingUseCase     _endingUseCase;
+    private readonly EndingResolver    _endingResolver;
     private readonly MiniGameUseCase   _miniGameUseCase;
     private readonly SkillUseCase      _skillUseCase;
     private readonly ShopUseCase       _shopUseCase;
@@ -84,6 +85,7 @@ public class GameContext
     public StageUseCase     StageUseCase      => _stageUseCase;
     public EventUseCase     EventUseCase      => _eventUseCase;
     public EndingUseCase    EndingUseCase     => _endingUseCase;
+    public IEndingResolver  EndingResolver    => _endingResolver;
     public MiniGameUseCase  MiniGameUseCase   => _miniGameUseCase;
     public SkillUseCase     SkillUseCase      => _skillUseCase;
     public ShopUseCase      ShopUseCase       => _shopUseCase;
@@ -141,6 +143,7 @@ public class GameContext
         _stageUseCase     = new StageUseCase(_stageRepo);
         _eventUseCase     = new EventUseCase(_eventMasterDataRepo, _characterRunRepo, _stageRepo);
         _endingUseCase    = new EndingUseCase(_endingMasterDataRepo, _characterAccountRepo);
+        _endingResolver   = new EndingResolver(_endingMasterDataRepo, _characterRunRepo, _characterAccountRepo);
         _miniGameUseCase  = new MiniGameUseCase(_characterRunRepo);
         _skillUseCase     = new SkillUseCase(_skillMasterDataRepo);
         _inventoryUseCase = new InventoryUseCase(_inventoryRepo, _characterRunRepo, _shopMasterDataRepo);
