@@ -1,4 +1,5 @@
 using System;
+using Samsara.Features.Ending.MasterData;
 using UnityEngine;
 
 namespace Samsara.Features.Stage.MasterData
@@ -8,9 +9,13 @@ namespace Samsara.Features.Stage.MasterData
     {
         private readonly string _logClass = $"[{nameof(BattleNodeDataSO)}]";
 
-        [SerializeField] private EnemySpawn[] _enemySpawns;
+        [SerializeField] private EnemySpawn[]        _enemySpawns;
+        [SerializeField] private EndingCandidateSlot _victoryEndings;
+        [SerializeField] private EndingCandidateSlot _defeatEndings;
 
-        public EnemySpawn[] EnemySpawns => _enemySpawns;
+        public EnemySpawn[]        EnemySpawns     => _enemySpawns;
+        public EndingCandidateSlot VictoryEndings  => _victoryEndings;
+        public EndingCandidateSlot DefeatEndings   => _defeatEndings;
     }
 
     [Serializable]
