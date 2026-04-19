@@ -1,5 +1,6 @@
 using System;
 using Samsara.Features.Character.MasterData;
+using Samsara.Features.Ending.MasterData;
 using UnityEngine;
 
 namespace Samsara.Features.Event.MasterData
@@ -58,17 +59,19 @@ namespace Samsara.Features.Event.MasterData
     [Serializable]
     public class EventResult
     {
-        [SerializeField] private EventResultType _resultType;
-        [SerializeField] private float _value;       // Used for HpChange, StatChange
-        [SerializeField] private bool _useStatType;    // Enable to specify which stat to change
-        [SerializeField] private StatType _statType;   // Which stat to change. Only used when _useStatType is true.
-        [SerializeField] private bool _hasMerchantId;  // Enable to specify which merchant to activate
-        [SerializeField] private int _merchantId;      // Merchant ID. Only used when _hasMerchantId is true.
+        [SerializeField] private EventResultType    _resultType;
+        [SerializeField] private float              _value;          // Used for HpChange, StatChange
+        [SerializeField] private bool               _useStatType;    // Enable to specify which stat to change
+        [SerializeField] private StatType           _statType;       // Which stat to change. Only used when _useStatType is true.
+        [SerializeField] private bool               _hasMerchantId;  // Enable to specify which merchant to activate
+        [SerializeField] private int                _merchantId;     // Merchant ID. Only used when _hasMerchantId is true.
+        [SerializeField] private EndingCandidateSlot _endingSlot;   // 이 결과 적용 시 시도할 엔딩 후보 슬롯. IsEmpty면 매칭 스킵.
 
-        public EventResultType ResultType => _resultType;
-        public float Value => _value;
-        public StatType? StatType => _useStatType ? _statType : (StatType?)null;
-        public int? MerchantId => _hasMerchantId ? _merchantId : (int?)null;
+        public EventResultType     ResultType  => _resultType;
+        public float               Value       => _value;
+        public StatType?           StatType    => _useStatType ? _statType : (StatType?)null;
+        public int?                MerchantId  => _hasMerchantId ? _merchantId : (int?)null;
+        public EndingCandidateSlot EndingSlot  => _endingSlot;
     }
 
     [Serializable]

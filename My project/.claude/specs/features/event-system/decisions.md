@@ -25,3 +25,26 @@ D-09 [DECISION] StagePresenter에서 SceneKey.ActionEvent(씬 파일 없음)를 
 D-10 [DECISION] 이벤트 완료 후 Stage 노드 진행 처리를 위해 PendingEventContext에 IsCompleted 플래그 추가. GameContext에 별도 LastEventResult 프로퍼티를 추가하지 않은 이유: EventPresenter는 GameContext 의존성이 없고(PendingEventContext만 주입) 추가하면 아키텍처 위반. PendingEventContext는 이미 주입된 객체이므로 자연스러운 신호 전달 경로.
 **Why:** Battle의 LastBattleResult 패턴(GameContext 직접 참조)을 그대로 따르면 EventPresenter에 GameContext를 추가해야 함. 이는 불필요한 의존성 확대.
 **How to apply:** IsCompleted는 EventPresenter가 ReturnScene으로 이동하기 직전에만 true로 설정. Death 결과는 Stage로 돌아오지 않으므로 설정하지 않음. StagePresenter가 소비 후 PendingEventContext를 null로 초기화하여 중복 처리 방지.
+
+--- Patch-001 ---
+
+D-11 [DECISION] EventResult._endingSlot null 체크 후 IsEmpty 평가
+  - EventSO는 ScriptableObject이므로 Unity가 [SerializeField] 클래스 필드를
+    Inspector에서 자동 초기화하지만, 코드에서 생성된 EventResult(ApplyChoice 반환값 등)는
+    null일 수 있음.
+  - EventPresenter에서 `slot != null && !slot.IsEmpty` 이중 가드로 NPE 방지.
+  - EndingCandidateSlot에 IsEmpty 프로퍼티 추가 (Candidates == null || Length == 0).
+
+D-12 [DECISION] PendingEventContext.IsStageEndNode 제거 — EndingContext.IsStageEndNode는 유지
+  - 제거 대상: PendingEventContext.IsStageEndNode (씬 간 전달 DTO 필드).
+  - 유지 대상: EndingContext.IsStageEndNode (Domain 평가 struct 필드).
+  - EndingResolver.EvaluateOne StageCompleteFlag 케이스는 삭제하지 않음.
+    이벤트 결과 엔딩은 슬롯 기반으로 매칭 범위를 제한하므로 IsStageEndNode가 false여도
+    기능 이상 없음.
+
+D-13 [DECISION] EventPresenter에서 EndingTriggerKind 직접 참조 제거
+  - 기존: TryEnterEndingAsync(EndingTriggerKind.EventResult, endingContext) — 전역 탐색.
+  - 변경: TryEnterEndingAsync(slot, endingContext) — 슬롯 후보 탐색.
+  - using Samsara.Features.Ending.MasterData는 EndingCandidateSlot 타입 추론에 필요해 유지.
+  - using Samsara.Features.Ending.MasterData에서 EndingTriggerKind도 포함되므로
+    unused using 경고는 발생하지 않음.

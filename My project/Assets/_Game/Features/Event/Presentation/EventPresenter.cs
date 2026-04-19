@@ -205,23 +205,27 @@ namespace Samsara.Features.Event.Presentation
                 // None, HpChange, StatChange: UseCase에서 이미 데이터 적용 완료
             }
 
-            // 2. 엔딩 매칭 시도 (MasterData 기반)
-            var ctx = _gameContext.PendingEventContext;
-            var endingContext = new EndingContext
+            // 2. 슬롯 기반 엔딩 매칭 시도 (슬롯 비어있으면 스킵)
+            var slot = result.EndingSlot;
+            if (slot != null && !slot.IsEmpty)
             {
-                EventId         = ctx.EventId,
-                EventResultType = result.ResultType,
-                IsStageEndNode  = ctx.IsStageEndNode
-            };
+                var ctx = _gameContext.PendingEventContext;
+                var endingContext = new EndingContext
+                {
+                    EventId         = ctx.EventId,
+                    EventResultType = result.ResultType
+                };
 
-            bool endingEntered = await _gameContext.EndingEntryService
-                .TryEnterEndingAsync(EndingTriggerKind.EventResult, endingContext);
+                bool endingEntered = await _gameContext.EndingEntryService
+                    .TryEnterEndingAsync(slot, endingContext);
 
-            if (endingEntered) return;  // 런 종료 — ReturnScene 복귀 불필요
+                if (endingEntered) return;  // 런 종료 — ReturnScene 복귀 불필요
+            }
 
-            // 3. 엔딩 없음 → ReturnScene 복귀 (StagePresenter가 노드 완료 처리)
-            ctx.IsCompleted = true;
-            await _gameContext.SceneNavigator.NavigateToAsync(ctx.ReturnScene);
+            // 3. 슬롯 비어있음 또는 엔딩 매칭 없음 → ReturnScene 복귀 (StagePresenter가 노드 완료 처리)
+            var pendingCtx = _gameContext.PendingEventContext;
+            pendingCtx.IsCompleted = true;
+            await _gameContext.SceneNavigator.NavigateToAsync(pendingCtx.ReturnScene);
         }
 
         // ──────────────────────────────────────────────

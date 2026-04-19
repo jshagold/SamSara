@@ -13,5 +13,8 @@ namespace Samsara.Features.Ending.MasterData
         [SerializeField] private EndingSO[] _candidates;
 
         public EndingSO[] Candidates => _candidates;
+
+        /// <summary>후보가 없으면 true — 엔딩 매칭을 스킵한다.</summary>
+        public bool IsEmpty => _candidates == null || _candidates.Length == 0;
     }
 }
