@@ -152,10 +152,9 @@ namespace Samsara.Features.StageScene.Presentation
 
                 _gameContext.PendingEventContext = new PendingEventContext
                 {
-                    EventId        = eventData.EventId,
-                    ReturnScene    = SceneKey.Stage,
-                    Origin         = EventOriginKind.StageNode,
-                    IsStageEndNode = _useCase.IsStageComplete(index)
+                    EventId     = eventData.EventId,
+                    ReturnScene = SceneKey.Stage,
+                    Origin      = EventOriginKind.StageNode
                 };
 
                 await _sceneNavigator.NavigateToAsync(SceneKey.Event);
@@ -195,34 +194,32 @@ namespace Samsara.Features.StageScene.Presentation
 
             _gameContext.LastBattleResult = null;
 
-            var vm             = _useCase.GetStageSceneViewModel();
+            var vm              = _useCase.GetStageSceneViewModel();
             int battleNodeIndex = vm.CurrentNodeIndex + 1;
-            bool isEndNode     = _useCase.IsStageComplete(battleNodeIndex);
+
+            var nodes      = _useCase.GetCurrentStageNodes();
+            var battleData = nodes[battleNodeIndex].BattleData;
 
             if (result.Value == BattleResult.Victory)
             {
-                // 엔딩 매칭 시도 (BattleVictory 트리거)
-                var endingContext = new EndingContext
+                // 슬롯 기반 엔딩 매칭 시도
+                var slot = battleData?.VictoryEndings;
+                if (slot != null)
                 {
-                    BattleResult   = BattleResult.Victory,
-                    IsStageEndNode = isEndNode
-                };
-
-                bool endingEntered = await _gameContext.EndingEntryService
-                    .TryEnterEndingAsync(EndingTriggerKind.BattleVictory, endingContext);
-
-                if (endingEntered) return;
+                    var endingContext  = new EndingContext { BattleResult = BattleResult.Victory };
+                    bool endingEntered = await _gameContext.EndingEntryService.TryEnterEndingAsync(slot, endingContext);
+                    if (endingEntered) return;
+                }
 
                 // 엔딩 없음 → 노드 완료 처리
                 var completionCtx = new NodeCompletionContext
                 {
-                    NodeIndex      = battleNodeIndex,
-                    NodeType       = NodeType.Battle,
-                    IsStageEndNode = isEndNode
+                    NodeIndex = battleNodeIndex,
+                    NodeType  = NodeType.Battle
                 };
                 await _gameContext.StageProgressService.CompleteNodeAsync(completionCtx);
 
-                if (isEndNode)
+                if (_useCase.IsStageComplete(battleNodeIndex))
                 {
                     var nextStages = _useCase.GetNextStageOptions();
                     var options = new List<StageOptionData>(nextStages.Count);
@@ -237,21 +234,17 @@ namespace Samsara.Features.StageScene.Presentation
             }
             else
             {
-                // 전투 패배 — 엔딩 매칭 시도 (BattleDefeat 트리거)
-                var endingContext = new EndingContext
+                // 슬롯 기반 엔딩 매칭 시도 (패배)
+                var slot = battleData?.DefeatEndings;
+                if (slot != null)
                 {
-                    BattleResult   = BattleResult.Defeat,
-                    IsStageEndNode = false
-                };
-
-                bool endingEntered = await _gameContext.EndingEntryService
-                    .TryEnterEndingAsync(EndingTriggerKind.BattleDefeat, endingContext);
-
-                if (!endingEntered)
-                {
-                    // 폴백 EndingSO가 반드시 존재해야 함. Manual Work 확인 필요.
-                    Debug.LogWarning($"{_logClass} 전투 패배 — 엔딩 매칭 없음. 폴백 EndingSO(TriggerKind=BattleDefeat, Conditions=empty)를 확인하세요.");
+                    var endingContext  = new EndingContext { BattleResult = BattleResult.Defeat };
+                    bool endingEntered = await _gameContext.EndingEntryService.TryEnterEndingAsync(slot, endingContext);
+                    if (endingEntered) return;
                 }
+
+                // 매칭 없음 → 현재 씬 유지 + 경고
+                Debug.LogWarning($"{_logClass} 전투 패배 — 엔딩 매칭 없음. BattleNodeData의 DefeatEndings 슬롯 설정 필요.");
             }
         }
 
@@ -271,9 +264,8 @@ namespace Samsara.Features.StageScene.Presentation
 
             var completionCtx = new NodeCompletionContext
             {
-                NodeIndex      = eventNodeIndex,
-                NodeType       = NodeType.Event,
-                IsStageEndNode = isEndNode
+                NodeIndex = eventNodeIndex,
+                NodeType  = NodeType.Event
             };
             await _gameContext.StageProgressService.CompleteNodeAsync(completionCtx);
 

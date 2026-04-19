@@ -5,7 +5,8 @@
       "mcp__claude_ai_Notion__notion-fetch",
       "Bash(python:*)",
       "mcp__claude_ai_Notion__notion-update-page",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Bash(grep \"\\\\.cs$\")"
     ]
   }
 }

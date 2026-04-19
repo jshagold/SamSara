@@ -51,6 +51,31 @@ namespace Samsara.Features.Ending.Domain
             if (!endingId.HasValue)
                 return false;
 
+            Debug.Log($"{_logClass} TryEnterEndingAsync: trigger={trigger}, endingId={endingId.Value}");
+            await EnterEndingAsync(endingId.Value);
+            return true;
+        }
+
+        public async UniTask<bool> TryEnterEndingAsync(EndingCandidateSlot slot, EndingContext context)
+        {
+            if (slot == null || slot.Candidates == null || slot.Candidates.Length == 0)
+                return false;
+
+            int? endingId = _endingResolver.TryResolve(slot.Candidates, context);
+            if (!endingId.HasValue)
+                return false;
+
+            Debug.Log($"{_logClass} TryEnterEndingAsync(slot): endingId={endingId.Value}");
+            await EnterEndingAsync(endingId.Value);
+            return true;
+        }
+
+        // ──────────────────────────────────────────────
+        // Helpers
+        // ──────────────────────────────────────────────
+
+        private async UniTask EnterEndingAsync(int endingId)
+        {
             var runData = _characterRunRepo.RunData;
             var summary = new RunSummaryData
             {
@@ -62,18 +87,12 @@ namespace Samsara.Features.Ending.Domain
 
             _gameContext.PendingEndingContext = new PendingEndingContext
             {
-                EndingId   = endingId.Value,
+                EndingId   = endingId,
                 RunSummary = summary
             };
 
-            Debug.Log($"{_logClass} TryEnterEndingAsync: trigger={trigger}, endingId={endingId.Value}");
             await _sceneNavigator.NavigateToAsync(SceneKey.Ending);
-            return true;
         }
-
-        // ──────────────────────────────────────────────
-        // Helpers
-        // ──────────────────────────────────────────────
 
         private string FindEvolutionName(string evolutionNodeId)
         {

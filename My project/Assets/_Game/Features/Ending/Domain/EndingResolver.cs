@@ -27,7 +27,7 @@ namespace Samsara.Features.Ending.Domain
         }
 
         // ──────────────────────────────────────────────
-        // TryResolve
+        // TryResolve — TriggerKind 전역 탐색
         // ──────────────────────────────────────────────
 
         /// <summary>
@@ -60,6 +60,41 @@ namespace Samsara.Features.Ending.Domain
             }
 
             Debug.Log($"{_logClass} TryResolve: trigger={trigger} → id={best.Id}, title={best.Title}, priority={best.Priority}");
+            return best.Id;
+        }
+
+        // ──────────────────────────────────────────────
+        // TryResolve — 슬롯 후보 배열 탐색
+        // ──────────────────────────────────────────────
+
+        /// <summary>
+        /// BattleNodeDataSO 슬롯 내 후보 배열만 평가. 매칭 없으면 null.
+        /// </summary>
+        public int? TryResolve(EndingSO[] candidates, EndingContext context)
+        {
+            if (candidates == null || candidates.Length == 0) return null;
+
+            EndingSO best         = null;
+            int      bestPriority = int.MinValue;
+
+            foreach (var so in candidates)
+            {
+                if (!EvaluateAll(so.Conditions, context)) continue;
+
+                if (so.Priority > bestPriority)
+                {
+                    best         = so;
+                    bestPriority = so.Priority;
+                }
+            }
+
+            if (best == null)
+            {
+                Debug.Log($"{_logClass} TryResolve(slot): 매칭 EndingSO 없음. 런 계속.");
+                return null;
+            }
+
+            Debug.Log($"{_logClass} TryResolve(slot): id={best.Id}, title={best.Title}, priority={best.Priority}");
             return best.Id;
         }
 

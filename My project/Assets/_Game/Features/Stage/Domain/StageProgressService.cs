@@ -13,15 +13,18 @@ namespace Samsara.Features.Stage.Domain
     {
         private readonly string _logClass = $"[{nameof(StageProgressService)}]";
 
-        private readonly IStageRepository        _stageRepo;
-        private readonly ICharacterRunRepository _characterRunRepo;
+        private readonly IStageRepository            _stageRepo;
+        private readonly ICharacterRunRepository     _characterRunRepo;
+        private readonly IStageMasterDataRepository  _stageMasterDataRepo;
 
         public StageProgressService(
-            IStageRepository        stageRepo,
-            ICharacterRunRepository characterRunRepo)
+            IStageRepository           stageRepo,
+            ICharacterRunRepository    characterRunRepo,
+            IStageMasterDataRepository stageMasterDataRepo)
         {
-            _stageRepo        = stageRepo;
-            _characterRunRepo = characterRunRepo;
+            _stageRepo           = stageRepo;
+            _characterRunRepo    = characterRunRepo;
+            _stageMasterDataRepo = stageMasterDataRepo;
         }
 
         // ──────────────────────────────────────────────
@@ -30,10 +33,9 @@ namespace Samsara.Features.Stage.Domain
 
         public async UniTask CompleteNodeAsync(NodeCompletionContext context)
         {
-            if (context.IsStageEndNode)
+            if (IsStageEndNode(context.NodeIndex))
             {
                 // 스테이지 클리어 — ClearedStageCount 증가 + 저장.
-                // CurrentNodeIndex 갱신은 불필요 (TransitionToStage에서 0으로 리셋됨).
                 _stageRepo.IncrementClearedStageCount();
                 await _stageRepo.SaveAsync();
                 Debug.Log($"{_logClass} CompleteNodeAsync: 끝 노드 {context.NodeIndex} — ClearedStageCount 증가.");
@@ -48,6 +50,21 @@ namespace Samsara.Features.Stage.Domain
                 await UniTask.WhenAll(_stageRepo.SaveAsync(), _characterRunRepo.SaveDataAsync());
                 Debug.Log($"{_logClass} CompleteNodeAsync: 노드 {context.NodeIndex} 완료 처리.");
             }
+        }
+
+        // ──────────────────────────────────────────────
+        // Helpers
+        // ──────────────────────────────────────────────
+
+        private bool IsStageEndNode(int nodeIndex)
+        {
+            var stageData = _stageRepo.RunData;
+            var stageSO   = _stageMasterDataRepo.GetStageById(stageData.CurrentStageId);
+            int nodeCount = stageSO.IsFixed
+                ? stageSO.FixedNodes.Length
+                : stageData.GeneratedNodeIds.Count;
+            if (nodeCount == 0 || nodeIndex < 0) return false;
+            return nodeIndex >= nodeCount - 1;
         }
     }
 }
