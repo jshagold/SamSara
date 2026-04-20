@@ -1,3 +1,5 @@
+using Samsara.Features.Character.MasterData;
+
 namespace Samsara.Features.Character.Data
 {
     public class CharacterRunData
@@ -13,5 +15,6 @@ namespace Samsara.Features.Character.Data
         public int ActionPoints;
         public int MaxActionPoints;
         public bool IsReincarnationPending;
+        public LastRunResult LastRunResult;
     }
 }
