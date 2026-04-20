@@ -17,7 +17,7 @@ MonoBehaviour:
   _initialDay: 1
   _initialActionPoints: 3
   _initialMaxActionPoints: 3
-  _startStageId: 1000
+  _startStageId: 10000
   _startNodeIndex: 0
   _initialMerchantAvailable: 0
   _inventorySlotCount: 3

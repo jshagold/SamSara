@@ -28,14 +28,6 @@ namespace Samsara.Features.Ending.Data
             throw new InvalidOperationException($"{_logClass} EndingSO not found: id={endingId}");
         }
 
-        public IReadOnlyList<EndingSO> GetEndingsByTriggerKind(EndingTriggerKind triggerKind)
-        {
-            var result = new List<EndingSO>();
-            foreach (var so in _cache.Values)
-                if (so.TriggerKind == triggerKind) result.Add(so);
-            return result;
-        }
-
         public EndingSO[] GetAllEndings()
         {
             var result = new EndingSO[_cache.Count];

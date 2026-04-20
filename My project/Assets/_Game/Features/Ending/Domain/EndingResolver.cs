@@ -5,97 +5,66 @@ using UnityEngine;
 namespace Samsara.Features.Ending.Domain
 {
     /// <summary>
-    /// TriggerKind 필터 + EndingContext 기반 Condition 평가로 최고 우선순위 EndingSO Id를 결정한다.
+    /// EndingCandidateSlot 기반 Condition 평가로 최고 우선순위 EndingSO Id를 결정한다.
     /// Pure C# class. Constructor DI.
     /// </summary>
     public class EndingResolver : IEndingResolver
     {
         private readonly string _logClass = $"[{nameof(EndingResolver)}]";
 
-        private readonly IEndingMasterDataRepository  _endingMasterDataRepo;
-        private readonly ICharacterRunRepository      _characterRunRepo;
-        private readonly ICharacterAccountRepository  _characterAccountRepo;
+        private readonly ICharacterRunRepository     _characterRunRepo;
+        private readonly ICharacterAccountRepository _characterAccountRepo;
 
         public EndingResolver(
-            IEndingMasterDataRepository endingMasterDataRepo,
             ICharacterRunRepository     characterRunRepo,
             ICharacterAccountRepository characterAccountRepo)
         {
-            _endingMasterDataRepo = endingMasterDataRepo;
             _characterRunRepo     = characterRunRepo;
             _characterAccountRepo = characterAccountRepo;
         }
 
         // ──────────────────────────────────────────────
-        // TryResolve — TriggerKind 전역 탐색
+        // IEndingResolver
         // ──────────────────────────────────────────────
 
-        /// <summary>
-        /// 주어진 TriggerKind의 EndingSO 중 EndingContext 조건을 만족하는
-        /// 최고 우선순위 Id를 반환. 매칭 없으면 null.
-        /// </summary>
-        public int? TryResolve(EndingTriggerKind trigger, EndingContext context)
+        public int? TryResolve(EndingCandidateSlot slot, EndingContext context)
         {
-            var candidates = _endingMasterDataRepo.GetEndingsByTriggerKind(trigger);
-
-            EndingSO best         = null;
-            int      bestPriority = int.MinValue;
-
-            // LINQ 금지 — foreach + 직접 비교 (CLAUDE.md §8)
-            foreach (var so in candidates)
+            if (slot == null || slot.IsEmpty)
             {
-                if (!EvaluateAll(so.Conditions, context)) continue;
-
-                if (so.Priority > bestPriority)
-                {
-                    best         = so;
-                    bestPriority = so.Priority;
-                }
-            }
-
-            if (best == null)
-            {
-                Debug.Log($"{_logClass} TryResolve: trigger={trigger} — 매칭 EndingSO 없음. 런 계속.");
+                Debug.Log($"{_logClass} TryResolve: 슬롯 null 또는 비어있음 — 매칭 스킵.");
                 return null;
             }
 
-            Debug.Log($"{_logClass} TryResolve: trigger={trigger} → id={best.Id}, title={best.Title}, priority={best.Priority}");
-            return best.Id;
-        }
+            EndingSO matchedEnding   = null;
+            int      matchedPriority = int.MinValue;
 
-        // ──────────────────────────────────────────────
-        // TryResolve — 슬롯 후보 배열 탐색
-        // ──────────────────────────────────────────────
-
-        /// <summary>
-        /// BattleNodeDataSO 슬롯 내 후보 배열만 평가. 매칭 없으면 null.
-        /// </summary>
-        public int? TryResolve(EndingSO[] candidates, EndingContext context)
-        {
-            if (candidates == null || candidates.Length == 0) return null;
-
-            EndingSO best         = null;
-            int      bestPriority = int.MinValue;
-
-            foreach (var so in candidates)
+            // 단일 foreach 패스, LINQ 금지 (§8 GC 최적화)
+            foreach (var ending in slot.Candidates)
             {
-                if (!EvaluateAll(so.Conditions, context)) continue;
+                if (ending == null) continue;
+                if (!EvaluateAll(ending.Conditions, context)) continue;
 
-                if (so.Priority > bestPriority)
+                if (ending.Priority > matchedPriority)
                 {
-                    best         = so;
-                    bestPriority = so.Priority;
+                    matchedEnding   = ending;
+                    matchedPriority = ending.Priority;
                 }
             }
 
-            if (best == null)
+            if (matchedEnding != null)
             {
-                Debug.Log($"{_logClass} TryResolve(slot): 매칭 EndingSO 없음. 런 계속.");
-                return null;
+                Debug.Log($"{_logClass} TryResolve: 매칭 성공 — id={matchedEnding.Id}, title={matchedEnding.Title}, priority={matchedEnding.Priority}");
+                return matchedEnding.Id;
             }
 
-            Debug.Log($"{_logClass} TryResolve(slot): id={best.Id}, title={best.Title}, priority={best.Priority}");
-            return best.Id;
+            if (slot.Fallback != null)
+            {
+                Debug.Log($"{_logClass} TryResolve: 조건 매칭 없음 → Fallback 사용 — id={slot.Fallback.Id}");
+                return slot.Fallback.Id;
+            }
+
+            Debug.Log($"{_logClass} TryResolve: 매칭 없음, Fallback 없음 — 런 계속.");
+            return null;
         }
 
         // ──────────────────────────────────────────────
@@ -104,7 +73,7 @@ namespace Samsara.Features.Ending.Domain
 
         private bool EvaluateAll(EndingCondition[] conditions, in EndingContext context)
         {
-            if (conditions == null || conditions.Length == 0) return true;  // 폴백 후보
+            if (conditions == null || conditions.Length == 0) return true;  // 빈 조건 = 무조건 통과
 
             foreach (var condition in conditions)
             {
@@ -129,9 +98,6 @@ namespace Samsara.Features.Ending.Domain
                 case EndingConditionType.EventResultType:
                     return context.EventResultType.HasValue
                         && (int)context.EventResultType.Value == condition.IntValue;
-
-                case EndingConditionType.StageCompleteFlag:
-                    return context.IsStageEndNode;
 
                 default:
                     Debug.LogWarning($"{_logClass} 미처리 EndingConditionType: {condition.Type} — true 반환 (안전 기본값)");

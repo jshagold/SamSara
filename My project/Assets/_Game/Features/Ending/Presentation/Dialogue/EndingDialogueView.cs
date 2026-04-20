@@ -19,6 +19,7 @@ namespace Samsara.Features.Ending.Presentation
             _dialoguePanel.SetActive(true);
             _portraitImage.gameObject.SetActive(true);
             _speakerNameText.gameObject.SetActive(true);
+            _dialogueText.gameObject.SetActive(true);
 
             _speakerNameText.text  = speakerName;
             _portraitImage.sprite  = portrait;
@@ -31,6 +32,7 @@ namespace Samsara.Features.Ending.Presentation
             _dialoguePanel.SetActive(true);
             _portraitImage.gameObject.SetActive(false);
             _speakerNameText.gameObject.SetActive(false);
+            _dialogueText.gameObject.SetActive(true);
 
             _dialogueText.text = text;
         }

@@ -17,8 +17,5 @@ namespace Samsara.Features.Ending.Domain
 
         /// <summary>EventResult 트리거 시 사용 — 이벤트 결과 타입.</summary>
         public EventResultType? EventResultType;
-
-        /// <summary>현재 노드가 스테이지 끝 노드인지 여부. StageCompleteFlag 조건 평가에 사용.</summary>
-        public bool IsStageEndNode;
     }
 }

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 664884c69dd49ba47ad012bf2f145bca, type: 3}
+  m_Name: Stage_Test_001
+  m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.Stage.MasterData.StageSO
+  _stageId: 10000
+  _stageName: test
+  _backgroundSpriteKey: 
+  _backgroundMusicKey: 
+  _isFixed: 1
+  _fixedNodes:
+  - {fileID: 11400000, guid: 7e4e2ae4f93324540bbc36479f3eb4f4, type: 2}
+  - {fileID: 11400000, guid: d386cd9a4190f8345abd21ad86129f6a, type: 2}
+  - {fileID: 11400000, guid: 11f4a03f2df4f494ea1ae0e9e011203c, type: 2}
+  - {fileID: 11400000, guid: a04740fe21d3e4b49a2d05ff94009a71, type: 2}
+  _randomNodePool:
+    _minBattleNodes: 1
+    _maxBattleNodes: 2
+    _minEventNodes: 1
+    _maxEventNodes: 2
+    _bossNodeCount: 1
+  _nextStageIds: []

@@ -150,7 +150,7 @@ public class GameContext
         _stageUseCase     = new StageUseCase(_stageRepo);
         _eventUseCase     = new EventUseCase(_eventMasterDataRepo, _characterRunRepo, _stageRepo);
         _endingUseCase      = new EndingUseCase(_endingMasterDataRepo, _characterAccountRepo);
-        _endingResolver     = new EndingResolver(_endingMasterDataRepo, _characterRunRepo, _characterAccountRepo);
+        _endingResolver     = new EndingResolver(_characterRunRepo, _characterAccountRepo);
         _endingEntryService   = new EndingEntryService(_endingResolver, _characterRunRepo, _stageRepo, _evolutionNodes, sceneNavigator, this);
         _stageProgressService = new StageProgressService(_stageRepo, _characterRunRepo, _stageMasterDataRepo);
         _miniGameUseCase    = new MiniGameUseCase(_characterRunRepo);

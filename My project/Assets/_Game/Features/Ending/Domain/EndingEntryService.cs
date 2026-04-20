@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Samsara.Features.Ending.Domain
 {
     /// <summary>
-    /// 엔딩 진입 공통 서비스. TryResolve로 EndingId를 결정하고,
+    /// 엔딩 진입 공통 서비스. EndingCandidateSlot 기반으로 EndingId를 결정하고,
     /// 매칭 시 RunSummaryData를 구성한 뒤 PendingEndingContext를 설정하고 EndingScene으로 전환한다.
     /// 매칭 없으면 false를 반환해 호출자가 런을 계속 처리하도록 한다.
     /// Pure C# class. Constructor DI.
@@ -45,27 +45,16 @@ namespace Samsara.Features.Ending.Domain
         // IEndingEntryService
         // ──────────────────────────────────────────────
 
-        public async UniTask<bool> TryEnterEndingAsync(EndingTriggerKind trigger, EndingContext context)
-        {
-            int? endingId = _endingResolver.TryResolve(trigger, context);
-            if (!endingId.HasValue)
-                return false;
-
-            Debug.Log($"{_logClass} TryEnterEndingAsync: trigger={trigger}, endingId={endingId.Value}");
-            await EnterEndingAsync(endingId.Value);
-            return true;
-        }
-
         public async UniTask<bool> TryEnterEndingAsync(EndingCandidateSlot slot, EndingContext context)
         {
-            if (slot == null || slot.Candidates == null || slot.Candidates.Length == 0)
-                return false;
-
-            int? endingId = _endingResolver.TryResolve(slot.Candidates, context);
+            int? endingId = _endingResolver.TryResolve(slot, context);
             if (!endingId.HasValue)
+            {
+                Debug.Log($"{_logClass} TryEnterEndingAsync: 매칭 없음 — 런 계속.");
                 return false;
+            }
 
-            Debug.Log($"{_logClass} TryEnterEndingAsync(slot): endingId={endingId.Value}");
+            Debug.Log($"{_logClass} TryEnterEndingAsync: 엔딩 매칭 — endingId={endingId.Value}");
             await EnterEndingAsync(endingId.Value);
             return true;
         }
