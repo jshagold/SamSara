@@ -145,10 +145,9 @@ namespace Samsara.Features.Ending.Presentation
             // PendingEndingContext 소비
             _gameContext.PendingEndingContext = null;
 
-            // TODO: ReplayScene/SplashScene 구현 시 RunData 리셋 로직 연결
-            _sceneNavigator.NavigateToAsync(SceneKey.Main).Forget();
+            _sceneNavigator.NavigateToAsync(SceneKey.Replay).Forget();
 
-            Debug.Log($"{_logClass} HandleRestart → SceneKey.Main 이동.");
+            Debug.Log($"{_logClass} HandleRestart → SceneKey.Replay 이동.");
         }
 
         // ──────────────────────────────────────────────

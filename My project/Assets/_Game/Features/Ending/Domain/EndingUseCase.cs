@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Samsara.Features.Character.Domain;
+using Samsara.Features.Character.MasterData;
 using Samsara.Features.Ending.MasterData;
 using UnityEngine;
 
@@ -11,16 +12,19 @@ namespace Samsara.Features.Ending.Domain
 
         private readonly IEndingMasterDataRepository  _endingMasterDataRepo;
         private readonly ICharacterAccountRepository  _characterAccountRepo;
+        private readonly ICharacterRunRepository      _characterRunRepo;
 
         private EndingSO _currentEnding;
         private int      _dialogueIndex;
 
         public EndingUseCase(
             IEndingMasterDataRepository endingMasterDataRepo,
-            ICharacterAccountRepository characterAccountRepo)
+            ICharacterAccountRepository characterAccountRepo,
+            ICharacterRunRepository     characterRunRepo)
         {
             _endingMasterDataRepo = endingMasterDataRepo;
             _characterAccountRepo = characterAccountRepo;
+            _characterRunRepo     = characterRunRepo;
         }
 
         // ──────────────────────────────────────────────
@@ -114,6 +118,11 @@ namespace Samsara.Features.Ending.Domain
                 _characterAccountRepo.MarkDirty();
                 _characterAccountRepo.SaveDataAsync().Forget();
             }
+
+            _characterRunRepo.RunData.LastRunResult = _currentEnding.IsGameOver
+                ? LastRunResult.GameOver
+                : LastRunResult.Ending;
+            _characterRunRepo.MarkDirty();
 
             Debug.Log($"{_logClass} CompleteEnding id={_currentEnding.Id}, isGameOver={_currentEnding.IsGameOver}, dirty={dirty}");
         }

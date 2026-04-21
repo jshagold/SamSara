@@ -42,3 +42,7 @@ D-05 [DECISION] T21: MaintenanceScene 탐험 이벤트 미구현 — IsStageEndN
     (Debug.Log "탐험 씬 미정의, 전환 스킵"). PendingEventContext 자체를 생성하지 않음.
   - IsStageEndNode setter 제거 대상 코드가 존재하지 않음 → skip.
   - 탐험 이벤트 구현 시 Origin=MaintenanceExploration 설정 필요 (IsStageEndNode 불필요).
+
+D-06 [DECISION] Patch-005: GameContext.cs를 "Files to modify" 외 추가 수정
+  - EndingUseCase 생성자에 ICharacterRunRepository 파라미터 추가로 인해 GameContext.cs의 new EndingUseCase(...) call site도 수정 필요.
+  - Patch-005 "Files to modify" 목록에 GameContext.cs가 미포함이지만 생성자 시그니처 변경의 필수 연동 수정이므로 함께 처리.
