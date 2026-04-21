@@ -1,13 +1,12 @@
 using System;
-using Samsara.Features.EvolutionTreeScene.Domain;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Samsara.Features.EvolutionTreeScene.Presentation.TreeArea
+namespace Samsara.Core.Tree
 {
-    public class EvolutionNodeView : MonoBehaviour
+    public class NodeView : MonoBehaviour
     {
-        private readonly string _logClass = $"[{nameof(EvolutionNodeView)}]";
+        private readonly string _logClass = $"[{nameof(NodeView)}]";
 
         [SerializeField] private Button _button;
         [SerializeField] private Image _nodeIcon;
@@ -28,7 +27,7 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation.TreeArea
 
         public event Action<string> OnNodeClicked;
 
-        /// <summary>UI 스프라이트 외부 주입. EvolutionTreeSceneBootstrapper에서 호출.</summary>
+        /// <summary>UI 스프라이트 외부 주입. SceneBootstrapper에서 호출.</summary>
         public void SetUISprites(
             Sprite current, Sprite evolvable, Sprite reachable,
             Sprite locked, Sprite hidden, Sprite questionMark)

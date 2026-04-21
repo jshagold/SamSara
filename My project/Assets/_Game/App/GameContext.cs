@@ -214,4 +214,41 @@ public class GameContext
 
         Debug.Log($"{_logClass} 긴급 동기 저장 완료.");
     }
+
+    // ──────────────────────────────────────────────
+    // ResetRunForReplayAsync — 재환생 런 초기화 (ReplayScene 전용)
+    // ──────────────────────────────────────────────
+    public async UniTask ResetRunForReplayAsync(int selectedEvolutionNodeId)
+    {
+        CharacterRunRepo.InitializeNewRun(RunConfig, selectedEvolutionNodeId);
+        StageRepo.InitializeNewRun(RunConfig);
+        ShopRepo.InitializeNewRun(RunConfig);
+        InventoryRepo.InitializeNewRun(RunConfig);
+
+        ApplyStatsFromEvolutionNode(selectedEvolutionNodeId);
+
+        SaveAllDataSync();
+
+        await UniTask.CompletedTask;
+    }
+
+    private void ApplyStatsFromEvolutionNode(int nodeId)
+    {
+        var nodeIdStr = nodeId.ToString();
+        foreach (var node in EvolutionNodes)
+        {
+            if (node.NodeId != nodeIdStr || node.BaseStats == null) continue;
+
+            var d       = CharacterRunRepo.RunData;
+            d.Hp        = node.BaseStats.Hp;
+            d.MaxHp     = node.BaseStats.Hp;
+            d.Strength  = node.BaseStats.Strength;
+            d.Toughness = node.BaseStats.Toughness;
+            d.Agility   = node.BaseStats.Agility;
+            return;
+        }
+
+        throw new InvalidOperationException(
+            $"{_logClass} ResetRunForReplayAsync: EvolutionNodeSO not found or BaseStats null for NodeId [{nodeIdStr}]");
+    }
 }

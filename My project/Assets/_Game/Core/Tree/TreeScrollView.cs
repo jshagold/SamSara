@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using Samsara.Features.EvolutionTreeScene.Domain;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Samsara.Features.EvolutionTreeScene.Presentation.TreeArea
+namespace Samsara.Core.Tree
 {
     public class TreeScrollView : MonoBehaviour
     {
@@ -11,11 +10,11 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation.TreeArea
 
         [SerializeField] private ScrollRect _scrollRect;
         [SerializeField] private RectTransform _content;
-        [SerializeField] private EvolutionNodeView _nodePrefab;
+        [SerializeField] private NodeView _nodePrefab;
         [SerializeField] private NodeConnectionView _connectionPrefab;
 
-        private readonly List<EvolutionNodeView> _nodeViews = new List<EvolutionNodeView>();
-        private readonly Dictionary<string, EvolutionNodeView> _nodeViewMap = new Dictionary<string, EvolutionNodeView>();
+        private readonly List<NodeView> _nodeViews = new List<NodeView>();
+        private readonly Dictionary<string, NodeView> _nodeViewMap = new Dictionary<string, NodeView>();
 
         public void BuildTree(TreeLayoutResult layoutResult)
         {
@@ -58,7 +57,7 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation.TreeArea
             }
         }
 
-        public EvolutionNodeView GetNodeView(string nodeId)
+        public NodeView GetNodeView(string nodeId)
         {
             _nodeViewMap.TryGetValue(nodeId, out var view);
             return view;
@@ -91,7 +90,7 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation.TreeArea
             _scrollRect.normalizedPosition = new Vector2(normalizedX, normalizedY);
         }
 
-        public EvolutionNodeView[] GetAllNodeViews()
+        public NodeView[] GetAllNodeViews()
         {
             return _nodeViews.ToArray();
         }

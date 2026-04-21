@@ -164,7 +164,7 @@ GameObject:
   - component: {fileID: 6210799196089074071}
   - component: {fileID: 328215907469461619}
   m_Layer: 5
-  m_Name: EvolutionNode
+  m_Name: TreeNode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

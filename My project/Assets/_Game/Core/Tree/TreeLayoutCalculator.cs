@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Samsara.Features.Character.MasterData;
 using UnityEngine;
 
-namespace Samsara.Features.EvolutionTreeScene.Domain
+namespace Samsara.Core.Tree
 {
     public struct NodeLayoutData
     {

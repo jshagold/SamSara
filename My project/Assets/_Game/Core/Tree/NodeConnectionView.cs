@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Samsara.Features.EvolutionTreeScene.Presentation.TreeArea
+namespace Samsara.Core.Tree
 {
     public class NodeConnectionView : MonoBehaviour
     {

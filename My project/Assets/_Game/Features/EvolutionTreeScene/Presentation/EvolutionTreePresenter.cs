@@ -6,9 +6,9 @@ using Samsara.Core.AssetLoading;
 using Samsara.Core.Navigation;
 using Samsara.Core.Popup;
 using Samsara.Features.Character.MasterData;
+using Samsara.Core.Tree;
 using Samsara.Features.EvolutionTreeScene.Domain;
 using Samsara.Features.EvolutionTreeScene.Presentation.Popup;
-using Samsara.Features.EvolutionTreeScene.Presentation.TreeArea;
 using UnityEngine;
 
 namespace Samsara.Features.EvolutionTreeScene.Presentation

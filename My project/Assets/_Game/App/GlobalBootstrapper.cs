@@ -124,7 +124,10 @@ public class GlobalBootstrapper : MonoBehaviour
             Debug.Log($"{_logClass} Step 4 완료 — 런타임 데이터 로드");
 
             // Step 4-A — 신규 런 자동 초기화 (저장 데이터 없을 때)
-            // TODO: Phase 6 — Move to SplashScene/ReplayScene
+            // New-user path only: auto-initialize RunData on first app launch.
+            // ReplayScene handles restart after an ended run via a separate path
+            // and does not inherit this auto-initialization.
+            // (Per ReplayScene Specify RQ-01 / RQ-12)
             {
                 var characterRunRepo = _gameContext.CharacterRunRepo;
                 var runData          = characterRunRepo.RunData;

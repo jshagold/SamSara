@@ -1,6 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Samsara.Core.MasterData;
+using Samsara.Core.Tree;
 using Samsara.Features.Character.Data;
 using Samsara.Features.Character.Domain;
 using Samsara.Features.Character.MasterData;
@@ -8,15 +9,6 @@ using Samsara.Features.Skill.Domain;
 
 namespace Samsara.Features.EvolutionTreeScene.Domain
 {
-    public enum NodeState
-    {
-        Current,
-        Evolvable,
-        Reachable,
-        Locked,
-        Hidden
-    }
-
     public struct EvolutionTreeStatsData
     {
         public int Hp;

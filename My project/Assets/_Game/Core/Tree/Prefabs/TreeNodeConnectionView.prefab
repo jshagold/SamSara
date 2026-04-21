@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 373476675256246819}
   - component: {fileID: 125179027494942462}
   m_Layer: 5
-  m_Name: NodeConnectionView
+  m_Name: TreeNodeConnectionView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

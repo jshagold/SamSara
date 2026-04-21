@@ -1,6 +1,6 @@
+using Samsara.Core.Tree;
 using Samsara.Features.EvolutionTreeScene.Presentation.Popup;
 using Samsara.Features.EvolutionTreeScene.Presentation.TopBar;
-using Samsara.Features.EvolutionTreeScene.Presentation.TreeArea;
 using UnityEngine;
 
 namespace Samsara.Features.EvolutionTreeScene.Presentation
