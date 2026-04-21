@@ -11,7 +11,7 @@ namespace Samsara.Features.Inventory.Domain
         InventorySlotData[] GetSlots();
         void SetSlot(int slotIndex, int itemId, int quantity);
         void ClearSlot(int slotIndex);
-        void ResetRunData();
+        void InitializeNewRun(RunConfigSO config);
         void MarkDirty();
     }
 }

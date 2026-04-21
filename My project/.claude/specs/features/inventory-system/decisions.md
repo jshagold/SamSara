@@ -16,3 +16,6 @@ Tasks.md에서 Hp 포션 사용 시 MaxHp 상한 처리 미정의. 현재 구현
 
 D-04 [DECISION] CharacterRunRepository 스탯 직접 수정 패턴
 ICharacterRunRepository에 스탯 증가 전용 메서드가 없으므로, RunData 프로퍼티를 통해 필드 직접 수정 후 MarkDirty() 호출 패턴 사용. 기존 MiniGameUseCase 등에서도 동일 패턴 사용 확인.
+
+D-05 [BACKLOG] InitializeNewRun에서 config.InventorySlotCount 미반영
+RunConfigSO에 InventorySlotCount 필드가 존재하므로 Patch-001 지시에 따라 사용해야 하나, InventoryRunData 생성자가 슬롯 수를 3으로 하드코딩하므로 현재 config 값이 실제로 반영되지 않음. InventoryRunData 생성자를 슬롯 수 파라미터 받도록 수정하거나 InventoryRepository에서 직접 배열 생성하는 방식으로 추후 개선 필요.

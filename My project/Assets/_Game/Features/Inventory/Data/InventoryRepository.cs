@@ -80,7 +80,7 @@ namespace Samsara.Features.Inventory.Data
             _isDirty = true;
         }
 
-        public void ResetRunData()
+        public void InitializeNewRun(RunConfigSO config)
         {
             _runData = new InventoryRunData();
             _isDirty = true;

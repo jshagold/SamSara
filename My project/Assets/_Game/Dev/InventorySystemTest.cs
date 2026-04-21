@@ -359,7 +359,7 @@ public class InventorySystemTest : MonoBehaviour
             await uc.AddItem(1, 2);
             await uc.AddItem(2, 3);
 
-            repo.ResetRunData();
+            repo.InitializeNewRun(ScriptableObject.CreateInstance<RunConfigSO>());
 
             var slots = repo.GetSlots();
             if (slots == null || slots.Length != 3)
