@@ -22,7 +22,9 @@
       "Bash(rm -f \"C:\\\\Users\\\\admin\\\\Documents\\\\SamSara\\\\My project\\\\Assets\\\\_Game\\\\Features\\\\Battle.meta\")",
       "Bash(grep *)",
       "Bash(git diff *)",
-      "Bash(git status *)"
+      "Bash(git status *)",
+      "Bash([ -d \"$feature_path/Presentation\" ])",
+      "Bash(sort echo *)"
     ]
   }
 }
