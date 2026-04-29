@@ -14,6 +14,7 @@ using Samsara.Features.Event.Domain;
 using Samsara.Features.Inventory.Data;
 using Samsara.Features.Inventory.Domain;
 using Samsara.Features.MiniGame.Domain;
+using Samsara.Features.ReplayScene.Domain;
 using Samsara.Features.Shop.Data;
 using Samsara.Features.Shop.Domain;
 using Samsara.Features.Skill.Data;
@@ -108,6 +109,9 @@ public class GameContext
 
     /// <summary>씬 간 데이터 전달 — 엔딩 진입 컨텍스트. EndingScene 진입 전 설정, 진입 후 즉시 소비.</summary>
     public PendingEndingContext PendingEndingContext { get; set; }
+
+    /// <summary>씬 간 데이터 전달 — ReplayScene 진입 컨텍스트. EndingScene 전환 직전 설정, ReplayScene 진입 직후 소비. (G-22)</summary>
+    public PendingReplayContext PendingReplayContext { get; set; }
 
     /// <summary>씬 간 데이터 전달 — 마지막 전투 결과. BattleScene 종료 시 설정, StageScene에서 소비.</summary>
     public BattleResult? LastBattleResult { get; set; }

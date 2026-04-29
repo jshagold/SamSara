@@ -12,7 +12,7 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation
         [SerializeField] private EvolutionTreeView _evolutionTreeView;
 
         // Node state frame sprites — Addressable keys (set in Inspector)
-        // Order matches SetUISprites: current, evolvable, reachable, locked, hidden, questionMark
+        // Index order consumed by EvolutionTreePresenter._uiSpriteKeys: [0]=current, [1]=evolvable, [2]=reachable, [3]=locked, [4]=hidden, [5]=questionMark
         [SerializeField] private string _currentFrameKey;
         [SerializeField] private string _evolvableFrameKey;
         [SerializeField] private string _reachableFrameKey;

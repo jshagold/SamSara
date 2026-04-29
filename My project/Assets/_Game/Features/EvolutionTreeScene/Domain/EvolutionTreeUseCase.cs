@@ -99,10 +99,10 @@ namespace Samsara.Features.EvolutionTreeScene.Domain
             return true;
         }
 
-        public NodeState ClassifyNodeState(EvolutionNodeSO node, EvolutionNodeSO currentNode)
+        public EvolutionNodeState ClassifyNodeState(EvolutionNodeSO node, EvolutionNodeSO currentNode)
         {
             if (node == currentNode)
-                return NodeState.Current;
+                return EvolutionNodeState.Current;
 
             bool isNextNode = false;
             if (currentNode.NextNodes != null)
@@ -120,15 +120,15 @@ namespace Samsara.Features.EvolutionTreeScene.Domain
             if (isNextNode)
             {
                 if (node.IsHidden && !CheckUnlockConditions(node))
-                    return NodeState.Hidden;
+                    return EvolutionNodeState.Hidden;
 
                 if (CheckUnlockConditions(node))
-                    return NodeState.Evolvable;
+                    return EvolutionNodeState.Evolvable;
 
-                return NodeState.Reachable;
+                return EvolutionNodeState.Reachable;
             }
 
-            return NodeState.Locked;
+            return EvolutionNodeState.Locked;
         }
 
         public async UniTask ExecuteEvolutionAsync(EvolutionNodeSO targetNode)

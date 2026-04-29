@@ -33,6 +33,14 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation
         // nodeId → 로드된 노드 아이콘 스프라이트 캐시
         private readonly Dictionary<string, Sprite> _nodeIconCache = new();
 
+        // 6 frame Sprite 인스턴스 필드 (Patch-001 §9-5 — Presenter mapping 책임)
+        private Sprite _currentFrameSprite;
+        private Sprite _evolvableFrameSprite;
+        private Sprite _reachableFrameSprite;
+        private Sprite _lockedFrameSprite;
+        private Sprite _hiddenFrameSprite;
+        private Sprite _questionMarkSprite;
+
         public EvolutionTreePresenter(
             EvolutionTreeUseCase useCase,
             TreeLayoutCalculator layoutCalculator,
@@ -61,18 +69,18 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation
             _allNodes    = _useCase.GetAllNodes();
             _currentNode = _useCase.FindCurrentNode();
 
-            // Load 6 UI frame sprites before building the tree
-            var currentFrame   = _uiSpriteKeys != null && _uiSpriteKeys.Length > 0 ? await _spriteLoader.LoadSpriteAsync(_uiSpriteKeys[0]) : null;
-            var evolvableFrame = _uiSpriteKeys != null && _uiSpriteKeys.Length > 1 ? await _spriteLoader.LoadSpriteAsync(_uiSpriteKeys[1]) : null;
-            var reachableFrame = _uiSpriteKeys != null && _uiSpriteKeys.Length > 2 ? await _spriteLoader.LoadSpriteAsync(_uiSpriteKeys[2]) : null;
-            var lockedFrame    = _uiSpriteKeys != null && _uiSpriteKeys.Length > 3 ? await _spriteLoader.LoadSpriteAsync(_uiSpriteKeys[3]) : null;
-            var hiddenFrame    = _uiSpriteKeys != null && _uiSpriteKeys.Length > 4 ? await _spriteLoader.LoadSpriteAsync(_uiSpriteKeys[4]) : null;
-            var questionMark   = _uiSpriteKeys != null && _uiSpriteKeys.Length > 5 ? await _spriteLoader.LoadSpriteAsync(_uiSpriteKeys[5]) : null;
+            // Load 6 UI frame sprites before building the tree (Patch-001 §9-5)
+            _currentFrameSprite   = _uiSpriteKeys != null && _uiSpriteKeys.Length > 0 ? await _spriteLoader.LoadSpriteAsync(_uiSpriteKeys[0]) : null;
+            _evolvableFrameSprite = _uiSpriteKeys != null && _uiSpriteKeys.Length > 1 ? await _spriteLoader.LoadSpriteAsync(_uiSpriteKeys[1]) : null;
+            _reachableFrameSprite = _uiSpriteKeys != null && _uiSpriteKeys.Length > 2 ? await _spriteLoader.LoadSpriteAsync(_uiSpriteKeys[2]) : null;
+            _lockedFrameSprite    = _uiSpriteKeys != null && _uiSpriteKeys.Length > 3 ? await _spriteLoader.LoadSpriteAsync(_uiSpriteKeys[3]) : null;
+            _hiddenFrameSprite    = _uiSpriteKeys != null && _uiSpriteKeys.Length > 4 ? await _spriteLoader.LoadSpriteAsync(_uiSpriteKeys[4]) : null;
+            _questionMarkSprite   = _uiSpriteKeys != null && _uiSpriteKeys.Length > 5 ? await _spriteLoader.LoadSpriteAsync(_uiSpriteKeys[5]) : null;
 
             var layoutResult = _layoutCalculator.CalculateLayout(_allNodes);
             _view.TreeScrollView.BuildTree(layoutResult);
 
-            // Setup each node view — load icon sprite + inject UI frame sprites
+            // Setup each node view — load icon sprite + apply mapping (Patch-001 §9-4 C1 self-mapping)
             foreach (var node in _allNodes)
             {
                 var nodeView = _view.TreeScrollView.GetNodeView(node.NodeId);
@@ -81,10 +89,15 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation
                 var iconSprite = await _spriteLoader.LoadSpriteAsync(node.NodeIconSpriteKey);
                 _nodeIconCache[node.NodeId] = iconSprite;
                 nodeView.Setup(node.NodeId, iconSprite);
-                nodeView.SetUISprites(currentFrame, evolvableFrame, reachableFrame, lockedFrame, hiddenFrame, questionMark);
 
                 var state = _useCase.ClassifyNodeState(node, _currentNode);
-                nodeView.SetNodeState(state);
+                var frameSprite = MapStateToFrameSprite(state);
+                nodeView.SetFrameSprite(frameSprite);
+
+                if (state == EvolutionNodeState.Hidden)
+                {
+                    nodeView.SetIconSprite(_questionMarkSprite);
+                }
             }
 
             _view.TreeScrollView.ScrollToNode(_currentNode.NodeId);
@@ -100,6 +113,19 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation
             _view.NodeDescriptionPopupView.OnCloseClicked  += HandleCloseClicked;
             _view.ReincarnationButtonView.OnReincarnationClicked += HandleReincarnationClicked;
             _view.BackButtonView.OnBackClicked             += HandleBackClicked;
+        }
+
+        private Sprite MapStateToFrameSprite(EvolutionNodeState state)
+        {
+            return state switch
+            {
+                EvolutionNodeState.Current   => _currentFrameSprite,
+                EvolutionNodeState.Evolvable => _evolvableFrameSprite,
+                EvolutionNodeState.Reachable => _reachableFrameSprite,
+                EvolutionNodeState.Locked    => _lockedFrameSprite,
+                EvolutionNodeState.Hidden    => _hiddenFrameSprite,
+                _ => null
+            };
         }
 
         private void HandleNodeClicked(string nodeId) => HandleNodeClickedAsync(nodeId).Forget();
@@ -120,7 +146,7 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation
             _selectedNode = tappedNode;
 
             var state = _useCase.ClassifyNodeState(tappedNode, _currentNode);
-            bool isHiddenLocked = state == NodeState.Hidden;
+            bool isHiddenLocked = state == EvolutionNodeState.Hidden;
 
             // Build stats text
             var statsBuilder = new StringBuilder();
@@ -155,7 +181,7 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation
                 StatsText      = statsBuilder.ToString(),
                 ConditionsText = conditionsBuilder.ToString(),
                 SkillIcons     = skillIcons,
-                CanEvolve      = state == NodeState.Evolvable,
+                CanEvolve      = state == EvolutionNodeState.Evolvable,
                 IsHiddenLocked = isHiddenLocked
             };
 

@@ -3,6 +3,7 @@ using Samsara.Core.AssetLoading;
 using Samsara.Core.Navigation;
 using Samsara.Core.Popup;
 using Samsara.Features.Ending.Domain;
+using Samsara.Features.ReplayScene.Domain;
 using UnityEngine;
 
 namespace Samsara.Features.Ending.Presentation
@@ -144,6 +145,12 @@ namespace Samsara.Features.Ending.Presentation
         {
             // PendingEndingContext 소비
             _gameContext.PendingEndingContext = null;
+
+            // PendingReplayContext set — RunData.LastRunResult 기준 (Patch-005가 set한 값을 단순 복사 / Patch-006)
+            _gameContext.PendingReplayContext = new PendingReplayContext
+            {
+                PreviousRunResult = _gameContext.CharacterRunRepo.RunData.LastRunResult
+            };
 
             _sceneNavigator.NavigateToAsync(SceneKey.Replay).Forget();
 

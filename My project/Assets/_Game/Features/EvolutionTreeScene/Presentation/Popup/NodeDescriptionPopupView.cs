@@ -21,6 +21,8 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation.Popup
         private readonly string _logClass = $"[{nameof(NodeDescriptionPopupView)}]";
 
         [SerializeField] private GameObject _popupRoot;
+        [SerializeField] private Image _dimBackground;
+        [SerializeField] private Button _dimBackgroundButton;
         [SerializeField] private Image _nodeIconImage;
         [SerializeField] private TMP_Text _characterNameText;
         [SerializeField] private TMP_Text _statsText;
@@ -80,12 +82,14 @@ namespace Samsara.Features.EvolutionTreeScene.Presentation.Popup
         {
             _evolveButton.onClick.AddListener(HandleEvolveClicked);
             _closeButton.onClick.AddListener(HandleCloseClicked);
+            _dimBackgroundButton.onClick.AddListener(HandleCloseClicked);
         }
 
         private void OnDisable()
         {
             _evolveButton.onClick.RemoveListener(HandleEvolveClicked);
             _closeButton.onClick.RemoveListener(HandleCloseClicked);
+            _dimBackgroundButton.onClick.RemoveListener(HandleCloseClicked);
         }
 
         private void HandleEvolveClicked()

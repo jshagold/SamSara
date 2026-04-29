@@ -46,3 +46,29 @@ D-05 [DECISION] T21: MaintenanceScene 탐험 이벤트 미구현 — IsStageEndN
 D-06 [DECISION] Patch-005: GameContext.cs를 "Files to modify" 외 추가 수정
   - EndingUseCase 생성자에 ICharacterRunRepository 파라미터 추가로 인해 GameContext.cs의 new EndingUseCase(...) call site도 수정 필요.
   - Patch-005 "Files to modify" 목록에 GameContext.cs가 미포함이지만 생성자 시그니처 변경의 필수 연동 수정이므로 함께 처리.
+
+---
+
+# --- Patch-006 ---
+
+**Date:** 2026-04-29 | **Source:** ReplayScene Plan v2.0.0 §6-1 / §6-4
+
+EndingPresenter.HandleRestart에 PendingReplayContext set 추가 + using Samsara.Features.ReplayScene.Domain 추가. Patch-005가 RunData.LastRunResult에 저장한 값을 단순 복사 (Single Source of Truth).
+
+D-P6-01 [DECISION] GameContext.CharacterRunRepo 프로퍼티명 일치 확인
+  - Patch-006 본문 가정 ("실제 _gameContext.CharacterRunRepo 액세스 경로 / 프로퍼티명은 Claude Code가 GameContext.cs 읽고 정확히 미러링") 에 따른 검증.
+  - GameContext.cs L77: `public ICharacterRunRepository CharacterRunRepo => _characterRunRepo;` — 일치.
+  - 추가 작업 불필요. 정합성 추적 차원 기록.
+
+D-P6-02 [DECISION] PendingReplayContext namespace — Tasks T2 정의 namespace 일치
+  - Patch-006 가정 (`using Samsara.Features.ReplayScene.Domain;`) 와 실제 ReplayScene Tasks T2 정의 namespace (`Samsara.Features.ReplayScene.Domain`) 일치.
+  - 정상 적용. 별도 조정 없음.
+
+D-P6-03 [DECISION] HandleRestart 내부 set 위치 — PendingEndingContext = null 직후
+  - Patch-006 본문 "After" 코드 그대로 적용:
+    ```
+    _gameContext.PendingEndingContext = null;
+    _gameContext.PendingReplayContext = new PendingReplayContext { PreviousRunResult = ... };
+    _sceneNavigator.NavigateToAsync(SceneKey.Replay).Forget();
+    ```
+  - 기존 PendingEndingContext cleanup과 symmetrical 위치 — 가독성 + 리뷰 용이.

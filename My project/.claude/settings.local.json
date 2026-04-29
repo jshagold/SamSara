@@ -24,7 +24,22 @@
       "Bash(git diff *)",
       "Bash(git status *)",
       "Bash([ -d \"$feature_path/Presentation\" ])",
-      "Bash(sort echo *)"
+      "Bash(sort echo *)",
+      "mcp__claude_ai_Notion__notion-create-pages",
+      "PowerShell(Get-Content *)",
+      "PowerShell($f = \"C:\\\\Users\\\\admin\\\\Documents\\\\SamSara\\\\My project\\\\.tmp_replay_plan.md\"; $text = [System.IO.File]::ReadAllText\\($f\\); $patterns = @\\(\"OQ-X1\", \"OQ-X2\", \"OQ-P2\", \"OQ-G1\", \"NodeView\", \"EvolutionNodeView\", \"_originalIcon\", \"NodeDescriptionPopupView\", \"Dim\", \"raycastTarget\", \"EvolutionNodeState\", \"ReplayNodeState\", \"선행 Patch\", \"EvolutionTreeScene Patch\", \"SetFrameSprite\", \"SetIconSprite\", \"공유 컴포넌트\", \"공용 트리\"\\); foreach \\($p in $patterns\\) { $idx = 0; while \\(\\($idx = $text.IndexOf\\($p, $idx\\)\\) -ge 0\\) { $start = [Math]::Max\\(0, $idx - 100\\); $end = [Math]::Min\\($text.Length, $idx + 200\\); Write-Output \\(\"[\" + $p + \" @ \" + $idx + \"]\"\\); Write-Output $text.Substring\\($start, $end - $start\\).Replace\\(\"`n\", \" | \"\\); Write-Output \"---\"; $idx += 1; if \\($idx -gt $text.Length\\) { break } } })",
+      "PowerShell($f = \"C:\\\\Users\\\\admin\\\\Documents\\\\SamSara\\\\My project\\\\.tmp_replay_plan.md\"; $text = [System.IO.File]::ReadAllText\\($f\\); Write-Output \"=== OQ-X2 details \\(around 114971\\) ===\"; Write-Output $text.Substring\\(114000, 2500\\); Write-Output \"=== OQ-P2 details \\(around 113709\\) ===\"; Write-Output $text.Substring\\(112800, 2200\\))",
+      "PowerShell($f = \"C:\\\\Users\\\\admin\\\\Documents\\\\SamSara\\\\My project\\\\.tmp_replay_plan.md\"; $text = [System.IO.File]::ReadAllText\\($f\\); $patterns = @\\(\"9-3\", \"9-6\", \"5-9\", \"SetFrameSprite\", \"SetIconSprite\", \"SetUISprites\", \"ClassifyNodeState\"\\); foreach \\($p in $patterns\\) { $idx = 0; $count = 0; while \\(\\(\\($idx = $text.IndexOf\\($p, $idx\\)\\) -ge 0\\) -and \\($count -lt 3\\)\\) { $start = [Math]::Max\\(0, $idx - 80\\); $end = [Math]::Min\\($text.Length, $idx + 400\\); Write-Output \\(\"[\" + $p + \" @ \" + $idx + \"]\"\\); Write-Output $text.Substring\\($start, $end - $start\\).Replace\\(\"`n\", \" | \"\\); Write-Output \"---\"; $idx += 1; $count += 1 } })",
+      "PowerShell($f = \"C:\\\\Users\\\\admin\\\\Documents\\\\SamSara\\\\My project\\\\.tmp_replay_plan.md\"; $text = [System.IO.File]::ReadAllText\\($f\\); Write-Output \"=== Section 9-1 to 9-7 area \\(offset 86000-100000\\) ===\"; Write-Output $text.Substring\\(86000, 14000\\))",
+      "PowerShell($f = \"C:\\\\Users\\\\admin\\\\Documents\\\\SamSara\\\\My project\\\\.tmp_replay_plan.md\"; $text = [System.IO.File]::ReadAllText\\($f\\); $idx = $text.IndexOf\\(\"5-9\"\\); Write-Output \"=== Section 5-9 \\(offset around $idx\\) ===\"; Write-Output $text.Substring\\($idx, 6000\\))",
+      "PowerShell($f = \"C:\\\\Users\\\\admin\\\\Documents\\\\SamSara\\\\My project\\\\.tmp_replay_plan.md\"; $text = [System.IO.File]::ReadAllText\\($f\\); $idx = $text.IndexOf\\(\"### 5-9\"\\); if \\($idx -lt 0\\) { $idx = $text.IndexOf\\(\"## 5-9\"\\) }; Write-Output \\(\"Section 5-9 start at \" + $idx\\); Write-Output $text.Substring\\($idx, 6500\\))",
+      "Bash(jq -r '.[0].text' mcp-claude_ai_Notion-notion-fetch-1777435897042.txt)",
+      "Read(//tmp/**)",
+      "Bash(jq -r '.[0].text' mcp-claude_ai_Notion-notion-fetch-1777435898682.txt)",
+      "PowerShell(Out-File *)",
+      "PowerShell($f = \"C:\\\\Users\\\\admin\\\\.claude\\\\projects\\\\C--Users-admin-Documents-SamSara-My-project\\\\487a9df2-0033-4f37-b381-028e8e6b41b0\\\\tool-results\\\\mcp-claude_ai_Notion-notion-fetch-1777435897042.txt\"; $bytes = [System.IO.File]::ReadAllBytes\\($f\\); $bytes.Length)",
+      "Bash(python *)",
+      "Bash(git mv *)"
     ]
   }
 }
