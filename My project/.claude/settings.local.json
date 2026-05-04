@@ -39,7 +39,16 @@
       "PowerShell(Out-File *)",
       "PowerShell($f = \"C:\\\\Users\\\\admin\\\\.claude\\\\projects\\\\C--Users-admin-Documents-SamSara-My-project\\\\487a9df2-0033-4f37-b381-028e8e6b41b0\\\\tool-results\\\\mcp-claude_ai_Notion-notion-fetch-1777435897042.txt\"; $bytes = [System.IO.File]::ReadAllBytes\\($f\\); $bytes.Length)",
       "Bash(python *)",
-      "Bash(git mv *)"
+      "Bash(git mv *)",
+      "Bash(git -C \"C:/Users/admin/Documents/SamSara/My project\" log --oneline --all -- \"Assets/_Game/Features/Character/Domain/ICharacterRunRepository.cs\")",
+      "Bash(git -C \"C:/Users/admin/Documents/SamSara/My project\" show aac7142 --stat)",
+      "Bash(git -C \"C:/Users/admin/Documents/SamSara/My project\" log --all --oneline -p -- \"Assets/_Game/Features/Character/Domain/ICharacterRunRepository.cs\")",
+      "Bash(git *)",
+      "Bash(findstr /i \"b794367\")",
+      "Bash(findstr /n \"EvolutionStage HandleEvolution NavigateTo SceneKey 준비 Coming\")",
+      "Bash(git show *)",
+      "Bash(mkdir -p /c/temp)",
+      "Read(//c//**)"
     ]
   }
 }

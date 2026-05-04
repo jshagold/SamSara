@@ -127,8 +127,7 @@ namespace Samsara.Features.CharacterInfoScene.Presentation
 
         private void HandleEvolutionStageClicked()
         {
-            _popupManager.ShowConfirmAsync(
-                new PopupRequest("준비 중", "진화 트리는 준비 중입니다.", "확인")).Forget();
+            _sceneNavigator.NavigateToAsync(SceneKey.EvolutionTree).Forget();
         }
 
         private void HandleSkillSlotClicked(int index)

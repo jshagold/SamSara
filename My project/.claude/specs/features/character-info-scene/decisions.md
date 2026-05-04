@@ -43,3 +43,15 @@ D-10 [DECISION] 버리기는 YesNo 확인 팝업 선행, 사용은 즉시 실행
 D-11 [DECISION] 사용/버리기 완료 후 RefreshStats()/RefreshInventory() 호출로 화면 즉시 갱신.
 **Why:** 아이템 사용 시 스탯이 변경되고, 버리기/사용 후 슬롯 수량이 감소하므로 StatListView와 InventoryView를 즉시 갱신해야 UI와 데이터 불일치 방지.
 **How to apply:** UseItemAsync 완료 후 RefreshStats + RefreshInventory, DiscardItemAsync 완료 후 RefreshInventory만 호출.
+
+D-12 [SPEC-GAP] v2.0.0 인벤토리 작업(commit `df89a16`, 2026-04-15)에서 patch-002의 EvolutionTree 내비게이션이 우발적으로 회귀됨 — 2026-05-04 복구.
+**Why:** 
+- 2026-04-07 patch-002 적용(commit `b794367`): `HandleEvolutionStageClicked()`를 "Coming Soon" 팝업 stub에서 `_sceneNavigator.NavigateToAsync(SceneKey.EvolutionTree).Forget();`로 교체.
+- 2026-04-15 v2.0.0 인벤토리 기능 추가(commit `df89a16`): `CharacterInfoPresenter.cs`를 230줄 규모로 리라이트하면서(126줄 → 251줄) 식별자 일괄 리네임(예: `EvolutionStageButtonView` → `EvolutionStageButton`, `InfoScrollView` → `InfoScroll` 등) 수반. 이 리라이트 과정에서 `HandleEvolutionStageClicked()` 본문이 patch-002 이전 상태("준비 중 / 진화 트리는 준비 중입니다" 팝업)로 되돌아감.
+- v2.0.0 spec(`tasks.md` v2.0.0 §1 "Scope: Presentation layer changes only" — 인벤토리 추가만 명시) 및 `decisions.md` D-01~D-11 어디에도 EvolutionTree 내비게이션을 되돌리는 결정/지시 없음. 사용자도 그런 지시를 내린 적 없음을 확인(2026-05-04).
+- 즉 v2.0.0 구현자(Claude)가 "파일 수정"을 "파일 재작성"으로 해석하면서 patch-002 변경분을 보존하지 못한 우발적 회귀.
+- ReplayScene 작업 중 컴파일 에러(CS0535, CharacterRepository Patch-003 별건) 조사 과정에서 23개 patch 일괄 audit 시 발견(2026-05-04).
+
+**How to apply:**
+- `CharacterInfoPresenter.cs:128-132` 본문을 `_sceneNavigator.NavigateToAsync(SceneKey.EvolutionTree).Forget();` 단일 호출로 복구 (2026-05-04 적용).
+- 향후 "기존 파일 Modify" 지시 시 구현자는 **재작성이 아니라 최소 차분 패치** 원칙으로 작업해야 함. tasks.md v2.0.0 Prerequisites §2가 이미 "Read the following existing files before making changes"를 명시했음에도 위반된 사례 — 향후 패치 작성 시 "Preserve all existing behavior except the specified additions" 류의 명시 필요 검토.

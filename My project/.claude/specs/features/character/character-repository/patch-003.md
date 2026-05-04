@@ -6,6 +6,31 @@
 
 ---
 
+## ⚠️ Retroactive Correction (2026-05-04)
+
+**This patch was originally applied in commit `aac7142` (2026-04-21) but was incomplete.**
+
+The "Claude Code Implementation Guide" → "Files to modify" section below
+(line 121-123 in original) **omitted `Assets/_Game/Features/Character/Domain/ICharacterRunRepository.cs`**.
+
+§3 of this patch changes the public method signature on `CharacterRunRepository`,
+which implements `ICharacterRunRepository`. C# requires the interface declaration
+to match the implementation; an optional parameter does NOT satisfy a no-parameter
+interface contract — they are distinct overloads. CS0535 was the inevitable consequence
+once a two-argument caller (`GameContext.ResetRunForReplayAsync`) was added.
+
+**Corrective actions taken on 2026-05-04:**
+1. `ICharacterRunRepository.cs:9` updated:
+   `void InitializeNewRun(RunConfigSO config, int? overrideEvolutionNodeId = null);`
+2. SPEC-GAP recorded as **D-04** in `.claude/specs/features/character/character-repository/decisions.md`.
+3. The "Files to modify" list below should be read as if it ALSO included
+   `Assets/_Game/Features/Character/Domain/ICharacterRunRepository.cs`.
+
+**Future patches:** When changing a class's public method signature, the matching
+interface file (if any) MUST be included in "Files to modify".
+
+---
+
 ## Background
 
 Three CharacterRepository-side changes are required as preceding work for ReplayScene implementation.
