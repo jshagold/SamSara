@@ -62,3 +62,17 @@ D-14 [DECISION] MerchantDialogue 클래스와 MerchantDialogueAdapter를 삭제�
 **주의:** MerchantSO .asset 파일의 기존 대사 데이터(_text → _dialogueText 필드명 불일치)는 직렬화 초기화됨 — Unity Editor에서 재입력 필요.
 **Why:** Tasks v2.0.0 명세 준수. 인벤토리가 꽉 찬 상태에서 골드 차감 후 AddItem 실패 시 골드 손실이 발생하는 버그를 방지하기 위해 가장 먼저 체크.
 **How to apply:** CanAddItem → OutOfStock → InsufficientGold 순서 유지. AddItem 실패(race condition 등)는 방어적으로 InventoryFull을 반환.
+
+D-15 [BACKLOG] ShopRepository.ResetRunData()와 InitializeNewRun(RunConfigSO) 중복 — Phase 6 종료 후 코드 검토 단계에서 처리 예정.
+**Why:**
+- `IShopRepository.cs:18-19`에 `InitializeNewRun(RunConfigSO)`와 `ResetRunData()` 두 메서드가 모두 선언되어 있고, `ShopRepository.cs:98` `InitializeNewRun()` 본문과 `:106` `ResetRunData()` 본문이 100% 동일 (`_runData = new ShopRunData(); _isDirty = true;`).
+- `ShopUseCase.cs:187` `public void ResetRunData() => _shopRepo.ResetRunData();`는 레거시 wrapper. 실제 reset 경로는 `GameContext.ResetRunForReplayAsync(line 229)`의 `ShopRepo.InitializeNewRun(RunConfig)` 호출이 담당하므로 dead code path.
+- InventorySystem patch-001(2026-04-21)에서 InventoryRepository의 `ResetRunData() → InitializeNewRun(RunConfigSO)` 통일 작업이 수행됐으나, ShopRepository에 동일 작업이 빠짐.
+- ReplayScene 작업 중 23개 patch 일괄 audit 시 발견(2026-05-04). 기능 버그는 아니지만 코드 중복 + 호출자 inconsistency.
+**How to apply:**
+- `IShopRepository.ResetRunData()` 선언 제거.
+- `ShopRepository.ResetRunData()` 구현 제거.
+- `ShopUseCase.ResetRunData()` 본문을 `_shopRepo.InitializeNewRun(_runConfig)` 호출로 변경 (ShopUseCase가 RunConfigSO를 보유하지 않을 경우 GameContext 경유 또는 wrapper 자체 제거).
+- 코드베이스 전체에서 `ResetRunData(` grep 후 잔여 호출자 정리.
+- 처리 시점: **Phase 6 (ReplayScene + SplashScene) 종료 후 통합 코드 검토/리팩토링 단계.**
+- 참조 패턴: `inventory-system/patch-001.md`
