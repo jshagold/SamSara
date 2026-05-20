@@ -404,7 +404,7 @@ public class InventorySystemTest : MonoBehaviour
             Hp = 50, MaxHp = 100,
             Strength = 10, Toughness = 10, Agility = 10
         };
-        public void   InitializeNewRun(RunConfigSO config) { }
+        public void   InitializeNewRun(RunConfigSO config, int? overrideEvolutionNodeId = null) { }
         public void   MarkDirty()                          { }
         public UniTask SaveDataAsync()                     => UniTask.CompletedTask;
         public void   SaveDataSync()                       { }
