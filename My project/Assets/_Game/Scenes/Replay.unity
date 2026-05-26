@@ -1340,10 +1340,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Features.ReplayScene.Presentation.ReplaySceneBootstrapper
   _view: {fileID: 832926790}
   _stateVisualConfig:
-    SelectableFrameSpriteKey: 
-    LockedFrameSpriteKey: 
-    HiddenFrameSpriteKey: 
-    QuestionMarkSpriteKey: 
+    SelectableFrameSpriteKey: node_frame_current
+    LockedFrameSpriteKey: node_frame_locked
+    HiddenFrameSpriteKey: node_frame_hidden
+    QuestionMarkSpriteKey: node_frame_hidden
 --- !u!4 &855325045
 Transform:
   m_ObjectHideFlags: 0
@@ -2299,7 +2299,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -50}
+  m_AnchoredPosition: {x: 0, y: -50.000015}
   m_SizeDelta: {x: 0, y: -100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1075398919
@@ -2316,8 +2316,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Samsara.Core.Tree.TreeScrollView
   _scrollRect: {fileID: 1075398920}
   _content: {fileID: 1475402961}
-  _nodePrefab: {fileID: 0}
-  _connectionPrefab: {fileID: 0}
+  _nodePrefab: {fileID: 328215907469461619, guid: 1fb08ce9d36c8c643ac0bdccfe0f8bca,
+    type: 3}
+  _connectionPrefab: {fileID: 125179027494942462, guid: de5a2052e5b243145b3bc1a100ba2b34,
+    type: 3}
 --- !u!114 &1075398920
 MonoBehaviour:
   m_ObjectHideFlags: 0
