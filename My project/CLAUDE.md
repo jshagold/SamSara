@@ -53,7 +53,8 @@
 
 - 어디를 봐야 할지 모르면 루트에서 해당 영역의 상위 페이지("들어갈 것 / 들어가지 않을 것 / 구분 기준")부터 확인한다.
 - 작업 방법·양식·운영 규칙은 자동 로드된 지침이 1차 출처다. 지침에 답이 있으면 노션을 fetch하지 않는다.
-- 노션의 CLAUDE.md / 지침 / Constitution 페이지가 단일 출처(SSOT)다. 로컬 파일은 그 사본이며, 노션 변경 시 동기화한다.
+- **지침 / Constitution**: 노션이 단일 출처(SSOT). 로컬 `.md`는 Claude Code용 사본이며, 노션 변경 시 동기화한다.
+- **CLAUDE.md**: 로컬 파일이 작업 원본. 노션의 CLAUDE.md 페이지는 아카이브/공유용 스냅샷(추후 합류 개발자용)이며, 로컬 갱신 시 동기화한다.
 
 > 프로젝트 문서 개편 진행 중 — "진행 상태(Project Status)" 페이지는 현재 부재 상태이며 개편 결과에 따라 신설 또는 폐기 예정. 결정되면 이 표와 체크리스트를 갱신한다.
 
@@ -70,7 +71,4 @@
 
 ---
 
-## Changelog
-
-- **2.0.0 (2026-05-28)** — 전면 재작성. 운영 규칙은 `ClaudeProjectInstruction.md`(v2.0.0)로 분리하고 `@` import로 자동 로드. 아키텍처/코딩 규칙은 Constitution이 단일 출처임을 명확화. CLAUDE.md는 부트스트랩 역할로 축소. 한국어 전환. 노션 진입점을 Samsara Project 루트 페이지로 지정하고, 옛 Project Status Page ID 제거(Project Status 페이지는 문서 개편 중 부재). CLAUDE.md를 노션의 SSOT 페이지로 관리하도록 표에 추가.
-- **1.3.0 (2026-03-30)** — Decisions Tags, Patch Files, Project Status, Spec Document Locations 추가.
+변경 이력은 노션 `루트 > 개발 tech 문서 > CLAUDE.md > Changelog` 자식 페이지에서 관리한다 (로컬은 자동 로드 컨텍스트 절감 목적으로 미보유).
