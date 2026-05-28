@@ -1,196 +1,76 @@
 # CLAUDE.md — Samsara Project
 
-**Version:** 1.3.0 | **Date:** 2026-03-30
+**Version:** 2.0.0 | **Date:** 2026-05-28
 
-This file is automatically read by Claude Code on startup.
-Read this before any Spec files. Apply all rules here to every file you create.
-
----
-
-## Constitution (Architecture Bible)
-
-**IMPORTANT: Read `constitution.md` before any implementation.**
-
-- All rules in this CLAUDE.md are derived from the Constitution.
-- In case of conflict between this file and the Constitution, **Constitution takes precedence.**
-- Every architectural decision must comply with the Constitution.
-
-### Reference Documents
-- Constitution: `.claude/constitution.md`
+이 파일은 Claude Code가 시작 시 자동으로 읽는 부트스트랩 문서다.
+운영 규칙(지침)과 아키텍처 규칙(Constitution)으로 가는 진입점 역할만 한다.
 
 ---
 
-## Project Overview
+## 지침 자동 로드
 
-- **Project:** Samsara
-- **Platform:** Mobile (Android / iOS)
-- **Engine:** Unity 6.2
-- **Architecture:** Feature-based Modular Architecture (DDD + Clean Architecture)
+@.claude/ClaudeProjectInstruction.md
+
+위 파일이 Samsara 프로젝트의 운영 규칙을 담는다.
+- 도구 분담 (Claude Code / Web / Gemini)
+- 절대 규칙 (추측 금지, Constitution 우선, UI 텍스트 하드코딩 금지)
+- 아키텍처 레드라인 요약
+- 노션 구조 안내
+- AI Spec 작업 운영 (Status / Specify / Plan / Tasks / Decisions / Patch / Backlog)
+- 작업 진행 원칙 (승인 흐름, 질문 규율)
+- 응답 스타일 (한국어 존댓말)
+- Notion 문서 작성 규칙
+- 버전 관리 & Changelog
+
+이 CLAUDE.md와 충돌 시 지침이 우선한다.
 
 ---
 
-## Path Rules (Non-Negotiable)
+## Constitution (아키텍처 바이블)
 
-All scripts MUST be inside `Assets/_Game/`. `Assets/Scripts/` does NOT exist.
+**구현 착수 전 `.claude/constitution.md`를 반드시 읽는다.**
 
-| Folder | Purpose |
+- 모든 아키텍처 결정의 단일 출처
+- 폴더 구조, Bootstrapper 계층, DI 규칙, Coding Standards, Data Persistence, Libraries 등
+- 지침 / CLAUDE.md와 충돌 시 Constitution이 우선
+- 현재 read-only 상태 (수정은 명시적 승인 필요)
+
+---
+
+## 노션 진입점
+
+**Samsara Project (루트):** https://www.notion.so/Samsara-Project-30252975d2df8073a47cf33c53e3703d
+
+이 루트 페이지 아래에 지침 §4의 5개 영역(로드맵 / 게임 정의·기획 / 개발 tech 문서 / AI Spec 문서 / 일지)이 위치한다.
+
+| 영역 / 문서 | 위치 |
 |---|---|
-| `Assets/_Game/App/` | GlobalBootstrapper, GameContext, top-level wiring |
-| `Assets/_Game/Core/` | Shared interfaces, base classes, utilities |
-| `Assets/_Game/Features/` | Independent game modules (Inventory, Battle, etc.) |
-| `Assets/_Game/Scenes/` | Scene files and SceneBootstrappers |
-| `Assets/Resources/MasterData/` | ScriptableObject .asset files ONLY |
+| CLAUDE.md (원본) | 루트 > 개발 tech 문서 > CLAUDE.md |
+| Claude Project Instruction / 지침 (원본) | 루트 > 개발 tech 문서 > Claude Project Instruction (지침) |
+| Constitution (원본) | 루트 > 개발 tech 문서 > Constitution |
+| AI Spec 문서 영역 | 루트 > AI Spec 문서 |
+| 로드맵 | 루트 > 로드맵 |
+
+- 어디를 봐야 할지 모르면 루트에서 해당 영역의 상위 페이지("들어갈 것 / 들어가지 않을 것 / 구분 기준")부터 확인한다.
+- 작업 방법·양식·운영 규칙은 자동 로드된 지침이 1차 출처다. 지침에 답이 있으면 노션을 fetch하지 않는다.
+- 노션의 CLAUDE.md / 지침 / Constitution 페이지가 단일 출처(SSOT)다. 로컬 파일은 그 사본이며, 노션 변경 시 동기화한다.
+
+> 프로젝트 문서 개편 진행 중 — "진행 상태(Project Status)" 페이지는 현재 부재 상태이며 개편 결과에 따라 신설 또는 폐기 예정. 결정되면 이 표와 체크리스트를 갱신한다.
 
 ---
 
-## Architecture Rules
+## 구현 착수 전 체크리스트
 
-### Dependency Injection
-- Logic classes (Presenter, UseCase, Repository) MUST use constructor injection.
-- `new` keyword is FORBIDDEN inside Logic classes.
-- `Singleton.Instance` access is FORBIDDEN inside Logic classes.
-- `new` is ONLY allowed inside `*Bootstrapper.cs` files.
-
-### Bootstrapper Hierarchy
-1. **GlobalBootstrapper** — Core system init, the ONLY allowed Singleton (`DontDestroyOnLoad`)
-2. **SceneBootstrapper** — Scene orchestrator. Initializes FeatureBootstrappers from `Start()`.
-3. **FeatureBootstrapper** — Passive. NO `Start()`/`Awake()` logic. Waits for `.Initialize()` from SceneBootstrapper.
-
-### Forbidden Patterns
-
-| Forbidden | Correct Alternative |
-|---|---|
-| `Manager.Instance` Singleton | DI via GameContext |
-| `new` inside Logic classes | Instantiate in Bootstrapper only |
-| Direct UI manipulation in Presenter | Delegate to View methods |
-| `Assets/Scripts/` path | Use `Assets/_Game/` |
-| Textures/Audio in `Resources/` | Direct Reference or Addressables |
-| Hardcoded game data | MasterData (ScriptableObject) |
-| LINQ / `new` inside `Update()` | Pre-allocated arrays / cached values |
+- [ ] 지침이 자동 로드되어 있는지 확인 (이 파일 상단 `@.claude/ClaudeProjectInstruction.md`)
+- [ ] Constitution 해당 섹션 확인 (`.claude/constitution.md`)
+- [ ] 필요 시 노션 루트(Samsara Project)에서 해당 작업 영역 fetch (현재 Project Status 페이지 부재 — 개편 중)
+- [ ] 대상 작업의 Specify / Plan / Tasks (또는 Patch) 확인
+- [ ] `Assets/_Game/` 경로 규칙 확인
+- [ ] 참조 파일 존재 여부 확인 — 없으면 빈 인터페이스 stub 먼저 생성
 
 ---
 
-## Libraries
+## Changelog
 
-| Library | Purpose | Import |
-|---|---|---|
-| UniTask | All async/await | `using Cysharp.Threading.Tasks;` |
-| DOTween | Tween animation | `using DG.Tweening;` |
-| Newtonsoft.Json | Serialization | `using Newtonsoft.Json;` |
-| TextMeshPro | UI text | `using TMPro;` |
-
-- Standard C# `Task` and Coroutines are FORBIDDEN. Use UniTask only.
-- Fire-and-Forget: use `.Forget()`.
-
----
-
-## Coding Standards
-
-### Naming
-- Public / Methods: `PascalCase`
-- Private fields: `_camelCase` (underscore prefix)
-- Suffixes: `*View`, `*Presenter`, `*UseCase`, `*Repository`, `*SO`
-
-### Log Tag
-Add to every class:
-
-    private readonly string _logClass = $"[{nameof(ClassName)}]";
-
-### Fail Fast
-- NO null-guard on `[SerializeField]` UI components. NullReferenceException must fire immediately.
-- On data integrity failure: throw `InvalidOperationException` immediately.
-
-### Safe Cleanup
-- In `OnDestroy()` / `Dispose()`: use `?.` null-conditional operator, NOT null checks.
-- Reason: prevents Exception Masking.
-
-### Inspector Variables
-- Declare as `[SerializeField] private`. Never use `public` fields for internal state.
-
----
-
-## Data Persistence Rules
-
-- **Save Strategy:** Save-on-Action (save immediately on data change, no timer-based saves)
-- **Async save:** `UniTask SaveDataAsync()` — for normal gameplay
-- **Sync save:** `void SaveDataSync()` — ONLY for `OnApplicationPause` / `OnApplicationQuit`. async is STRICTLY FORBIDDEN here.
-- **I/O:** MUST be offloaded to ThreadPool via `UniTask.RunOnThreadPool`
-- **Serialization:** Use Newtonsoft.Json
-
----
-
-## Decisions Tags (Required)
-
-When recording judgments in `decisions.md`, you MUST use one of these tags:
-
-| Tag | Meaning | What happens next |
-|---|---|---|
-| `[DECISION]` | Code-level judgment call | Uploaded to Notion Decisions page |
-| `[BACKLOG]` | Temporary implementation, needs real impl later | Moved to Notion Backlog page |
-| `[SPEC-GAP]` | Spec was missing a needed definition | Hak reviews, may trigger Specify version-up |
-
-Format each entry like:
-
-    D-01 [DECISION] Used coroutine instead of DOTween for gauge animation
-    D-02 [BACKLOG] Skill detail popup not implemented — showing name only
-    D-03 [SPEC-GAP] Inventory section integration method not defined in Specify
-
-Every entry MUST have exactly one tag. Do not mix tags or omit them.
-
----
-
-## Patch Files
-
-When Hak provides a Patch file (`.claude/specs/[feature-name]/patch-NNN.md`):
-- Read the Patch file as your primary guide (instead of tasks.md)
-- Modify ONLY the files specified in the Patch
-- Do NOT create new files unless the Patch explicitly instructs it
-- Record any additional judgments in `decisions.md` with appropriate tags
-- Follow the Claude Code Implementation Guide section in the Patch
-
----
-
-## Project Status (Notion)
-
-Project-wide editor state, scene configurations, global decisions, and manual task completion are tracked in the Notion **Project Status** document.
-
-**Notion Page ID:** `32652975d2df812f93abd1eecf7dd634`
-
-Before any implementation, use Notion MCP to fetch this page and review:
-- Current scene configurations (cameras, objects, Canvas setup)
-- Global decisions (e.g., Bootstrap scene has no camera)
-- Manual tasks that must be completed in Unity Editor
-- Known issues
-
----
-
-## Spec Document Locations
-
-All Spec documents are in Notion.
-
-| Feature | Location |
-|---|---|
-| Project Status | `문서 > Project Status` |
-| GlobalBootstrapper + GameContext | `문서 > [App] > GlobalBootstrapper + GameContext` |
-| SceneNavigator | `문서 > [Core] > SceneNavigator` |
-| PopupManager | `문서 > [Core] > PopupManager` |
-| Error Handling | `문서 > [Core] > Error Handling` |
-| CharacterRepository | `문서 > [Features] > CharacterRepository` |
-| StageRepository | `문서 > [Features] > StageRepository` |
-| MainScene | `문서 > [Features] > MainScene` |
-| MasterData (Character, Stage, Enemy, Event) | `문서 > [Features] > MasterData` |
-
-When implementing from Tasks: use the **Tasks-MD** file as your primary guide.
-When implementing from Patch: use the **Patch-NNN-MD** file as your primary guide.
-
----
-
-## Pre-Implementation Checklist
-
-- [ ] Read this entire CLAUDE.md
-- [ ] Read `constitution.md` (project root)
-- [ ] Fetch **Project Status** from Notion (Page ID: `32652975d2df812f93abd1eecf7dd634`) and review current state
-- [ ] Open the Tasks-MD (or Patch-MD) for the target Feature
-- [ ] Verify `Assets/_Game/` path rules
-- [ ] Confirm all referenced files in Tasks exist
-  - If missing → create empty interface stubs first, then proceed
+- **2.0.0 (2026-05-28)** — 전면 재작성. 운영 규칙은 `ClaudeProjectInstruction.md`(v2.0.0)로 분리하고 `@` import로 자동 로드. 아키텍처/코딩 규칙은 Constitution이 단일 출처임을 명확화. CLAUDE.md는 부트스트랩 역할로 축소. 한국어 전환. 노션 진입점을 Samsara Project 루트 페이지로 지정하고, 옛 Project Status Page ID 제거(Project Status 페이지는 문서 개편 중 부재). CLAUDE.md를 노션의 SSOT 페이지로 관리하도록 표에 추가.
+- **1.3.0 (2026-03-30)** — Decisions Tags, Patch Files, Project Status, Spec Document Locations 추가.
